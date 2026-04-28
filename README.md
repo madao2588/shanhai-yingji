@@ -1,5 +1,7 @@
 # 山海映记
 
+线上地址：[https://madao2588.github.io/shanhai-yingji/](https://madao2588.github.io/shanhai-yingji/)
+
 山海映记是一个本地优先的移动端旅行影像档案原型。它把旅行地图、日记、目的地点评、照片导入、长图生成、个人档案管理，以及本地 JSON 导入/导出放在一个静态前端页面里。
 
 ## 功能概览
@@ -53,6 +55,8 @@ node tests\browser-flow.test.mjs
 
 > 浏览器测试依赖 Codex 桌面运行时里自带的 Playwright 包；如果在普通环境运行，需要自行安装 Playwright。
 
+GitHub Actions 会在 push 和 pull request 时自动运行语法检查和 Node 级测试；浏览器流程测试仍作为本地验证保留。
+
 ## 项目结构
 
 ```text
@@ -99,7 +103,11 @@ node tests\browser-flow.test.mjs
 
 ## GitHub Pages
 
-这是静态站点，可以直接用 GitHub Pages 发布：
+这是静态站点，已通过 GitHub Pages 发布：
+
+[https://madao2588.github.io/shanhai-yingji/](https://madao2588.github.io/shanhai-yingji/)
+
+如需重新配置：
 
 1. 打开仓库 `Settings -> Pages`。
 2. Source 选择 `Deploy from a branch`。
