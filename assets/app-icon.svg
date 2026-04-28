@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="山海映记图标">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="70%">
+      <stop offset="0%" stop-color="#1f6f6a" stop-opacity=".42"/>
+      <stop offset="58%" stop-color="#15191d"/>
+      <stop offset="100%" stop-color="#101214"/>
+    </radialGradient>
+    <linearGradient id="route" x1="46" y1="164" x2="204" y2="84" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#d6b56d"/>
+      <stop offset="62%" stop-color="#f2c777"/>
+      <stop offset="100%" stop-color="#ff7a5c"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="url(#bg)"/>
+  <path d="M45 156c35-46 73-58 113-39 23 11 38 6 53-16" fill="none" stroke="url(#route)" stroke-width="8" stroke-linecap="round" filter="url(#glow)"/>
+  <circle cx="128" cy="128" r="48" fill="none" stroke="#f5efe4" stroke-opacity=".92" stroke-width="8"/>
+  <circle cx="128" cy="128" r="67" fill="none" stroke="#d6b56d" stroke-opacity=".25" stroke-width="2"/>
+  <circle cx="188" cy="91" r="13" fill="#ff7a5c" filter="url(#glow)"/>
+  <path d="M69 189c19-15 43-16 65-5 21 10 44 10 65-7" fill="none" stroke="#f5efe4" stroke-opacity=".16" stroke-width="3" stroke-linecap="round"/>
+</svg>

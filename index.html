@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>山海映记</title>
+    <link rel="icon" href="assets/app-icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="stage" aria-label="山海映记移动端原型">
+      <section class="phone" aria-label="山海映记应用界面">
+        <div class="app">
+          <section class="splash" id="splash" aria-label="入场加载界面">
+            <canvas id="splashCanvas" aria-hidden="true"></canvas>
+            <div class="splash-map" aria-hidden="true">
+              <span class="contour contour-a"></span>
+              <span class="contour contour-b"></span>
+              <span class="contour contour-c"></span>
+            </div>
+            <div class="splash-content">
+              <div class="brand-mark brand-mark-large" aria-hidden="true">
+                <span class="aperture"></span>
+                <span class="route-line"></span>
+                <span class="route-dot"></span>
+              </div>
+              <h1>山海映记</h1>
+              <p>正在展开你的山海地图</p>
+              <div class="progress-ring" aria-hidden="true"></div>
+            </div>
+          </section>
+
+          <div class="screens">
+            <section class="screen record-screen is-active" data-screen="record" aria-label="我的山海档案">
+              <header class="topbar">
+                <div>
+                  <p class="eyebrow">私人旅行影像档案</p>
+                  <h2>我的山海档案</h2>
+                </div>
+                <button class="icon-button profile-button" type="button" aria-label="个人资料" data-open-profile>
+                  <span></span>
+                </button>
+              </header>
+
+              <section class="year-summary" aria-label="年度旅行摘要">
+                <span data-summary-year>2026</span>
+                <i></i>
+                <span data-summary-country>4 个国家</span>
+                <i></i>
+                <span data-summary-city>12 座城市</span>
+                <i></i>
+                <span data-summary-memory>28 篇映记</span>
+              </section>
+
+              <section class="mode-panel" aria-label="记录模式">
+                <div class="mode-switch" role="tablist" aria-label="地图和日记切换">
+                  <button class="mode-tab is-active" type="button" role="tab" aria-selected="true" data-mode="map">地图</button>
+                  <button class="mode-tab" type="button" role="tab" aria-selected="false" data-mode="diary">日记</button>
+                </div>
+
+                <div class="mode-view map-view is-active" id="mapView">
+                  <article class="map-card">
+                    <div class="map-header">
+                      <div>
+                        <p>足迹总览</p>
+                        <strong>从东京到雷克雅未克</strong>
+                      </div>
+                      <span>12 城市</span>
+                    </div>
+
+                    <div class="archive-map" aria-label="个人世界地图">
+                      <svg viewBox="0 0 720 420" role="img" aria-label="世界地图足迹与旅行路线">
+                        <defs>
+                          <linearGradient id="routeGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#d6b56d" />
+                            <stop offset="55%" stop-color="#ff7a5c" />
+                            <stop offset="100%" stop-color="#6fc8bd" />
+                          </linearGradient>
+                          <filter id="softGlow">
+                            <feGaussianBlur stdDeviation="4" result="blur" />
+                            <feMerge>
+                              <feMergeNode in="blur" />
+                              <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                          </filter>
+                        </defs>
+                        <g class="grid">
+                          <path d="M80 80 H650 M70 145 H660 M60 210 H670 M70 275 H660 M90 340 H640" />
+                          <path d="M135 54 V366 M240 42 V382 M360 36 V390 M480 44 V382 M585 58 V366" />
+                        </g>
+                        <g class="continents">
+                          <path d="M95 126 C126 74 188 64 234 94 C270 118 286 161 260 197 C236 231 174 226 145 257 C120 284 86 260 81 220 C76 180 70 157 95 126 Z" />
+                          <path d="M214 253 C242 236 287 243 305 276 C326 315 304 367 268 383 C239 395 214 370 215 332 C216 302 188 274 214 253 Z" />
+                          <path d="M330 107 C380 70 448 78 492 116 C535 154 542 216 500 250 C466 278 414 268 382 292 C350 316 308 302 294 261 C281 223 286 140 330 107 Z" />
+                          <path d="M438 231 C478 220 526 236 551 270 C578 307 560 355 515 361 C478 366 444 341 430 305 C417 270 403 242 438 231 Z" />
+                          <path d="M523 111 C566 86 632 100 660 142 C684 179 660 224 613 224 C571 224 542 195 510 188 C475 181 484 134 523 111 Z" />
+                          <path d="M548 302 C579 278 636 286 660 323 C682 356 648 387 604 377 C562 368 516 327 548 302 Z" />
+                        </g>
+                        <g class="visited">
+                          <path d="M523 111 C566 86 632 100 660 142 C684 179 660 224 613 224 C571 224 542 195 510 188 C475 181 484 134 523 111 Z" />
+                          <path d="M438 231 C478 220 526 236 551 270 C578 307 560 355 515 361 C478 366 444 341 430 305 C417 270 403 242 438 231 Z" />
+                        </g>
+                        <path class="travel-route route-shadow" d="M579 169 C520 98 447 98 405 143 C348 205 455 284 308 311 C247 322 217 288 185 262" />
+                        <path class="travel-route" d="M579 169 C520 98 447 98 405 143 C348 205 455 284 308 311 C247 322 217 288 185 262" />
+                        <g class="city-pin" transform="translate(579 169)"><circle r="9" /><circle r="3" /></g>
+                        <g class="city-pin city-gold" transform="translate(356 108)"><circle r="7" /><circle r="2.5" /></g>
+                        <g class="city-pin city-gold" transform="translate(368 175)"><circle r="7" /><circle r="2.5" /></g>
+                        <g class="city-pin" transform="translate(185 262)"><circle r="7" /><circle r="2.5" /></g>
+                      </svg>
+
+                      <div class="photo-fragment fragment-a">
+                        <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=260&q=80" alt="京都旅行照片" />
+                        <span>Kyoto</span>
+                      </div>
+                      <div class="photo-fragment fragment-b">
+                        <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=260&q=80" alt="冰岛旅行照片" />
+                        <span>Iceland</span>
+                      </div>
+                      <div class="year-chip">2026</div>
+                    </div>
+
+                    <div class="map-metrics" aria-label="旅行统计">
+                      <div><strong>18,420</strong><span>公里路线</span></div>
+                      <div><strong>46</strong><span>张精选照片</span></div>
+                      <div><strong>7</strong><span>段回望</span></div>
+                    </div>
+                  </article>
+                </div>
+
+                <div class="mode-view diary-view" id="diaryView">
+                  <article class="diary-feature">
+                    <img src="https://images.unsplash.com/photo-1528164344705-47542687000d?auto=format&fit=crop&w=720&q=82" alt="京都清水寺照片" />
+                    <div>
+                      <p>04 月 12 日 · 京都</p>
+                      <h3>雨后的清水寺</h3>
+                      <span>石板路还在反光，风里有樱花落下来的声音。</span>
+                    </div>
+                  </article>
+                  <div class="timeline" data-diary-timeline>
+                    <article><time>03.28</time><div><h3>冰岛环岛第 3 天</h3><p>黑沙滩、海风和一场迟到的日落。</p></div></article>
+                    <article><time>02.16</time><div><h3>巴黎左岸一小时</h3><p>把咖啡、旧书摊和塞纳河放进一篇映记。</p></div></article>
+                    <article class="continue-card"><time>今天</time><div><h3>继续记录</h3><p>补完下一段山海。</p></div></article>
+                  </div>
+                </div>
+              </section>
+
+              <section class="memory-strip" aria-label="最近映记">
+                <div class="section-title">
+                  <p>最近映记</p>
+                  <button type="button" data-open-archive>全部</button>
+                </div>
+                <div class="memory-row" data-memory-row>
+                  <article>
+                    <img src="https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=420&q=82" alt="京都街景照片" />
+                    <h3>京都 · 雨后的清水寺</h3>
+                    <p>12 张照片 · 1,240 字</p>
+                  </article>
+                  <article>
+                    <img src="https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?auto=format&fit=crop&w=420&q=82" alt="冰岛山脉照片" />
+                    <h3>冰岛环岛第 3 天</h3>
+                    <p>9 张照片 · 860 字</p>
+                  </article>
+                </div>
+              </section>
+            </section>
+
+            <section class="screen archive-screen" data-screen="archive" aria-label="全部映记档案">
+              <header class="detail-topbar">
+                <button class="back-button" type="button" data-archive-back aria-label="返回记录"></button>
+                <div>
+                  <p class="eyebrow">私人旅行档案库</p>
+                  <h2>全部映记</h2>
+                </div>
+              </header>
+
+              <section class="archive-search" aria-label="搜索映记">
+                <span class="search-glyph" aria-hidden="true"></span>
+                <input type="search" placeholder="搜索城市、国家、标题或片段" data-archive-search aria-label="搜索城市、国家、标题或片段" />
+              </section>
+
+              <div class="archive-filter-row" aria-label="档案筛选">
+                <button class="is-active" type="button" data-archive-filter="all">全部</button>
+                <button type="button" data-archive-filter="japan">日本</button>
+                <button type="button" data-archive-filter="iceland">冰岛</button>
+                <button type="button" data-archive-filter="year-2026">2026</button>
+                <button type="button" data-archive-filter="saved">已保存</button>
+              </div>
+
+              <p class="archive-count" data-archive-count>2 篇映记</p>
+              <section class="archive-list" data-archive-list aria-label="映记结果列表"></section>
+              <p class="archive-empty" data-archive-empty hidden>没有找到匹配的映记，换个关键词或筛选试试。</p>
+            </section>
+
+            <section class="screen memory-detail-screen" data-screen="memory-detail" aria-label="映记详情">
+              <header class="detail-topbar">
+                <button class="back-button" type="button" data-memory-back aria-label="返回记录"></button>
+                <div>
+                  <p class="eyebrow">私人映记档案</p>
+                  <h2 data-memory-title>京都 · 雨后的清水寺</h2>
+                </div>
+              </header>
+
+              <article class="memory-detail-hero">
+                <img data-memory-hero src="https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=900&q=82" alt="映记封面照片" />
+                <div>
+                  <p data-memory-location>日本京都</p>
+                  <h3 data-memory-meta>12 张照片 · 1,240 字</h3>
+                </div>
+              </article>
+
+              <section class="memory-prose" aria-label="映记正文">
+                <p data-memory-body>石板路还在反光，风里有樱花落下来的声音。</p>
+              </section>
+
+              <section class="memory-gallery" data-memory-gallery aria-label="映记照片"></section>
+
+              <section class="memory-route-card" aria-label="映记路线">
+                <div>
+                  <p>路线回看</p>
+                  <h3 data-memory-route>清水寺 -> 二年坂 -> 八坂神社</h3>
+                </div>
+                <span data-memory-origin>来自最近映记</span>
+              </section>
+            </section>
+
+            <section class="screen community-screen" data-screen="community" aria-label="社区">
+              <header class="topbar compact">
+                <div>
+                  <p class="eyebrow">山海之间的公开回望</p>
+                  <h2>社区</h2>
+                </div>
+                <button class="icon-button search-button" type="button" aria-label="搜索目的地点评"></button>
+              </header>
+              <div class="topic-tabs" aria-label="社区分类">
+                <button class="is-active" type="button">点评</button>
+                <button type="button">精选</button>
+                <button type="button">附近</button>
+                <button type="button">城市</button>
+              </div>
+              <section class="destination-review" aria-label="目的地点评搜索">
+                <div class="review-search">
+                  <span class="search-glyph" aria-hidden="true"></span>
+                  <input type="search" value="京都" placeholder="搜索城市、景区或关键词" aria-label="搜索城市、景区或关键词" />
+                  <button type="button">搜索</button>
+                </div>
+                <div class="review-filters" aria-label="点评筛选">
+                  <button class="review-filter is-active" type="button" data-review-filter="all">全部</button>
+                  <button class="review-filter" type="button" data-review-filter="photo">出片</button>
+                  <button class="review-filter" type="button" data-review-filter="quiet">安静</button>
+                  <button class="review-filter" type="button" data-review-filter="culture">人文</button>
+                  <button class="review-filter" type="button" data-review-filter="nature">自然</button>
+                </div>
+                <article class="review-overview">
+                  <div>
+                    <p>京都 · 清水寺周边</p>
+                    <h3>4.7</h3>
+                    <span>2,846 条旅行点评 · 89% 推荐</span>
+                  </div>
+                  <dl>
+                    <div><dt>出片</dt><dd>96</dd></div>
+                    <div><dt>拥挤</dt><dd>72</dd></div>
+                    <div><dt>消费</dt><dd>中</dd></div>
+                  </dl>
+                </article>
+                <div class="review-list">
+                  <article class="review-card" role="button" tabindex="0" data-review-card data-destination-id="kiyomizu" data-type="culture photo" data-keywords="京都 清水寺 二年坂 三年坂 日落 摄影 人文">
+                    <div class="review-score"><strong>4.8</strong><span>值得专程去</span></div>
+                    <div>
+                      <h3>清水寺与二年坂</h3>
+                      <p>适合清晨或日落前去，街巷层次很完整；10:30 后人流明显变密，拍照需要避开主坡道。</p>
+                      <div class="sentiment-bars" aria-label="评价分布">
+                        <span style="--bar: 89%">好评 89%</span>
+                        <span style="--bar: 8%">一般 8%</span>
+                        <span style="--bar: 3%">差评 3%</span>
+                      </div>
+                      <div class="review-tags"><span>出片强</span><span>人多</span><span>步行坡多</span></div>
+                      <button class="review-open" type="button">查看详情</button>
+                    </div>
+                  </article>
+                  <article class="review-card" role="button" tabindex="0" data-review-card data-destination-id="philosopher" data-type="quiet culture" data-keywords="京都 哲学之道 樱花 安静 散步 咖啡">
+                    <div class="review-score"><strong>4.6</strong><span>慢游首选</span></div>
+                    <div>
+                      <h3>哲学之道</h3>
+                      <p>比热门寺社更适合写日记和长时间散步，樱花季早晨体验最好；餐饮选择少，建议提前规划休息点。</p>
+                      <div class="sentiment-bars" aria-label="评价分布">
+                        <span style="--bar: 84%">好评 84%</span>
+                        <span style="--bar: 12%">一般 12%</span>
+                        <span style="--bar: 4%">差评 4%</span>
+                      </div>
+                      <div class="review-tags"><span>安静</span><span>适合独行</span><span>补给少</span></div>
+                      <button class="review-open" type="button">查看详情</button>
+                    </div>
+                  </article>
+                  <article class="review-card" role="button" tabindex="0" data-review-card data-destination-id="reynisfjara" data-type="nature photo" data-keywords="冰岛 黑沙滩 自然 风大 海岸 摄影">
+                    <div class="review-score"><strong>4.5</strong><span>天气决定体验</span></div>
+                    <div>
+                      <h3>冰岛黑沙滩</h3>
+                      <p>现场震撼感很强，但风浪和天气会显著影响体验；适合短暂停留拍摄，不建议把行程排得太紧。</p>
+                      <div class="sentiment-bars" aria-label="评价分布">
+                        <span style="--bar: 81%">好评 81%</span>
+                        <span style="--bar: 14%">一般 14%</span>
+                        <span style="--bar: 5%">差评 5%</span>
+                      </div>
+                      <div class="review-tags"><span>自然奇观</span><span>风大</span><span>安全距离</span></div>
+                      <button class="review-open" type="button">查看详情</button>
+                    </div>
+                  </article>
+                </div>
+                <p class="review-empty" hidden>没有找到匹配的点评，换个城市、景区或关键词试试。</p>
+              </section>
+              <article class="community-hero">
+                <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=84" alt="冰岛公开回顾封面" />
+                <div>
+                  <p>精选公开映记</p>
+                  <h3>北大西洋的第七次日落</h3>
+                  <span>冰岛 · 6 城市 · 42 张照片</span>
+                </div>
+              </article>
+              <div class="community-feed">
+                <article>
+                  <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=420&q=82" alt="巴黎照片" />
+                  <h3>巴黎左岸的雨</h3>
+                  <p>2.1k 喜欢 · 186 评论</p>
+                </article>
+                <article>
+                  <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=420&q=82" alt="迪拜照片" />
+                  <h3>沙漠边缘的夜航</h3>
+                  <p>846 喜欢 · 72 评论</p>
+                </article>
+                <article>
+                  <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=420&q=82" alt="山脉照片" />
+                  <h3>阿尔卑斯清晨</h3>
+                  <p>1.4k 喜欢 · 98 评论</p>
+                </article>
+                <article>
+                  <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=420&q=82" alt="海岸照片" />
+                  <h3>海岸线上的慢镜头</h3>
+                  <p>983 喜欢 · 64 评论</p>
+                </article>
+              </div>
+            </section>
+
+            <section class="screen destination-screen" data-screen="destination" aria-label="景区详情">
+              <header class="detail-topbar">
+                <button class="back-button" type="button" data-destination-back aria-label="返回社区"></button>
+                <div>
+                  <p class="eyebrow">目的地判断档案</p>
+                  <h2 data-destination-title>清水寺与二年坂</h2>
+                </div>
+              </header>
+
+              <article class="destination-hero">
+                <img data-destination-image src="https://images.unsplash.com/photo-1528164344705-47542687000d?auto=format&fit=crop&w=900&q=84" alt="清水寺与二年坂照片" />
+                <div class="destination-hero-copy">
+                  <p data-destination-location>日本 · 京都 · 东山</p>
+                  <div class="destination-rating">
+                    <strong data-destination-score>4.8</strong>
+                    <span data-destination-recommend>89% 推荐 · 2,846 条点评</span>
+                  </div>
+                  <h3 data-destination-summary>适合第一次来京都的人，把古寺、坡道、街巷和日落放在同一段行程里。</h3>
+                </div>
+              </article>
+
+              <section class="insight-grid" aria-label="景区基础信息">
+                <article><span>最佳季节</span><strong data-destination-season>3-4 月 / 11 月</strong></article>
+                <article><span>停留时间</span><strong data-destination-duration>2.5-4 小时</strong></article>
+                <article><span>门票消费</span><strong data-destination-cost>门票低 · 周边中</strong></article>
+                <article><span>拥挤时段</span><strong data-destination-crowd>10:30-15:30</strong></article>
+              </section>
+
+              <section class="decision-card" aria-label="是否值得去">
+                <div>
+                  <p>是否值得去</p>
+                  <h3 data-destination-verdict>值得专程去，但要避开主流时段。</h3>
+                  <span data-destination-fit>适合摄影、第一次到访、短途城市漫游；不适合完全讨厌人流的人。</span>
+                </div>
+                <button type="button" data-want-action>加入想去</button>
+                <button type="button" data-plan-action>创建计划</button>
+              </section>
+
+              <p class="action-feedback" data-action-feedback aria-live="polite"></p>
+
+              <section class="plan-draft" data-plan-panel hidden aria-label="旅行计划草稿">
+                <div class="section-title">
+                  <p>计划草稿</p>
+                  <button type="button" data-plan-close>收起</button>
+                </div>
+                <div class="plan-head">
+                  <span data-plan-status>未保存</span>
+                  <h3 data-plan-title>清水寺与二年坂</h3>
+                </div>
+                <div class="plan-grid" aria-label="计划摘要">
+                  <article><span>建议停留</span><strong data-plan-duration>2.5-4 小时</strong></article>
+                  <article><span>最佳季节</span><strong data-plan-season>3-4 月 / 11 月</strong></article>
+                  <article><span>人流提醒</span><strong data-plan-crowd>10:30-15:30</strong></article>
+                </div>
+                <div class="plan-route">
+                  <span>推荐路线</span>
+                  <p data-plan-route>清水寺 -> 二年坂 -> 三年坂 -> 八坂神社，步行约 38 分钟。</p>
+                </div>
+                <button class="plan-save" type="button" data-plan-save>保存到旅行计划</button>
+              </section>
+
+              <section class="detail-section" aria-label="优缺点摘要">
+                <div class="section-title">
+                  <p>优缺点摘要</p>
+                </div>
+                <div class="pros-cons">
+                  <article>
+                    <h3>值得去的理由</h3>
+                    <ul data-destination-pros>
+                      <li>京都代表性画面密度高，照片和文字都容易成章。</li>
+                      <li>清水寺、二年坂、三年坂可以串成半日路线。</li>
+                      <li>日落前后的光线层次最完整。</li>
+                    </ul>
+                  </article>
+                  <article>
+                    <h3>需要注意</h3>
+                    <ul data-destination-cons>
+                      <li>热门时段人流很密，主坡道拍摄体验下降。</li>
+                      <li>坡道多，雨天和拖行李不友好。</li>
+                      <li>周边消费和排队会被季节放大。</li>
+                    </ul>
+                  </article>
+                </div>
+              </section>
+
+              <section class="detail-section" aria-label="评价维度">
+                <div class="section-title">
+                  <p>评价维度</p>
+                </div>
+                <div class="dimension-list" data-destination-dimensions>
+                  <article style="--value: 96%"><span>出片指数</span><strong>96</strong></article>
+                  <article style="--value: 88%"><span>文化体验</span><strong>88</strong></article>
+                  <article style="--value: 72%"><span>拥挤压力</span><strong>72</strong></article>
+                  <article style="--value: 78%"><span>交通便利</span><strong>78</strong></article>
+                </div>
+              </section>
+
+              <section class="personal-place-link" aria-label="个人记录联动">
+                <div>
+                  <p>我的记录</p>
+                  <h3 data-destination-memory>你在这里有 1 篇映记</h3>
+                  <span data-destination-memory-note>雨后的清水寺 · 12 张照片 · 1,240 字</span>
+                </div>
+                <button type="button" data-memory-action>查看映记</button>
+              </section>
+
+              <section class="detail-map" aria-label="附近路线">
+                <div class="section-title">
+                  <p>附近与路线</p>
+                </div>
+                <div class="mini-map">
+                  <span class="mini-route"></span>
+                  <i class="mini-pin pin-main"></i>
+                  <i class="mini-pin pin-near-a"></i>
+                  <i class="mini-pin pin-near-b"></i>
+                  <p data-destination-route>清水寺 -> 二年坂 -> 三年坂 -> 八坂神社，步行约 38 分钟。</p>
+                </div>
+              </section>
+
+              <section class="detail-section" aria-label="真实短评">
+                <div class="section-title">
+                  <p>真实短评</p>
+                  <button type="button">同季节</button>
+                </div>
+                <div class="comment-tabs" aria-label="短评筛选">
+                  <button class="is-active" type="button">高赞</button>
+                  <button type="button">最新</button>
+                  <button type="button">差评</button>
+                  <button type="button">有图</button>
+                </div>
+                <div class="detail-comments" data-destination-comments>
+                  <article><strong>林澈</strong><p>早上七点半到，坡道还很安静，雨后石板路很漂亮。十点之后体验明显下降。</p></article>
+                  <article><strong>南山</strong><p>值得去，但不要只打卡寺门。二年坂往下走的街巷更适合慢慢记录。</p></article>
+                </div>
+              </section>
+            </section>
+
+            <section class="screen create-screen" data-screen="create" aria-label="创建映记">
+              <header class="topbar compact">
+                <div>
+                  <p class="eyebrow">把今天变成档案</p>
+                  <h2>创建映记</h2>
+                </div>
+              </header>
+              <div class="step-rail" aria-label="创建步骤">
+                <span class="is-active">地点</span>
+                <span>照片</span>
+                <span>文字</span>
+                <span>预览</span>
+              </div>
+              <form class="create-form">
+                <label>
+                  <span>旅行标题</span>
+                  <input type="text" value="京都 · 雨后的清水寺" aria-label="旅行标题" data-create-title />
+                </label>
+                <label>
+                  <span>时间与地点</span>
+                  <input type="text" value="2026.04.12 · 日本京都" aria-label="时间与地点" data-create-location />
+                </label>
+                <label>
+                  <span>这段回望</span>
+                  <textarea aria-label="这段回望" data-create-body>石板路还在反光，风里有樱花落下来的声音。</textarea>
+                </label>
+              </form>
+              <section class="media-picker" aria-label="照片选择">
+                <div class="section-title">
+                  <p>精选照片</p>
+                  <div class="section-actions">
+                    <button type="button" data-import-photo>导入照片</button>
+                    <button type="button" data-add-photo>自动补一张</button>
+                  </div>
+                </div>
+                <input class="photo-input" type="file" accept="image/*" multiple data-photo-input aria-label="导入本地照片" />
+                <div class="media-grid" data-photo-library>
+                  <button class="photo-option is-selected" type="button" data-photo-option data-photo-id="temple" data-photo-place="清水寺" data-photo-time="07:42" data-photo-src="https://images.unsplash.com/photo-1528164344705-47542687000d?auto=format&fit=crop&w=360&q=82" aria-pressed="true">
+                    <img src="https://images.unsplash.com/photo-1528164344705-47542687000d?auto=format&fit=crop&w=360&q=82" alt="清水寺雨后照片" />
+                    <span>清水寺 · 07:42</span>
+                  </button>
+                  <button class="photo-option is-selected" type="button" data-photo-option data-photo-id="slope" data-photo-place="二年坂" data-photo-time="08:18" data-photo-src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=360&q=82" aria-pressed="true">
+                    <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=360&q=82" alt="京都街巷照片" />
+                    <span>二年坂 · 08:18</span>
+                  </button>
+                  <button class="photo-option" type="button" data-photo-option data-photo-id="lantern" data-photo-place="八坂神社" data-photo-time="18:04" data-photo-src="https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=360&q=82" aria-pressed="false">
+                    <img src="https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=360&q=82" alt="京都黄昏照片" />
+                    <span>八坂神社 · 18:04</span>
+                  </button>
+                </div>
+                <div class="selected-strip" data-selected-photos aria-label="已选照片"></div>
+              </section>
+
+              <section class="auto-timeline" data-auto-timeline aria-label="自动生成地点时间线"></section>
+
+              <article class="recap-preview share-poster" data-share-poster>
+                <div class="poster-frame">
+                  <img data-poster-image src="https://images.unsplash.com/photo-1528164344705-47542687000d?auto=format&fit=crop&w=720&q=82" alt="映记分享长图主图" />
+                  <div class="poster-copy">
+                    <span data-poster-location>2026.04.12 · 日本京都</span>
+                    <h3 data-poster-title>京都 · 雨后的清水寺</h3>
+                    <p data-poster-body>石板路还在反光，风里有樱花落下来的声音。</p>
+                  </div>
+                </div>
+                <p>生成预览</p>
+                <h3 data-recap-status>2 张照片 · 2 个地点 · 可生成分享长图</h3>
+                <button type="button" data-generate-recap>生成电影回顾长图</button>
+                <div class="poster-export-actions">
+                  <canvas data-export-canvas width="1080" height="1680" hidden></canvas>
+                  <a href="#" download="shan-hai-yingji.png" aria-disabled="true" data-download-poster>生成后可下载 PNG</a>
+                </div>
+                <button class="save-memory-action" type="button" data-save-memory>保存到我的档案</button>
+                <p class="save-status" data-save-status></p>
+              </article>
+            </section>
+
+            <section class="screen messages-screen" data-screen="messages" aria-label="消息">
+              <header class="topbar compact">
+                <div>
+                  <p class="eyebrow">互动与系统提醒</p>
+                  <h2>消息</h2>
+                </div>
+              </header>
+              <div class="message-list">
+                <article><span class="message-dot"></span><div><h3>你的「冰岛环岛第 3 天」收到 28 个喜欢</h3><p>刚刚</p></div></article>
+                <article><span></span><div><h3>山海映记已为你生成 2026 春日回顾草稿</h3><p>昨天 21:40</p></div></article>
+                <article><span></span><div><h3>社区精选：有 3 篇映记提到了京都</h3><p>周日</p></div></article>
+              </div>
+            </section>
+
+            <section class="screen profile-screen" data-screen="profile" aria-label="我的">
+              <header class="profile-hero">
+                <div class="profile-avatar"></div>
+                <p>林澈</p>
+                <h2>把走过的山海，映成自己的记忆。</h2>
+              </header>
+              <div class="profile-stats">
+                <div><strong>28</strong><span>映记</span></div>
+                <div><strong>12</strong><span>城市</span></div>
+                <div><strong>4</strong><span>国家</span></div>
+              </div>
+              <section class="settings-list" aria-label="个人设置">
+                <button type="button"><span>私密草稿</span><em>6 篇</em></button>
+                <button type="button"><span>公开主页</span><em>已开启</em></button>
+                <button type="button"><span>照片与位置权限</span><em>管理</em></button>
+                <button type="button"><span>导出旅行档案</span><em>PDF / 长图</em></button>
+              </section>
+            </section>
+          </div>
+
+          <nav class="bottom-nav" aria-label="主导航">
+            <button class="nav-button is-active" type="button" aria-label="记录" data-target="record">
+              <span class="nav-icon nav-record"></span>
+              <em>记录</em>
+            </button>
+            <button class="nav-button" type="button" aria-label="社区" data-target="community">
+              <span class="nav-icon nav-community"></span>
+              <em>社区</em>
+            </button>
+            <button class="nav-button create-action" type="button" aria-label="创建" data-target="create">
+              <span></span>
+              <em>创建</em>
+            </button>
+            <button class="nav-button" type="button" aria-label="消息" data-target="messages">
+              <span class="nav-icon nav-message"></span>
+              <em>消息</em>
+            </button>
+            <button class="nav-button" type="button" aria-label="我的" data-target="profile">
+              <span class="nav-icon nav-me"></span>
+              <em>我的</em>
+            </button>
+          </nav>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
