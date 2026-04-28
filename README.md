@@ -45,7 +45,7 @@ node tests\browser-flow.test.mjs
 
 `storage.test.mjs`、`domain-memory.test.mjs` 和 `archive-export.test.mjs` 覆盖本地档案读写、旧数据迁移、版本化映记、导入导出和合并逻辑。
 
-`browser-flow.test.mjs` 使用 Playwright 跑真实浏览器流程，覆盖创建表单回车不刷新、本地图片导入保存为 data URL、保存映记、收藏筛选、删除确认和 JSON 导入。
+`browser-flow.test.mjs` 使用 Playwright 跑真实浏览器流程，覆盖创建表单回车不刷新、本地图片导入保存为 data URL、保存映记、收藏筛选、内联编辑、删除确认和 JSON 导入。
 
 > 浏览器测试依赖 Codex 桌面运行时里自带的 Playwright 包；如果在普通环境运行，需要自行安装 Playwright。
 
@@ -102,5 +102,5 @@ node tests\browser-flow.test.mjs
 
 - 数据只保存在当前浏览器的 `localStorage`，没有账号、云同步或后端。
 - 目的地和种子映记仍是静态样例数据。
-- 编辑映记使用浏览器原生 `prompt`，后续可以换成更完整的表单 UI。
+- 编辑映记已支持档案页内联表单；更复杂的照片、地点和路线编辑仍可继续扩展。
 - 分享长图在部分远程图片跨域失败时会降级为渐变背景。

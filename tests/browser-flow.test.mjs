@@ -67,6 +67,15 @@ try {
   await page.waitForFunction(() => document.querySelector("[data-archive-transfer-status]")?.textContent.includes("导入完成"));
   await page.click('[data-archive-filter="all"]');
   await page.waitForFunction(() => document.querySelector("[data-archive-list]")?.textContent.includes("导入映记"));
+
+  await page.locator("[data-archive-edit]").first().click();
+  await page.waitForSelector("[data-edit-panel]:not([hidden])");
+  await page.fill("[data-edit-title]", "导入映记已编辑");
+  await page.fill("[data-edit-tags]", "导入,精选");
+  await page.click("[data-edit-save]");
+  await page.waitForFunction(() => document.querySelector("[data-archive-list]")?.textContent.includes("导入映记已编辑"));
+  await page.click('[data-archive-filter="tagged"]');
+  await page.waitForFunction(() => document.querySelector("[data-archive-list]")?.textContent.includes("精选"));
 } finally {
   await browser.close();
 }

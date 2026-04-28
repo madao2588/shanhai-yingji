@@ -195,6 +195,29 @@
                 <input type="file" accept="application/json,.json" data-import-archive-input hidden />
                 <span data-archive-transfer-status></span>
               </div>
+              <form class="archive-edit-panel" data-edit-panel hidden>
+                <div>
+                  <p class="eyebrow">编辑映记</p>
+                  <h3 data-edit-heading>本地档案</h3>
+                </div>
+                <label>
+                  <span>标题</span>
+                  <input type="text" data-edit-title />
+                </label>
+                <label>
+                  <span>正文</span>
+                  <textarea rows="4" data-edit-body></textarea>
+                </label>
+                <label>
+                  <span>标签</span>
+                  <input type="text" data-edit-tags />
+                </label>
+                <div class="archive-edit-actions">
+                  <button type="submit" data-edit-save>保存</button>
+                  <button type="button" data-edit-cancel>取消</button>
+                </div>
+                <p data-edit-status></p>
+              </form>
               <section class="archive-list" data-archive-list aria-label="映记结果列表"></section>
               <p class="archive-empty" data-archive-empty hidden>没有找到匹配的映记，换个关键词或筛选试试。</p>
             </section>

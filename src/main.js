@@ -45,6 +45,14 @@ const exportArchiveButton = document.querySelector("[data-export-archive]");
 const importArchiveButton = document.querySelector("[data-import-archive]");
 const importArchiveInput = document.querySelector("[data-import-archive-input]");
 const archiveTransferStatus = document.querySelector("[data-archive-transfer-status]");
+const editPanel = document.querySelector("[data-edit-panel]");
+const editHeading = document.querySelector("[data-edit-heading]");
+const editTitle = document.querySelector("[data-edit-title]");
+const editBody = document.querySelector("[data-edit-body]");
+const editTags = document.querySelector("[data-edit-tags]");
+const editSave = document.querySelector("[data-edit-save]");
+const editCancel = document.querySelector("[data-edit-cancel]");
+const editStatus = document.querySelector("[data-edit-status]");
 const searchShortcut = document.querySelector(".search-button");
 const destinationSearch = document.querySelector(".review-search input");
 const destinationSearchButton = document.querySelector(".review-search button");
@@ -113,6 +121,7 @@ let activeReviewFilter = "all";
 let activeArchiveFilter = "all";
 let activeDestinationId = "kiyomizu";
 let activeMemoryId = "seed-kyoto";
+let activeEditMemoryId = "";
 let selectedPhotoIds = Array.from(photoOptions)
   .filter((option) => option.classList.contains("is-selected"))
   .map((option) => option.dataset.photoId);
@@ -586,31 +595,53 @@ function editSavedMemory(memoryId) {
     return;
   }
 
-  const nextTitle = prompt("映记标题", current.title);
-  if (nextTitle === null) {
+  activeEditMemoryId = memoryId;
+  editHeading.textContent = current.title;
+  editTitle.value = current.title;
+  editBody.value = current.body || "";
+  editTags.value = current.tags?.join(", ") || "";
+  editStatus.textContent = "";
+  editPanel.hidden = false;
+  editTitle.focus();
+}
+
+function closeEditPanel() {
+  activeEditMemoryId = "";
+  editPanel.hidden = true;
+  editStatus.textContent = "";
+}
+
+function parseTagInput(value) {
+  return value
+    .split(/[,，]/)
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+}
+
+function saveEditedMemory() {
+  const current = savedMemories.find((memory) => memory.id === activeEditMemoryId);
+  if (!current) {
+    closeEditPanel();
     return;
   }
 
-  const nextBody = prompt("映记正文", current.body);
-  if (nextBody === null) {
-    return;
-  }
-
-  const nextTags = prompt("标签，用逗号分隔", current.tags?.join(", ") || "");
-  if (nextTags === null) {
-    return;
-  }
-
-  updateSavedMemory(memoryId, (memory) => ({
+  const nextTitle = editTitle.value.trim() || current.title;
+  const nextBody = editBody.value.trim() || current.body;
+  const nextTags = parseTagInput(editTags.value);
+  const didSave = updateSavedMemory(activeEditMemoryId, (memory) => ({
     ...memory,
-    title: nextTitle.trim() || memory.title,
-    body: nextBody.trim() || memory.body,
-    tags: nextTags
-      .split(/[,，]/)
-      .map((tag) => tag.trim())
-      .filter(Boolean),
+    title: nextTitle,
+    body: nextBody,
+    tags: nextTags,
     updatedAt: new Date().toISOString(),
   }));
+
+  if (!didSave) {
+    editStatus.textContent = "本机存储不可用，编辑没有保存。";
+    return;
+  }
+
+  closeEditPanel();
   renderPersonalArchive();
   renderArchiveLibrary();
 }
@@ -1373,6 +1404,11 @@ archiveFilters.forEach((button) => {
 exportArchiveButton.addEventListener("click", exportArchive);
 importArchiveButton.addEventListener("click", () => importArchiveInput.click());
 importArchiveInput.addEventListener("change", importArchiveFile);
+editPanel.addEventListener("submit", (event) => {
+  event.preventDefault();
+  saveEditedMemory();
+});
+editCancel.addEventListener("click", closeEditPanel);
 
 createForm.addEventListener("submit", (event) => {
   event.preventDefault();
