@@ -1,19 +1,12 @@
 import assert from "node:assert/strict";
-import { createRequire } from "node:module";
-import { homedir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-
-const require = createRequire(import.meta.url);
-const bundledNodeModules =
-  process.env.CODEX_BUNDLED_NODE_MODULES ||
-  resolve(homedir(), ".cache", "codex-runtimes", "codex-primary-runtime", "dependencies", "node", "node_modules");
-const playwright = require(require.resolve("playwright", { paths: [bundledNodeModules] }));
+import { chromium } from "playwright";
 
 const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const pageUrl = pathToFileURL(resolve(projectRoot, "index.html")).href;
 
-const browser = await playwright.chromium.launch();
+const browser = await chromium.launch();
 const page = await browser.newPage();
 
 try {

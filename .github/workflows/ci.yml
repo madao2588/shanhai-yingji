@@ -19,21 +19,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "24"
+          cache: npm
 
-      - name: Check JavaScript syntax
-        run: |
-          node --check src/main.js
-          node --check src/data/seed-destinations.js
-          node --check src/data/seed-memories.js
-          node --check src/domain/memory.js
-          node --check src/storage/archive-export.js
-          node --check src/storage/local-store.js
-          node --check service-worker.js
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Run Node tests
-        run: |
-          node tests/archive-export.test.mjs
-          node tests/domain-memory.test.mjs
-          node tests/prototype.test.mjs
-          node tests/pwa.test.mjs
-          node tests/storage.test.mjs
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run tests
+        run: npm test

@@ -27,22 +27,19 @@ start .\index.html
 
 ## 测试
 
-项目使用 Node 脚本做轻量验证：
+项目使用 npm 脚本做轻量验证，并把 Playwright 浏览器流程纳入 CI：
 
 ```powershell
-node --check src\main.js
-node --check src\data\seed-destinations.js
-node --check src\data\seed-memories.js
-node --check src\domain\memory.js
-node --check src\storage\archive-export.js
-node --check src\storage\local-store.js
-node --check service-worker.js
-node tests\archive-export.test.mjs
-node tests\domain-memory.test.mjs
-node tests\prototype.test.mjs
-node tests\pwa.test.mjs
-node tests\storage.test.mjs
-node tests\browser-flow.test.mjs
+npm install
+npm test
+```
+
+也可以拆开运行：
+
+```powershell
+npm run check
+npm run test:node
+npm run test:browser
 ```
 
 `prototype.test.mjs` 检查关键页面结构、样式选择器和核心函数是否存在。
@@ -53,9 +50,7 @@ node tests\browser-flow.test.mjs
 
 `browser-flow.test.mjs` 使用 Playwright 跑真实浏览器流程，覆盖创建表单回车不刷新、本地图片导入保存为 data URL、保存映记、收藏筛选、地点/路线/图片/标签内联编辑、删除确认和 JSON 导入。
 
-> 浏览器测试依赖 Codex 桌面运行时里自带的 Playwright 包；如果在普通环境运行，需要自行安装 Playwright。
-
-GitHub Actions 会在 push 和 pull request 时自动运行语法检查和 Node 级测试；浏览器流程测试仍作为本地验证保留。
+GitHub Actions 会在 push 和 pull request 时自动安装依赖、安装 Chromium，并运行完整 `npm test`。
 
 ## 项目结构
 

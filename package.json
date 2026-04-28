@@ -1,0 +1,15 @@
+{
+  "name": "shanhai-yingji",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local-first static travel archive prototype.",
+  "scripts": {
+    "check": "node --check src/main.js && node --check src/data/seed-destinations.js && node --check src/data/seed-memories.js && node --check src/domain/memory.js && node --check src/storage/archive-export.js && node --check src/storage/local-store.js && node --check service-worker.js && node --check tests/archive-export.test.mjs && node --check tests/browser-flow.test.mjs && node --check tests/domain-memory.test.mjs && node --check tests/prototype.test.mjs && node --check tests/pwa.test.mjs && node --check tests/storage.test.mjs",
+    "test:node": "node tests/archive-export.test.mjs && node tests/domain-memory.test.mjs && node tests/prototype.test.mjs && node tests/pwa.test.mjs && node tests/storage.test.mjs",
+    "test:browser": "node tests/browser-flow.test.mjs",
+    "test": "npm run check && npm run test:node && npm run test:browser"
+  },
+  "devDependencies": {
+    "playwright": "^1.59.1"
+  }
+}
