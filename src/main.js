@@ -430,10 +430,14 @@ function getMemoryCountry(memory) {
 }
 
 function getMemorySearchText(memory) {
-  return [memory.title, memory.location, memory.country, memory.city, memory.body, memory.route]
+  return [memory.title, memory.location, memory.country, memory.city, memory.body, memory.route, ...(memory.tags || [])]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
+}
+
+function isSavedMemory(memory) {
+  return memory.source === "saved" || memory.id.startsWith("memory-");
 }
 
 function matchesArchiveFilter(memory) {
@@ -453,8 +457,16 @@ function matchesArchiveFilter(memory) {
     return (memory.year || "2026") === "2026";
   }
 
+  if (activeArchiveFilter === "favorite") {
+    return memory.favorite;
+  }
+
+  if (activeArchiveFilter === "tagged") {
+    return memory.tags?.length > 0;
+  }
+
   if (activeArchiveFilter === "saved") {
-    return memory.source === "saved" || memory.id.startsWith("memory-");
+    return isSavedMemory(memory);
   }
 
   return true;
@@ -475,6 +487,11 @@ function renderArchiveCard(memory) {
   const label = document.createElement("p");
   const title = document.createElement("h3");
   const body = document.createElement("span");
+  const tagList = document.createElement("div");
+  const actions = document.createElement("div");
+  const favoriteButton = document.createElement("button");
+  const editButton = document.createElement("button");
+  const deleteButton = document.createElement("button");
 
   article.dataset.memoryId = memory.id;
   article.setAttribute("role", "button");
@@ -484,7 +501,48 @@ function renderArchiveCard(memory) {
   label.textContent = `${memory.year || "2026"} · ${getMemoryCountry(memory)} · ${memory.photoCount} 张照片`;
   title.textContent = memory.title;
   body.textContent = memory.body;
-  copy.append(label, title, body);
+  tagList.className = "tag-list";
+  (memory.tags?.length ? memory.tags : ["未标记"]).forEach((tag) => {
+    const tagItem = document.createElement("em");
+    tagItem.textContent = tag;
+    tagList.append(tagItem);
+  });
+  actions.className = "archive-actions";
+  favoriteButton.type = "button";
+  favoriteButton.dataset.archiveFavorite = memory.id;
+  favoriteButton.textContent = memory.favorite ? "已收藏" : "收藏";
+  favoriteButton.classList.toggle("is-active", memory.favorite);
+  favoriteButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+    toggleArchiveFavorite(memory.id);
+  });
+
+  if (isSavedMemory(memory)) {
+    actions.append(favoriteButton);
+
+    editButton.type = "button";
+    editButton.dataset.archiveEdit = memory.id;
+    editButton.textContent = "编辑";
+    editButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      editSavedMemory(memory.id);
+    });
+
+    deleteButton.type = "button";
+    deleteButton.dataset.archiveDelete = memory.id;
+    deleteButton.textContent = "删除";
+    deleteButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      deleteSavedMemory(memory.id);
+    });
+
+    actions.append(editButton, deleteButton);
+  }
+
+  copy.append(label, title, body, tagList);
+  if (actions.childElementCount > 0) {
+    copy.append(actions);
+  }
   article.append(image, copy);
   article.addEventListener("click", () => openMemoryDetail(memory.id));
   article.addEventListener("keydown", (event) => {
@@ -494,6 +552,80 @@ function renderArchiveCard(memory) {
     }
   });
   return article;
+}
+
+function updateSavedMemory(memoryId, updater) {
+  const index = savedMemories.findIndex((memory) => memory.id === memoryId);
+  if (index === -1) {
+    return false;
+  }
+
+  savedMemories = savedMemories.map((memory, itemIndex) => (itemIndex === index ? memoryDomain.normalizeMemory(updater(memory)) : memory));
+  const result = persistSavedMemories();
+  return result.ok;
+}
+
+function toggleArchiveFavorite(memoryId) {
+  if (!updateSavedMemory(memoryId, (memory) => ({ ...memory, favorite: !memory.favorite, updatedAt: new Date().toISOString() }))) {
+    archiveCount.textContent = "本机存储不可用，收藏状态没有保存。";
+    return;
+  }
+
+  renderPersonalArchive();
+  renderArchiveLibrary();
+}
+
+function editSavedMemory(memoryId) {
+  const current = savedMemories.find((memory) => memory.id === memoryId);
+  if (!current) {
+    return;
+  }
+
+  const nextTitle = prompt("映记标题", current.title);
+  if (nextTitle === null) {
+    return;
+  }
+
+  const nextBody = prompt("映记正文", current.body);
+  if (nextBody === null) {
+    return;
+  }
+
+  const nextTags = prompt("标签，用逗号分隔", current.tags?.join(", ") || "");
+  if (nextTags === null) {
+    return;
+  }
+
+  updateSavedMemory(memoryId, (memory) => ({
+    ...memory,
+    title: nextTitle.trim() || memory.title,
+    body: nextBody.trim() || memory.body,
+    tags: nextTags
+      .split(/[,，]/)
+      .map((tag) => tag.trim())
+      .filter(Boolean),
+    updatedAt: new Date().toISOString(),
+  }));
+  renderPersonalArchive();
+  renderArchiveLibrary();
+}
+
+function deleteSavedMemory(memoryId) {
+  const current = savedMemories.find((memory) => memory.id === memoryId);
+  if (!current || !confirm(`删除「${current.title}」？`)) {
+    return;
+  }
+
+  savedMemories = savedMemories.filter((memory) => memory.id !== memoryId);
+  const result = persistSavedMemories();
+  if (!result.ok) {
+    savedMemories = [current, ...savedMemories];
+    archiveCount.textContent = "本机存储不可用，删除没有保存。";
+    return;
+  }
+
+  renderPersonalArchive();
+  renderArchiveLibrary();
 }
 
 function renderArchiveLibrary() {
@@ -939,6 +1071,7 @@ function buildCreatedMemory() {
     alt: cover.alt,
     route: selected.map((photo) => photo.place).join(" -> ") || location,
     origin: "来自刚保存的映记",
+    tags: [country, city].filter((tag) => tag && tag !== "未标记地点"),
     photos: (selected.length ? selected : [cover]).map((photo) => photo.src),
   });
 }

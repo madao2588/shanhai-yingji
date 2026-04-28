@@ -20,6 +20,8 @@ assert.match(html, /data-screen="archive"/, "prototype should include a full arc
 assert.match(html, /data-open-archive/, "record home should expose an archive entry action");
 assert.match(html, /data-archive-search/, "archive library should expose a search input");
 assert.match(html, /data-archive-filter/, "archive library should expose filter controls");
+assert.match(html, /data-archive-filter="favorite"/, "archive library should expose a favorite filter");
+assert.match(html, /data-archive-filter="tagged"/, "archive library should expose a tagged filter");
 assert.match(html, /data-archive-list/, "archive library should expose a dynamic result list");
 assert.match(html, /data-archive-empty/, "archive library should expose an empty state");
 assert.match(html, /data-screen="memory-detail"/, "prototype should include a personal memory detail screen");
@@ -61,6 +63,8 @@ assert.match(css, /\.archive-screen/, "archive screen should have dedicated styl
 assert.match(css, /\.archive-search/, "archive search should be styled");
 assert.match(css, /\.archive-filter-row/, "archive filters should be styled");
 assert.match(css, /\.archive-list/, "archive list should be styled");
+assert.match(css, /\.archive-actions/, "archive management actions should be styled");
+assert.match(css, /\.tag-list/, "archive tags should be styled");
 assert.match(css, /\.memory-detail-screen/, "memory detail screen should have dedicated styling");
 assert.match(css, /\.memory-detail-hero/, "memory detail hero should be styled");
 assert.match(css, /\.memory-gallery/, "memory detail gallery should be styled");
@@ -88,6 +92,9 @@ assert.match(js, /let activeArchiveFilter/, "archive library should track an act
 assert.match(js, /function openArchiveLibrary/, "archive entry action should open the archive library");
 assert.match(js, /function renderArchiveLibrary/, "archive library should render archive entries");
 assert.match(js, /function filterArchiveLibrary/, "archive library should filter entries");
+assert.match(js, /function toggleArchiveFavorite/, "archive library should toggle favorites");
+assert.match(js, /function deleteSavedMemory/, "archive library should delete saved entries");
+assert.match(js, /function editSavedMemory/, "archive library should edit saved entries");
 assert.match(js, /function openMemoryDetail/, "memory cards should open a personal memory detail");
 assert.match(js, /function renderMemoryDetail/, "memory detail should render selected archive data");
 assert.match(js, /function renderDestination/, "detail view should render selected destination data");
