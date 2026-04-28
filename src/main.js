@@ -98,6 +98,7 @@ const particlePalette = [
 ];
 
 const destinationData = window.destinationData || {};
+const memoryDomain = window.shanhaiMemoryDomain;
 const localStore = window.shanhaiLocalStore;
 
 let particles = [];
@@ -923,8 +924,7 @@ function buildCreatedMemory() {
   const country = location.includes("日本") ? "日本" : location.includes("冰岛") ? "冰岛" : "未标记";
   const city = location.replace(/\d{4}\.\d{2}\.\d{2}\s*·\s*/, "").replace(country, "").trim() || location;
 
-  return {
-    id: `memory-${Date.now()}`,
+  return memoryDomain.createMemory({
     title: createTitle.value.trim() || "未命名映记",
     location,
     country,
@@ -940,7 +940,7 @@ function buildCreatedMemory() {
     route: selected.map((photo) => photo.place).join(" -> ") || location,
     origin: "来自刚保存的映记",
     photos: (selected.length ? selected : [cover]).map((photo) => photo.src),
-  };
+  });
 }
 
 function saveCreatedMemory() {

@@ -3,12 +3,16 @@ import { existsSync, readFileSync } from "node:fs";
 import vm from "node:vm";
 
 const storagePath = "src/storage/local-store.js";
+const domainPath = "src/domain/memory.js";
+assert.equal(existsSync(domainPath), true, "memory domain helpers should exist before the storage adapter runs");
 assert.equal(existsSync(storagePath), true, "local storage adapter should live in src/storage");
 
+const domainCode = readFileSync(domainPath, "utf8");
 const storageCode = readFileSync(storagePath, "utf8");
 const main = readFileSync("src/main.js", "utf8");
 const context = { window: {} };
 vm.createContext(context);
+vm.runInContext(domainCode, context, { filename: domainPath });
 vm.runInContext(storageCode, context, { filename: storagePath });
 
 const store = context.window.shanhaiLocalStore;
@@ -51,12 +55,15 @@ assert.deepEqual(
 );
 
 const memoryStorage = fakeStorage({ "shanhai-memory-entries": JSON.stringify([{ id: "one" }]) });
-assert.deepEqual(plain(store.loadSavedMemories(memoryStorage)), [{ id: "one" }], "stored memory entries should load");
+const loadedLegacyMemory = plain(store.loadSavedMemories(memoryStorage))[0];
+assert.equal(loadedLegacyMemory.id, "one", "stored memory entries should load");
+assert.deepEqual(loadedLegacyMemory.tags, [], "legacy memory entries should be normalized with tags");
+assert.equal(loadedLegacyMemory.favorite, false, "legacy memory entries should be normalized with favorite state");
 assert.deepEqual(plain(store.loadSavedMemories(fakeStorage({ "shanhai-memory-entries": "{broken" }))), [], "broken memory JSON should fall back to an empty archive");
 
 const writable = fakeStorage();
 assert.deepEqual(plain(store.saveDestinationState({ wants: ["kiyomizu"], plans: [] }, writable)), { ok: true }, "destination writes should report success");
-assert.deepEqual(JSON.parse(writable.dump()["shanhai-destination-state"]), { wants: ["kiyomizu"], plans: [] }, "destination writes should persist JSON");
+assert.deepEqual(JSON.parse(writable.dump()["shanhai-archive"]).destinationState, { wants: ["kiyomizu"], plans: [] }, "destination writes should persist inside the versioned archive");
 
 const failingStorage = {
   getItem() {

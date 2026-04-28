@@ -8,7 +8,7 @@ const seedDestinationsPath = "src/data/seed-destinations.js";
 const seedMemoriesPath = "src/data/seed-memories.js";
 
 assert.match(html, /<script src="src\/main\.js"><\/script>/, "prototype should load the app through the src entry while keeping direct file-open support");
-assert.match(html, /<script src="src\/data\/seed-destinations\.js"><\/script>\s*<script src="src\/data\/seed-memories\.js"><\/script>\s*<script src="src\/storage\/local-store\.js"><\/script>\s*<script src="src\/main\.js"><\/script>/, "seed and storage scripts should load before the app entry while keeping classic script support");
+assert.match(html, /<script src="src\/data\/seed-destinations\.js"><\/script>\s*<script src="src\/data\/seed-memories\.js"><\/script>\s*<script src="src\/domain\/memory\.js"><\/script>\s*<script src="src\/storage\/local-store\.js"><\/script>\s*<script src="src\/main\.js"><\/script>/, "seed, domain, and storage scripts should load before the app entry while keeping classic script support");
 assert.equal(existsSync(seedDestinationsPath), true, "destination seed data should live in src/data");
 assert.equal(existsSync(seedMemoriesPath), true, "memory seed data should live in src/data");
 
@@ -80,6 +80,7 @@ assert.doesNotMatch(js, /const destinationData = \{/, "destination data should b
 assert.doesNotMatch(js, /const seedMemories = \[/, "seed memories should be extracted out of the app entry");
 assert.match(js, /window\.destinationData/, "app entry should read destination seed data from the classic-script global");
 assert.match(js, /window\.seedMemories/, "app entry should read memory seed data from the classic-script global");
+assert.match(js, /window\.shanhaiMemoryDomain/, "app entry should create user memories through the memory domain");
 assert.match(seedDestinations, /window\.destinationData\s*=/, "destination seed data should be exposed for classic script loading");
 assert.match(seedMemories, /window\.seedMemories\s*=/, "memory seed data should be exposed for classic script loading");
 assert.match(js, /function openDestination/, "review card click should open a destination");

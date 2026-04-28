@@ -1,48 +1,59 @@
 (function () {
+  const archiveStorageKey = "shanhai-archive";
   const destinationStorageKey = "shanhai-destination-state";
   const memoryStorageKey = "shanhai-memory-entries";
+  const memoryDomain = window.shanhaiMemoryDomain;
 
   function getStorage(storage) {
     return storage || window.localStorage;
   }
 
-  function loadDestinationState(storage) {
+  function readJson(storage, key) {
     try {
-      const parsed = JSON.parse(getStorage(storage).getItem(destinationStorageKey));
-      return {
-        wants: Array.isArray(parsed?.wants) ? parsed.wants : [],
-        plans: Array.isArray(parsed?.plans) ? parsed.plans : [],
-      };
+      const value = getStorage(storage).getItem(key);
+      return value ? JSON.parse(value) : undefined;
     } catch {
-      return { wants: [], plans: [] };
+      return undefined;
     }
+  }
+
+  function readArchive(storage) {
+    const archive = readJson(storage, archiveStorageKey);
+    if (archive) {
+      return memoryDomain.normalizeArchive(archive);
+    }
+
+    return memoryDomain.normalizeArchive({
+      memories: readJson(storage, memoryStorageKey),
+      destinationState: readJson(storage, destinationStorageKey),
+    });
+  }
+
+  function writeArchive(archive, storage) {
+    try {
+      getStorage(storage).setItem(archiveStorageKey, JSON.stringify(memoryDomain.normalizeArchive(archive)));
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error: error?.message || "storage unavailable" };
+    }
+  }
+
+  function loadDestinationState(storage) {
+    return readArchive(storage).destinationState;
   }
 
   function saveDestinationState(destinationState, storage) {
-    try {
-      getStorage(storage).setItem(destinationStorageKey, JSON.stringify(destinationState));
-      return { ok: true };
-    } catch (error) {
-      return { ok: false, error: error?.message || "storage unavailable" };
-    }
+    const archive = readArchive(storage);
+    return writeArchive({ ...archive, destinationState }, storage);
   }
 
   function loadSavedMemories(storage) {
-    try {
-      const parsed = JSON.parse(getStorage(storage).getItem(memoryStorageKey));
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
+    return readArchive(storage).memories;
   }
 
   function persistSavedMemories(memories, storage) {
-    try {
-      getStorage(storage).setItem(memoryStorageKey, JSON.stringify(memories));
-      return { ok: true };
-    } catch (error) {
-      return { ok: false, error: error?.message || "storage unavailable" };
-    }
+    const archive = readArchive(storage);
+    return writeArchive({ ...archive, memories }, storage);
   }
 
   window.shanhaiLocalStore = {
