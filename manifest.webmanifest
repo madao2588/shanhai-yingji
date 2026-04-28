@@ -1,0 +1,19 @@
+{
+  "name": "山海映记",
+  "short_name": "山海映记",
+  "description": "本地优先的旅行影像档案",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a1214",
+  "theme_color": "#0a1214",
+  "icons": [
+    {
+      "src": "assets/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

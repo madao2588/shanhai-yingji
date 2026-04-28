@@ -34,9 +34,11 @@ node --check src\data\seed-memories.js
 node --check src\domain\memory.js
 node --check src\storage\archive-export.js
 node --check src\storage\local-store.js
+node --check service-worker.js
 node tests\archive-export.test.mjs
 node tests\domain-memory.test.mjs
 node tests\prototype.test.mjs
+node tests\pwa.test.mjs
 node tests\storage.test.mjs
 node tests\browser-flow.test.mjs
 ```
@@ -44,6 +46,8 @@ node tests\browser-flow.test.mjs
 `prototype.test.mjs` 检查关键页面结构、样式选择器和核心函数是否存在。
 
 `storage.test.mjs`、`domain-memory.test.mjs` 和 `archive-export.test.mjs` 覆盖本地档案读写、旧数据迁移、版本化映记、导入导出和合并逻辑。
+
+`pwa.test.mjs` 检查移动端 manifest、主题色、service worker 注册和离线缓存清单。
 
 `browser-flow.test.mjs` 使用 Playwright 跑真实浏览器流程，覆盖创建表单回车不刷新、本地图片导入保存为 data URL、保存映记、收藏筛选、内联编辑、删除确认和 JSON 导入。
 
@@ -72,8 +76,11 @@ node tests\browser-flow.test.mjs
 |   |-- browser-flow.test.mjs
 |   |-- domain-memory.test.mjs
 |   |-- prototype.test.mjs
+|   |-- pwa.test.mjs
 |   `-- storage.test.mjs
 |-- index.html
+|-- manifest.webmanifest
+|-- service-worker.js
 |-- styles.css
 `-- README.md
 ```
@@ -86,6 +93,7 @@ node tests\browser-flow.test.mjs
 - 映记模型在 `src/domain/memory.js` 中规范化，保证新旧数据都有 `createdAt`、`updatedAt`、`tags` 和 `favorite`。
 - 本地存储在 `src/storage/local-store.js` 中封装，兼容旧的分离 key，并写入新的版本化 `shanhai-archive`。
 - 导入导出逻辑在 `src/storage/archive-export.js` 中封装，导入时按 `id` 合并去重。
+- PWA 外壳由 `manifest.webmanifest` 和 `service-worker.js` 提供；service worker 只在 `http/https` 下注册，避免破坏 `file://` 直接打开。
 - 本地导入图片通过 `FileReader.readAsDataURL()` 转为 data URL，避免保存后依赖临时 `blob:` 地址。
 - 分享长图通过隐藏 Canvas 绘制，再导出 PNG。
 

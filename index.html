@@ -4,7 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>山海映记</title>
+    <meta name="theme-color" content="#0a1214" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="山海映记" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="icon" href="assets/app-icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="assets/app-icon.svg" />
+    <link rel="manifest" href="manifest.webmanifest" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -650,5 +656,10 @@
     <script src="src/storage/local-store.js"></script>
     <script src="src/storage/archive-export.js"></script>
     <script src="src/main.js"></script>
+    <script>
+      if ("serviceWorker" in navigator && window.location.protocol.startsWith("http")) {
+        navigator.serviceWorker.register("service-worker.js");
+      }
+    </script>
   </body>
 </html>
