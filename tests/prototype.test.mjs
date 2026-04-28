@@ -29,6 +29,9 @@ assert.match(html, /data-import-archive/, "archive library should expose archive
 assert.match(html, /data-edit-panel/, "archive library should expose an inline edit panel");
 assert.match(html, /data-edit-title/, "archive edit panel should expose a title input");
 assert.match(html, /data-edit-body/, "archive edit panel should expose a body input");
+assert.match(html, /data-edit-location/, "archive edit panel should expose a location input");
+assert.match(html, /data-edit-route/, "archive edit panel should expose a route input");
+assert.match(html, /data-edit-photos/, "archive edit panel should expose photo URL editing");
 assert.match(html, /data-edit-tags/, "archive edit panel should expose a tag input");
 assert.match(html, /data-screen="memory-detail"/, "prototype should include a personal memory detail screen");
 assert.match(html, /data-memory-back/, "memory detail should include a back action");
@@ -105,6 +108,8 @@ assert.match(js, /function deleteSavedMemory/, "archive library should delete sa
 assert.match(js, /function editSavedMemory/, "archive library should edit saved entries");
 assert.match(js, /function saveEditedMemory/, "archive library should save inline edits");
 assert.match(js, /function closeEditPanel/, "archive library should close inline edits");
+assert.match(js, /function parsePhotoInput/, "archive library should parse edited photo URLs");
+assert.match(js, /function inferLocationParts/, "archive library should update country and city from edited locations");
 assert.doesNotMatch(js, /prompt\(/, "archive editing should not use browser prompt dialogs");
 assert.match(js, /function exportArchive/, "archive library should export local archive JSON");
 assert.match(js, /function importArchiveFile/, "archive library should import local archive JSON");

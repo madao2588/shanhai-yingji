@@ -49,6 +49,9 @@ const editPanel = document.querySelector("[data-edit-panel]");
 const editHeading = document.querySelector("[data-edit-heading]");
 const editTitle = document.querySelector("[data-edit-title]");
 const editBody = document.querySelector("[data-edit-body]");
+const editLocation = document.querySelector("[data-edit-location]");
+const editRoute = document.querySelector("[data-edit-route]");
+const editPhotos = document.querySelector("[data-edit-photos]");
 const editTags = document.querySelector("[data-edit-tags]");
 const editSave = document.querySelector("[data-edit-save]");
 const editCancel = document.querySelector("[data-edit-cancel]");
@@ -450,6 +453,12 @@ function getMemorySearchText(memory) {
     .toLowerCase();
 }
 
+function inferLocationParts(location = "") {
+  const country = location.includes("日本") ? "日本" : location.includes("冰岛") ? "冰岛" : "未标记";
+  const city = location.replace(/\d{4}\.\d{2}\.\d{2}\s*·\s*/, "").replace(country, "").trim() || location;
+  return { country, city };
+}
+
 function isSavedMemory(memory) {
   return memory.source === "saved" || memory.id.startsWith("memory-");
 }
@@ -599,6 +608,9 @@ function editSavedMemory(memoryId) {
   editHeading.textContent = current.title;
   editTitle.value = current.title;
   editBody.value = current.body || "";
+  editLocation.value = current.location || "";
+  editRoute.value = current.route || "";
+  editPhotos.value = (current.photos?.length ? current.photos : [current.cover]).filter(Boolean).join("\n");
   editTags.value = current.tags?.join(", ") || "";
   editStatus.textContent = "";
   editPanel.hidden = false;
@@ -618,6 +630,13 @@ function parseTagInput(value) {
     .filter(Boolean);
 }
 
+function parsePhotoInput(value) {
+  return value
+    .split(/\r?\n/)
+    .map((src) => src.trim())
+    .filter(Boolean);
+}
+
 function saveEditedMemory() {
   const current = savedMemories.find((memory) => memory.id === activeEditMemoryId);
   if (!current) {
@@ -627,11 +646,24 @@ function saveEditedMemory() {
 
   const nextTitle = editTitle.value.trim() || current.title;
   const nextBody = editBody.value.trim() || current.body;
+  const nextLocation = editLocation.value.trim() || current.location;
+  const nextRoute = editRoute.value.trim() || nextLocation;
+  const nextPhotos = parsePhotoInput(editPhotos.value);
   const nextTags = parseTagInput(editTags.value);
+  const nextCover = nextPhotos[0] || current.cover;
+  const locationParts = inferLocationParts(nextLocation);
   const didSave = updateSavedMemory(activeEditMemoryId, (memory) => ({
     ...memory,
     title: nextTitle,
     body: nextBody,
+    location: nextLocation,
+    country: locationParts.country,
+    city: locationParts.city,
+    route: nextRoute,
+    cover: nextCover,
+    photos: nextPhotos.length ? nextPhotos : memory.photos,
+    photoCount: nextPhotos.length || memory.photoCount,
+    words: nextBody.length,
     tags: nextTags,
     updatedAt: new Date().toISOString(),
   }));
@@ -1139,8 +1171,7 @@ function buildCreatedMemory() {
   const cover = selected[0] || getPhotoData(photoOptions[0]);
   const body = createBody.value.trim() || "写下这一段回望后生成分享长图。";
   const location = createLocation.value.trim() || "未标记地点";
-  const country = location.includes("日本") ? "日本" : location.includes("冰岛") ? "冰岛" : "未标记";
-  const city = location.replace(/\d{4}\.\d{2}\.\d{2}\s*·\s*/, "").replace(country, "").trim() || location;
+  const { country, city } = inferLocationParts(location);
 
   return memoryDomain.createMemory({
     title: createTitle.value.trim() || "未命名映记",

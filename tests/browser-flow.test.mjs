@@ -71,11 +71,17 @@ try {
   await page.locator("[data-archive-edit]").first().click();
   await page.waitForSelector("[data-edit-panel]:not([hidden])");
   await page.fill("[data-edit-title]", "导入映记已编辑");
+  await page.fill("[data-edit-location]", "冰岛维克");
+  await page.fill("[data-edit-route]", "维克 -> 黑沙滩");
+  await page.fill("[data-edit-photos]", "https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?auto=format&fit=crop&w=420&q=82");
   await page.fill("[data-edit-tags]", "导入,精选");
   await page.click("[data-edit-save]");
   await page.waitForFunction(() => document.querySelector("[data-archive-list]")?.textContent.includes("导入映记已编辑"));
+  await page.waitForFunction(() => document.querySelector("[data-archive-list]")?.textContent.includes("冰岛"));
   await page.click('[data-archive-filter="tagged"]');
   await page.waitForFunction(() => document.querySelector("[data-archive-list]")?.textContent.includes("精选"));
+  await page.click('[data-archive-filter="iceland"]');
+  await page.waitForFunction(() => document.querySelector("[data-archive-list]")?.textContent.includes("导入映记已编辑"));
 } finally {
   await browser.close();
 }
