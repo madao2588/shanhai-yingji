@@ -3,7 +3,9 @@ import { readFileSync } from "node:fs";
 
 const html = readFileSync("index.html", "utf8");
 const css = readFileSync("styles.css", "utf8");
-const js = readFileSync("app.js", "utf8");
+const js = readFileSync("src/main.js", "utf8");
+
+assert.match(html, /<script src="src\/main\.js"><\/script>/, "prototype should load the app through the src entry while keeping direct file-open support");
 
 assert.match(html, /data-screen="destination"/, "prototype should include a destination detail screen");
 assert.match(html, /data-screen="archive"/, "prototype should include a full archive library screen");

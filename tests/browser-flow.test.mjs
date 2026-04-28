@@ -18,6 +18,7 @@ const page = await browser.newPage();
 
 try {
   await page.goto(pageUrl);
+  await page.waitForFunction(() => document.querySelector("#splash")?.classList.contains("is-hidden"));
 
   await page.click('[data-target="create"]');
   const urlBeforeEnter = page.url();

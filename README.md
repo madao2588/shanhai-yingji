@@ -27,7 +27,7 @@ start .\index.html
 项目使用 Node 脚本做轻量验证：
 
 ```powershell
-node --check app.js
+node --check src\main.js
 node tests\prototype.test.mjs
 node tests\browser-flow.test.mjs
 ```
@@ -47,7 +47,8 @@ node tests\browser-flow.test.mjs
 ├── tests/
 │   ├── browser-flow.test.mjs
 │   └── prototype.test.mjs
-├── app.js
+├── src/
+│   └── main.js
 ├── index.html
 ├── styles.css
 └── README.md
