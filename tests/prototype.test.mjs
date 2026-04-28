@@ -1,11 +1,19 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 
 const html = readFileSync("index.html", "utf8");
 const css = readFileSync("styles.css", "utf8");
 const js = readFileSync("src/main.js", "utf8");
+const seedDestinationsPath = "src/data/seed-destinations.js";
+const seedMemoriesPath = "src/data/seed-memories.js";
 
 assert.match(html, /<script src="src\/main\.js"><\/script>/, "prototype should load the app through the src entry while keeping direct file-open support");
+assert.match(html, /<script src="src\/data\/seed-destinations\.js"><\/script>\s*<script src="src\/data\/seed-memories\.js"><\/script>\s*<script src="src\/main\.js"><\/script>/, "seed data should load before the app entry while keeping classic script support");
+assert.equal(existsSync(seedDestinationsPath), true, "destination seed data should live in src/data");
+assert.equal(existsSync(seedMemoriesPath), true, "memory seed data should live in src/data");
+
+const seedDestinations = readFileSync(seedDestinationsPath, "utf8");
+const seedMemories = readFileSync(seedMemoriesPath, "utf8");
 
 assert.match(html, /data-screen="destination"/, "prototype should include a destination detail screen");
 assert.match(html, /data-screen="archive"/, "prototype should include a full archive library screen");
@@ -68,7 +76,12 @@ assert.match(css, /\.poster-export-actions/, "poster export actions should be st
 assert.match(css, /\.save-memory-action/, "save-to-archive action should be styled");
 assert.match(css, /\.save-status/, "save feedback should be styled");
 
-assert.match(js, /const destinationData =/, "destination data should be modeled in JS");
+assert.doesNotMatch(js, /const destinationData = \{/, "destination data should be extracted out of the app entry");
+assert.doesNotMatch(js, /const seedMemories = \[/, "seed memories should be extracted out of the app entry");
+assert.match(js, /window\.destinationData/, "app entry should read destination seed data from the classic-script global");
+assert.match(js, /window\.seedMemories/, "app entry should read memory seed data from the classic-script global");
+assert.match(seedDestinations, /window\.destinationData\s*=/, "destination seed data should be exposed for classic script loading");
+assert.match(seedMemories, /window\.seedMemories\s*=/, "memory seed data should be exposed for classic script loading");
 assert.match(js, /function openDestination/, "review card click should open a destination");
 assert.match(js, /let activeArchiveFilter/, "archive library should track an active filter");
 assert.match(js, /function openArchiveLibrary/, "archive entry action should open the archive library");

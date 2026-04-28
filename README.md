@@ -28,6 +28,8 @@ start .\index.html
 
 ```powershell
 node --check src\main.js
+node --check src\data\seed-destinations.js
+node --check src\data\seed-memories.js
 node tests\prototype.test.mjs
 node tests\browser-flow.test.mjs
 ```
@@ -48,6 +50,9 @@ node tests\browser-flow.test.mjs
 │   ├── browser-flow.test.mjs
 │   └── prototype.test.mjs
 ├── src/
+│   ├── data/
+│   │   ├── seed-destinations.js
+│   │   └── seed-memories.js
 │   └── main.js
 ├── index.html
 ├── styles.css
