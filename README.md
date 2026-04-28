@@ -30,7 +30,9 @@ start .\index.html
 node --check src\main.js
 node --check src\data\seed-destinations.js
 node --check src\data\seed-memories.js
+node --check src\storage\local-store.js
 node tests\prototype.test.mjs
+node tests\storage.test.mjs
 node tests\browser-flow.test.mjs
 ```
 
@@ -48,11 +50,14 @@ node tests\browser-flow.test.mjs
 │   └── app-icon.svg
 ├── tests/
 │   ├── browser-flow.test.mjs
-│   └── prototype.test.mjs
+│   ├── prototype.test.mjs
+│   └── storage.test.mjs
 ├── src/
 │   ├── data/
 │   │   ├── seed-destinations.js
 │   │   └── seed-memories.js
+│   ├── storage/
+│   │   └── local-store.js
 │   └── main.js
 ├── index.html
 ├── styles.css

@@ -8,7 +8,7 @@ const seedDestinationsPath = "src/data/seed-destinations.js";
 const seedMemoriesPath = "src/data/seed-memories.js";
 
 assert.match(html, /<script src="src\/main\.js"><\/script>/, "prototype should load the app through the src entry while keeping direct file-open support");
-assert.match(html, /<script src="src\/data\/seed-destinations\.js"><\/script>\s*<script src="src\/data\/seed-memories\.js"><\/script>\s*<script src="src\/main\.js"><\/script>/, "seed data should load before the app entry while keeping classic script support");
+assert.match(html, /<script src="src\/data\/seed-destinations\.js"><\/script>\s*<script src="src\/data\/seed-memories\.js"><\/script>\s*<script src="src\/storage\/local-store\.js"><\/script>\s*<script src="src\/main\.js"><\/script>/, "seed and storage scripts should load before the app entry while keeping classic script support");
 assert.equal(existsSync(seedDestinationsPath), true, "destination seed data should live in src/data");
 assert.equal(existsSync(seedMemoriesPath), true, "memory seed data should live in src/data");
 
@@ -93,7 +93,7 @@ assert.match(js, /function renderDestination/, "detail view should render select
 assert.match(js, /function toggleWantToGo/, "want-to-go action should be implemented");
 assert.match(js, /function openPlanDraft/, "planning action should be implemented");
 assert.match(js, /function openMemoryLink/, "memory action should be implemented");
-assert.match(js, /localStorage/, "destination actions should persist lightweight local state");
+assert.match(js, /window\.shanhaiLocalStore/, "destination actions should persist lightweight local state through the storage adapter");
 assert.match(js, /function selectPhotoAsset/, "create flow should select photo assets");
 assert.match(js, /function renderSelectedPhotos/, "create flow should render selected photos");
 assert.match(js, /function renderAutoTimeline/, "create flow should render an automatic timeline");
@@ -104,7 +104,7 @@ assert.match(js, /FileReader/, "local photo imports should use FileReader for re
 assert.doesNotMatch(js, /URL\.createObjectURL/, "saved local photos should not rely on temporary blob URLs");
 assert.match(js, /function moveSelectedPhoto/, "create flow should reorder selected photos");
 assert.match(js, /function drawPosterToCanvas/, "create flow should render poster PNG to canvas");
-assert.match(js, /const memoryStorageKey =/, "personal archive entries should use local storage");
+assert.match(js, /localStore\.persistSavedMemories/, "personal archive entries should use the storage adapter");
 assert.match(js, /function saveCreatedMemory/, "create flow should save a memory entry");
 assert.match(js, /function renderPersonalArchive/, "record home should render saved memory entries");
 assert.match(js, /createForm\.addEventListener\("submit"/, "create form should intercept submit events");

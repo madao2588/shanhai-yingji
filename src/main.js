@@ -98,6 +98,7 @@ const particlePalette = [
 ];
 
 const destinationData = window.destinationData || {};
+const localStore = window.shanhaiLocalStore;
 
 let particles = [];
 let animationFrame = 0;
@@ -109,45 +110,21 @@ let activeMemoryId = "seed-kyoto";
 let selectedPhotoIds = Array.from(photoOptions)
   .filter((option) => option.classList.contains("is-selected"))
   .map((option) => option.dataset.photoId);
-const destinationStorageKey = "shanhai-destination-state";
-const memoryStorageKey = "shanhai-memory-entries";
 const baseArchiveStats = {
   memories: 28,
   cities: 12,
 };
 const seedMemories = window.seedMemories || [];
-let destinationState = loadDestinationState();
-let savedMemories = loadSavedMemories();
-
-function loadDestinationState() {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(destinationStorageKey));
-    return {
-      wants: Array.isArray(parsed?.wants) ? parsed.wants : [],
-      plans: Array.isArray(parsed?.plans) ? parsed.plans : [],
-    };
-  } catch {
-    return { wants: [], plans: [] };
-  }
-}
-
-function loadSavedMemories() {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(memoryStorageKey));
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
+let destinationState = localStore.loadDestinationState();
+let savedMemories = localStore.loadSavedMemories();
 
 function persistSavedMemories() {
-  localStorage.setItem(memoryStorageKey, JSON.stringify(savedMemories));
+  return localStore.persistSavedMemories(savedMemories);
 }
 
 function saveDestinationState() {
-  try {
-    localStorage.setItem(destinationStorageKey, JSON.stringify(destinationState));
-  } catch {
+  const result = localStore.saveDestinationState(destinationState);
+  if (!result.ok) {
     actionFeedback.textContent = "本机存储不可用，本次状态只会暂时保留。";
   }
 }
@@ -972,7 +949,10 @@ function saveCreatedMemory() {
   savedMemories = [memory, ...savedMemories].slice(0, 12);
 
   try {
-    persistSavedMemories();
+    const result = persistSavedMemories();
+    if (!result.ok) {
+      throw new Error(result.error);
+    }
     renderPersonalArchive();
     renderArchiveLibrary();
     saveMemoryButton.textContent = "已保存到我的档案";
