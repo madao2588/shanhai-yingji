@@ -1,5 +1,6 @@
 (function () {
   const archiveStorageKey = "shanhai-archive";
+  const createDraftStorageKey = "shanhai-create-draft";
   const destinationStorageKey = "shanhai-destination-state";
   const memoryStorageKey = "shanhai-memory-entries";
   const memoryDomain = window.shanhaiMemoryDomain;
@@ -64,9 +65,34 @@
     return writeArchive(archive, storage);
   }
 
+  function loadCreateDraft(storage) {
+    return readJson(storage, createDraftStorageKey) || null;
+  }
+
+  function saveCreateDraft(draft, storage) {
+    try {
+      getStorage(storage).setItem(createDraftStorageKey, JSON.stringify(draft));
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error: error?.message || "storage unavailable" };
+    }
+  }
+
+  function clearCreateDraft(storage) {
+    try {
+      getStorage(storage).removeItem(createDraftStorageKey);
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error: error?.message || "storage unavailable" };
+    }
+  }
+
   window.shanhaiLocalStore = {
     loadArchive,
     persistArchive,
+    loadCreateDraft,
+    saveCreateDraft,
+    clearCreateDraft,
     loadDestinationState,
     saveDestinationState,
     loadSavedMemories,

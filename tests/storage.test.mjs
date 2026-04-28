@@ -24,6 +24,9 @@ function plain(value) {
 assert.equal(typeof store.loadDestinationState, "function", "store should expose destination state loading");
 assert.equal(typeof store.loadArchive, "function", "store should expose full archive loading");
 assert.equal(typeof store.persistArchive, "function", "store should expose full archive saving");
+assert.equal(typeof store.loadCreateDraft, "function", "store should expose create draft loading");
+assert.equal(typeof store.saveCreateDraft, "function", "store should expose create draft saving");
+assert.equal(typeof store.clearCreateDraft, "function", "store should expose create draft clearing");
 assert.equal(typeof store.saveDestinationState, "function", "store should expose destination state saving");
 assert.equal(typeof store.loadSavedMemories, "function", "store should expose memory loading");
 assert.equal(typeof store.persistSavedMemories, "function", "store should expose memory saving");
@@ -37,6 +40,9 @@ function fakeStorage(initial = {}) {
     },
     setItem(key, value) {
       values.set(key, String(value));
+    },
+    removeItem(key) {
+      values.delete(key);
     },
     dump() {
       return Object.fromEntries(values);
@@ -67,6 +73,13 @@ const writable = fakeStorage();
 assert.deepEqual(plain(store.saveDestinationState({ wants: ["kiyomizu"], plans: [] }, writable)), { ok: true }, "destination writes should report success");
 assert.deepEqual(JSON.parse(writable.dump()["shanhai-archive"]).destinationState, { wants: ["kiyomizu"], plans: [] }, "destination writes should persist inside the versioned archive");
 assert.equal(plain(store.loadArchive(writable)).version, 1, "full archive loading should read the versioned archive");
+
+const draftStorage = fakeStorage();
+const draft = { title: "Draft", selectedPhotoIds: ["fuji"], localPhotos: [{ id: "local-one", src: "data:image/png;base64,AA==" }] };
+assert.deepEqual(plain(store.saveCreateDraft(draft, draftStorage)), { ok: true }, "create drafts should report successful writes");
+assert.deepEqual(plain(store.loadCreateDraft(draftStorage)), draft, "create drafts should round-trip through the storage adapter");
+assert.deepEqual(plain(store.clearCreateDraft(draftStorage)), { ok: true }, "create drafts should report successful clearing");
+assert.equal(store.loadCreateDraft(draftStorage), null, "cleared create drafts should load as null");
 
 const failingStorage = {
   getItem() {

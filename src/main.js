@@ -128,6 +128,7 @@ let activeEditMemoryId = "";
 let selectedPhotoIds = Array.from(photoOptions)
   .filter((option) => option.classList.contains("is-selected"))
   .map((option) => option.dataset.photoId);
+let isRestoringCreateDraft = false;
 const baseArchiveStats = {
   memories: 28,
   cities: 12,
@@ -336,6 +337,82 @@ function getPhotoData(option) {
 function getSelectedPhotoData() {
   const photoById = new Map(photoOptions.map((option) => [option.dataset.photoId, option]));
   return selectedPhotoIds.map((photoId) => photoById.get(photoId)).filter(Boolean).map(getPhotoData);
+}
+
+function readCreateDraft() {
+  return localStore.loadCreateDraft();
+}
+
+function getLocalPhotoDrafts() {
+  return photoOptions
+    .filter((option) => option.dataset.photoId.startsWith("local-"))
+    .map(getPhotoData);
+}
+
+function saveCreateDraft() {
+  if (isRestoringCreateDraft) {
+    return;
+  }
+
+  const result = localStore.saveCreateDraft({
+    title: createTitle.value,
+    location: createLocation.value,
+    body: createBody.value,
+    selectedPhotoIds,
+    localPhotos: getLocalPhotoDrafts(),
+  });
+
+  if (!result.ok) {
+    saveStatus.textContent = "草稿暂时无法自动保存，本机存储空间可能不足。";
+  }
+}
+
+function clearCreateDraft() {
+  localStore.clearCreateDraft();
+}
+
+function restoreCreateDraft() {
+  const draft = readCreateDraft();
+
+  if (!draft || typeof draft !== "object") {
+    syncCreateFlow(false);
+    return;
+  }
+
+  isRestoringCreateDraft = true;
+
+  if (Array.isArray(draft.localPhotos)) {
+    draft.localPhotos.forEach((photo) => {
+      const hasPhoto = photo?.id && photoOptions.some((option) => option.dataset.photoId === photo.id);
+      if (hasPhoto || !photo?.src) {
+        return;
+      }
+      createPhotoOption({
+        id: photo.id,
+        place: photo.place || "本地照片",
+        time: photo.time || "--",
+        src: photo.src,
+        alt: photo.alt || `${photo.place || "本地照片"} 旅行照片`,
+      });
+    });
+  }
+
+  if (typeof draft.title === "string") {
+    createTitle.value = draft.title;
+  }
+  if (typeof draft.location === "string") {
+    createLocation.value = draft.location;
+  }
+  if (typeof draft.body === "string") {
+    createBody.value = draft.body;
+  }
+  if (Array.isArray(draft.selectedPhotoIds)) {
+    const availablePhotoIds = new Set(photoOptions.map((option) => option.dataset.photoId));
+    selectedPhotoIds = draft.selectedPhotoIds.filter((photoId) => availablePhotoIds.has(photoId));
+  }
+
+  isRestoringCreateDraft = false;
+  syncCreateFlow(false);
 }
 
 function getBodyExcerpt() {
@@ -937,6 +1014,7 @@ function selectPhotoAsset(event) {
 
   syncCreateFlow(false);
   updateCreateProgress();
+  saveCreateDraft();
 }
 
 function createPhotoOption(photo) {
@@ -997,6 +1075,7 @@ async function importLocalPhotos(event) {
   event.target.value = "";
   syncCreateFlow(false);
   updateCreateProgress();
+  saveCreateDraft();
 }
 
 function moveSelectedPhoto(photoId, direction) {
@@ -1011,12 +1090,14 @@ function moveSelectedPhoto(photoId, direction) {
   [nextIds[index], nextIds[targetIndex]] = [nextIds[targetIndex], nextIds[index]];
   selectedPhotoIds = nextIds;
   syncCreateFlow(false);
+  saveCreateDraft();
 }
 
 function removeSelectedPhoto(photoId) {
   selectedPhotoIds = selectedPhotoIds.filter((id) => id !== photoId);
   syncCreateFlow(false);
   updateCreateProgress();
+  saveCreateDraft();
 }
 
 function addSuggestedPhoto() {
@@ -1028,6 +1109,7 @@ function addSuggestedPhoto() {
 
   syncCreateFlow(false);
   updateCreateProgress();
+  saveCreateDraft();
 }
 
 function updateCreateProgress() {
@@ -1225,6 +1307,7 @@ function saveCreatedMemory() {
     }
     renderPersonalArchive();
     renderArchiveLibrary();
+    clearCreateDraft();
     saveMemoryButton.textContent = "已保存到我的档案";
     saveStatus.textContent = "已写入首页最近映记，并同步年度档案统计。";
   } catch {
@@ -1464,7 +1547,10 @@ editCancel.addEventListener("click", closeEditPanel);
 createForm.addEventListener("submit", (event) => {
   event.preventDefault();
 });
-createForm.addEventListener("input", updateCreateProgress);
+createForm.addEventListener("input", () => {
+  updateCreateProgress();
+  saveCreateDraft();
+});
 photoOptions.forEach((option) => {
   option.addEventListener("click", selectPhotoAsset);
 });
@@ -1517,6 +1603,7 @@ window.addEventListener("hashchange", handleHashRoute);
 window.addEventListener("load", () => {
   sizeCanvas();
   renderPersonalArchive();
+  restoreCreateDraft();
   updateCreateProgress();
   filterReviews();
   renderDestination(activeDestinationId);

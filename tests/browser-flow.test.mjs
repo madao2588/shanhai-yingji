@@ -11,6 +11,8 @@ const page = await browser.newPage();
 
 try {
   await page.goto(pageUrl);
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
   await page.waitForFunction(() => document.querySelector("#splash")?.classList.contains("is-hidden"));
 
   await page.click('[data-target="create"]');
@@ -42,11 +44,31 @@ try {
     "selected photos should support reordering and removal before saving"
   );
 
+  await page.fill("[data-create-title]", "草稿里的映记");
+  await page.fill("[data-create-location]", "葡萄牙里斯本");
+  await page.fill("[data-create-body]", "刷新之后仍然要留住这段尚未保存的旅行回忆");
+  await page.reload();
+  await page.waitForFunction(() => document.querySelector("#splash")?.classList.contains("is-hidden"));
+
+  assert.equal(await page.locator("[data-create-title]").inputValue(), "草稿里的映记", "create title draft should restore after reload");
+  assert.equal(await page.locator("[data-create-location]").inputValue(), "葡萄牙里斯本", "create location draft should restore after reload");
+  assert.equal(
+    await page.locator("[data-create-body]").inputValue(),
+    "刷新之后仍然要留住这段尚未保存的旅行回忆",
+    "create body draft should restore after reload"
+  );
+  assert.deepEqual(
+    await page.locator("[data-selected-photo-card] h3").allTextContents(),
+    ["kyoto local", "二年坂"],
+    "selected photo order should restore from the draft after reload"
+  );
+
   await page.fill("[data-create-title]", "测试收藏映记");
   await page.fill("[data-create-location]", "日本京都");
   await page.fill("[data-create-body]", "收藏筛选和删除测试");
   await page.click("[data-save-memory]");
   await page.waitForFunction(() => document.querySelector("[data-save-status]")?.textContent.includes("已写入"));
+  assert.equal(await page.evaluate(() => localStorage.getItem("shanhai-create-draft")), null, "saving should clear the create draft");
 
   await page.click('[data-target="record"]');
   await page.click("[data-open-archive]");

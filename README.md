@@ -11,6 +11,7 @@
 - 映记详情：展示封面、正文、图册和路线回看。
 - 目的地点评：浏览目的地评分、推荐理由、优缺点、评价维度和真实短评。
 - 创建映记：编辑标题、地点和正文，选择或导入照片，并可调整照片顺序、移除误选照片，自动生成时间线。
+- 草稿续写：创建页会自动保存未完成内容，刷新后恢复标题、地点、正文和照片顺序；正式保存后清空草稿。
 - 分享长图：将当前映记绘制到 Canvas，并导出 PNG。
 - 本地档案：使用版本化 `localStorage` 对象保存映记、想去、计划、标签和收藏状态。
 - 导入/导出：把本地档案导出为 JSON，也可以从 JSON 合并恢复，默认不覆盖已有映记。
@@ -48,7 +49,7 @@ npm run test:browser
 
 `pwa.test.mjs` 检查移动端 manifest、主题色、service worker 注册和离线缓存清单。
 
-`browser-flow.test.mjs` 使用 Playwright 跑真实浏览器流程，覆盖创建表单回车不刷新、本地图片导入保存为 data URL、已选照片排序和移除、保存映记、收藏筛选、地点/路线/图片/标签内联编辑、删除确认和 JSON 导入。
+`browser-flow.test.mjs` 使用 Playwright 跑真实浏览器流程，覆盖创建表单回车不刷新、本地图片导入保存为 data URL、已选照片排序和移除、创建草稿刷新恢复、保存后清空草稿、保存映记、收藏筛选、地点/路线/图片/标签内联编辑、删除确认和 JSON 导入。
 
 GitHub Actions 会在 push 和 pull request 时自动安装依赖、安装 Chromium，并运行完整 `npm test`。
 
@@ -94,6 +95,7 @@ GitHub Actions 会在 push 和 pull request 时自动安装依赖、安装 Chrom
 - 导入导出逻辑在 `src/storage/archive-export.js` 中封装，导入时按 `id` 合并去重。
 - PWA 外壳由 `manifest.webmanifest` 和 `service-worker.js` 提供；service worker 只在 `http/https` 下注册，避免破坏 `file://` 直接打开。
 - 本地导入图片通过 `FileReader.readAsDataURL()` 转为 data URL，避免保存后依赖临时 `blob:` 地址。
+- 创建页草稿使用独立的 `shanhai-create-draft` key，不写入正式档案；保存映记成功后自动清理。
 - 分享长图通过隐藏 Canvas 绘制，再导出 PNG。
 
 ## GitHub Pages
