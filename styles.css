@@ -2253,6 +2253,10 @@ img {
   opacity: 0.32;
 }
 
+.photo-order button[data-selected-photo-remove] {
+  color: rgba(255, 203, 190, 0.92);
+}
+
 .auto-timeline {
   display: grid;
   gap: 9px;

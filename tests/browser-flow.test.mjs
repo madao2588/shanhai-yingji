@@ -29,6 +29,19 @@ try {
 
   assert.match(importedSrc, /^data:image\/png;base64,/, "local imported photos should be stored as data URLs");
 
+  const selectedCards = page.locator("[data-selected-photo-card]");
+  assert.equal(await selectedCards.count(), 3, "selected photos should render as manageable cards");
+  await selectedCards.last().locator("[data-selected-photo-up]").click();
+  await selectedCards.nth(1).locator("[data-selected-photo-up]").click();
+  await selectedCards.nth(1).locator("[data-selected-photo-remove]").click();
+
+  const selectedPlaces = await selectedCards.locator("h3").allTextContents();
+  assert.deepEqual(
+    selectedPlaces,
+    ["kyoto local", "二年坂"],
+    "selected photos should support reordering and removal before saving"
+  );
+
   await page.fill("[data-create-title]", "测试收藏映记");
   await page.fill("[data-create-location]", "日本京都");
   await page.fill("[data-create-body]", "收藏筛选和删除测试");

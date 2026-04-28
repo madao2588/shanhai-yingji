@@ -812,23 +812,37 @@ function renderSelectedPhotos() {
       const order = document.createElement("div");
       const previous = document.createElement("button");
       const next = document.createElement("button");
+      const remove = document.createElement("button");
 
       card.className = "selected-card";
+      card.dataset.selectedPhotoCard = "";
       image.src = photo.src;
       image.alt = photo.alt;
       title.textContent = photo.place;
       meta.textContent = `${photo.time} · 第 ${index + 1} 张`;
       order.className = "photo-order";
       previous.type = "button";
-      previous.textContent = "前";
+      previous.textContent = "←";
+      previous.dataset.selectedPhotoUp = "";
+      previous.ariaLabel = `将 ${photo.place} 前移`;
+      previous.title = "前移照片";
       previous.disabled = index === 0;
       previous.addEventListener("click", () => moveSelectedPhoto(photo.id, -1));
       next.type = "button";
-      next.textContent = "后";
+      next.textContent = "→";
+      next.dataset.selectedPhotoDown = "";
+      next.ariaLabel = `将 ${photo.place} 后移`;
+      next.title = "后移照片";
       next.disabled = index === selected.length - 1;
       next.addEventListener("click", () => moveSelectedPhoto(photo.id, 1));
+      remove.type = "button";
+      remove.textContent = "×";
+      remove.dataset.selectedPhotoRemove = "";
+      remove.ariaLabel = `移除 ${photo.place}`;
+      remove.title = "移除照片";
+      remove.addEventListener("click", () => removeSelectedPhoto(photo.id));
 
-      order.append(previous, next);
+      order.append(previous, next, remove);
       copy.append(title, meta, order);
       card.append(image, copy);
       return card;
@@ -997,6 +1011,12 @@ function moveSelectedPhoto(photoId, direction) {
   [nextIds[index], nextIds[targetIndex]] = [nextIds[targetIndex], nextIds[index]];
   selectedPhotoIds = nextIds;
   syncCreateFlow(false);
+}
+
+function removeSelectedPhoto(photoId) {
+  selectedPhotoIds = selectedPhotoIds.filter((id) => id !== photoId);
+  syncCreateFlow(false);
+  updateCreateProgress();
 }
 
 function addSuggestedPhoto() {
