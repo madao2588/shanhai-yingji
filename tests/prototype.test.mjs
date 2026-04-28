@@ -8,7 +8,7 @@ const seedDestinationsPath = "src/data/seed-destinations.js";
 const seedMemoriesPath = "src/data/seed-memories.js";
 
 assert.match(html, /<script src="src\/main\.js"><\/script>/, "prototype should load the app through the src entry while keeping direct file-open support");
-assert.match(html, /<script src="src\/data\/seed-destinations\.js"><\/script>\s*<script src="src\/data\/seed-memories\.js"><\/script>\s*<script src="src\/domain\/memory\.js"><\/script>\s*<script src="src\/storage\/local-store\.js"><\/script>\s*<script src="src\/main\.js"><\/script>/, "seed, domain, and storage scripts should load before the app entry while keeping classic script support");
+assert.match(html, /<script src="src\/data\/seed-destinations\.js"><\/script>\s*<script src="src\/data\/seed-memories\.js"><\/script>\s*<script src="src\/domain\/memory\.js"><\/script>\s*<script src="src\/storage\/local-store\.js"><\/script>\s*<script src="src\/storage\/archive-export\.js"><\/script>\s*<script src="src\/main\.js"><\/script>/, "seed, domain, storage, and transfer scripts should load before the app entry while keeping classic script support");
 assert.equal(existsSync(seedDestinationsPath), true, "destination seed data should live in src/data");
 assert.equal(existsSync(seedMemoriesPath), true, "memory seed data should live in src/data");
 
@@ -24,6 +24,8 @@ assert.match(html, /data-archive-filter="favorite"/, "archive library should exp
 assert.match(html, /data-archive-filter="tagged"/, "archive library should expose a tagged filter");
 assert.match(html, /data-archive-list/, "archive library should expose a dynamic result list");
 assert.match(html, /data-archive-empty/, "archive library should expose an empty state");
+assert.match(html, /data-export-archive/, "archive library should expose archive export");
+assert.match(html, /data-import-archive/, "archive library should expose archive import");
 assert.match(html, /data-screen="memory-detail"/, "prototype should include a personal memory detail screen");
 assert.match(html, /data-memory-back/, "memory detail should include a back action");
 assert.match(html, /data-memory-title/, "memory detail should expose a title target");
@@ -65,6 +67,7 @@ assert.match(css, /\.archive-filter-row/, "archive filters should be styled");
 assert.match(css, /\.archive-list/, "archive list should be styled");
 assert.match(css, /\.archive-actions/, "archive management actions should be styled");
 assert.match(css, /\.tag-list/, "archive tags should be styled");
+assert.match(css, /\.archive-transfer/, "archive import and export controls should be styled");
 assert.match(css, /\.memory-detail-screen/, "memory detail screen should have dedicated styling");
 assert.match(css, /\.memory-detail-hero/, "memory detail hero should be styled");
 assert.match(css, /\.memory-gallery/, "memory detail gallery should be styled");
@@ -95,6 +98,9 @@ assert.match(js, /function filterArchiveLibrary/, "archive library should filter
 assert.match(js, /function toggleArchiveFavorite/, "archive library should toggle favorites");
 assert.match(js, /function deleteSavedMemory/, "archive library should delete saved entries");
 assert.match(js, /function editSavedMemory/, "archive library should edit saved entries");
+assert.match(js, /function exportArchive/, "archive library should export local archive JSON");
+assert.match(js, /function importArchiveFile/, "archive library should import local archive JSON");
+assert.match(js, /window\.shanhaiArchiveTransfer/, "app entry should use archive transfer helpers");
 assert.match(js, /function openMemoryDetail/, "memory cards should open a personal memory detail");
 assert.match(js, /function renderMemoryDetail/, "memory detail should render selected archive data");
 assert.match(js, /function renderDestination/, "detail view should render selected destination data");

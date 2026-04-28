@@ -42,6 +42,10 @@
     return readArchive(storage).destinationState;
   }
 
+  function loadArchive(storage) {
+    return readArchive(storage);
+  }
+
   function saveDestinationState(destinationState, storage) {
     const archive = readArchive(storage);
     return writeArchive({ ...archive, destinationState }, storage);
@@ -56,7 +60,13 @@
     return writeArchive({ ...archive, memories }, storage);
   }
 
+  function persistArchive(archive, storage) {
+    return writeArchive(archive, storage);
+  }
+
   window.shanhaiLocalStore = {
+    loadArchive,
+    persistArchive,
     loadDestinationState,
     saveDestinationState,
     loadSavedMemories,

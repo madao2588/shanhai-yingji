@@ -31,7 +31,9 @@ node --check src\main.js
 node --check src\data\seed-destinations.js
 node --check src\data\seed-memories.js
 node --check src\domain\memory.js
+node --check src\storage\archive-export.js
 node --check src\storage\local-store.js
+node tests\archive-export.test.mjs
 node tests\domain-memory.test.mjs
 node tests\prototype.test.mjs
 node tests\storage.test.mjs
@@ -61,6 +63,7 @@ node tests\browser-flow.test.mjs
 │   ├── domain/
 │   │   └── memory.js
 │   ├── storage/
+│   │   ├── archive-export.js
 │   │   └── local-store.js
 │   └── main.js
 ├── index.html

@@ -22,6 +22,8 @@ function plain(value) {
 }
 
 assert.equal(typeof store.loadDestinationState, "function", "store should expose destination state loading");
+assert.equal(typeof store.loadArchive, "function", "store should expose full archive loading");
+assert.equal(typeof store.persistArchive, "function", "store should expose full archive saving");
 assert.equal(typeof store.saveDestinationState, "function", "store should expose destination state saving");
 assert.equal(typeof store.loadSavedMemories, "function", "store should expose memory loading");
 assert.equal(typeof store.persistSavedMemories, "function", "store should expose memory saving");
@@ -64,6 +66,7 @@ assert.deepEqual(plain(store.loadSavedMemories(fakeStorage({ "shanhai-memory-ent
 const writable = fakeStorage();
 assert.deepEqual(plain(store.saveDestinationState({ wants: ["kiyomizu"], plans: [] }, writable)), { ok: true }, "destination writes should report success");
 assert.deepEqual(JSON.parse(writable.dump()["shanhai-archive"]).destinationState, { wants: ["kiyomizu"], plans: [] }, "destination writes should persist inside the versioned archive");
+assert.equal(plain(store.loadArchive(writable)).version, 1, "full archive loading should read the versioned archive");
 
 const failingStorage = {
   getItem() {

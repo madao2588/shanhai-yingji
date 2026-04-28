@@ -52,6 +52,21 @@ try {
   page.once("dialog", (dialog) => dialog.accept());
   await page.locator("[data-archive-delete]").first().click();
   await page.waitForFunction(() => !document.querySelector("[data-archive-list]")?.textContent.includes("测试收藏映记"));
+
+  await page.setInputFiles("[data-import-archive-input]", {
+    name: "archive.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(
+      JSON.stringify({
+        version: 1,
+        memories: [{ id: "imported-one", title: "导入映记", body: "从 JSON 恢复", source: "saved", location: "日本京都" }],
+        destinationState: { wants: ["kiyomizu"], plans: [] },
+      })
+    ),
+  });
+  await page.waitForFunction(() => document.querySelector("[data-archive-transfer-status]")?.textContent.includes("导入完成"));
+  await page.click('[data-archive-filter="all"]');
+  await page.waitForFunction(() => document.querySelector("[data-archive-list]")?.textContent.includes("导入映记"));
 } finally {
   await browser.close();
 }

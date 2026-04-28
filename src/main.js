@@ -41,6 +41,10 @@ const archiveFilters = document.querySelectorAll("[data-archive-filter]");
 const archiveList = document.querySelector("[data-archive-list]");
 const archiveEmpty = document.querySelector("[data-archive-empty]");
 const archiveCount = document.querySelector("[data-archive-count]");
+const exportArchiveButton = document.querySelector("[data-export-archive]");
+const importArchiveButton = document.querySelector("[data-import-archive]");
+const importArchiveInput = document.querySelector("[data-import-archive-input]");
+const archiveTransferStatus = document.querySelector("[data-archive-transfer-status]");
 const searchShortcut = document.querySelector(".search-button");
 const destinationSearch = document.querySelector(".review-search input");
 const destinationSearchButton = document.querySelector(".review-search button");
@@ -100,6 +104,7 @@ const particlePalette = [
 const destinationData = window.destinationData || {};
 const memoryDomain = window.shanhaiMemoryDomain;
 const localStore = window.shanhaiLocalStore;
+const archiveTransfer = window.shanhaiArchiveTransfer;
 
 let particles = [];
 let animationFrame = 0;
@@ -626,6 +631,56 @@ function deleteSavedMemory(memoryId) {
 
   renderPersonalArchive();
   renderArchiveLibrary();
+}
+
+function getCurrentArchive() {
+  return {
+    version: 1,
+    memories: savedMemories,
+    destinationState,
+  };
+}
+
+function exportArchive() {
+  const json = archiveTransfer.buildArchiveExport(getCurrentArchive());
+  const link = document.createElement("a");
+  link.href = `data:application/json;charset=utf-8,${encodeURIComponent(json)}`;
+  link.download = `shanhai-yingji-archive-${new Date().toISOString().slice(0, 10)}.json`;
+  link.click();
+  archiveTransferStatus.textContent = "已生成本地档案 JSON。";
+}
+
+function importArchiveFile() {
+  const [file] = importArchiveInput.files || [];
+  if (!file) {
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.addEventListener("load", () => {
+    const parsed = archiveTransfer.parseArchiveImport(String(reader.result || ""));
+    if (!parsed.ok) {
+      archiveTransferStatus.textContent = "导入失败：请选择有效的山海映记 JSON。";
+      importArchiveInput.value = "";
+      return;
+    }
+
+    const merged = archiveTransfer.mergeArchive(getCurrentArchive(), parsed.archive);
+    const result = localStore.persistArchive(merged);
+    if (!result.ok) {
+      archiveTransferStatus.textContent = "本机存储不可用，导入没有保存。";
+      importArchiveInput.value = "";
+      return;
+    }
+
+    savedMemories = merged.memories;
+    destinationState = merged.destinationState;
+    renderPersonalArchive();
+    renderArchiveLibrary();
+    archiveTransferStatus.textContent = `导入完成，当前共有 ${savedMemories.length} 篇本地映记。`;
+    importArchiveInput.value = "";
+  });
+  reader.readAsText(file);
 }
 
 function renderArchiveLibrary() {
@@ -1315,6 +1370,9 @@ archiveFilters.forEach((button) => {
     renderArchiveLibrary();
   });
 });
+exportArchiveButton.addEventListener("click", exportArchive);
+importArchiveButton.addEventListener("click", () => importArchiveInput.click());
+importArchiveInput.addEventListener("change", importArchiveFile);
 
 createForm.addEventListener("submit", (event) => {
   event.preventDefault();

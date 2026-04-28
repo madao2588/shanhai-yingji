@@ -189,6 +189,12 @@
               </div>
 
               <p class="archive-count" data-archive-count>2 篇映记</p>
+              <div class="archive-transfer" aria-label="档案导入导出">
+                <button type="button" data-export-archive>导出 JSON</button>
+                <button type="button" data-import-archive>导入 JSON</button>
+                <input type="file" accept="application/json,.json" data-import-archive-input hidden />
+                <span data-archive-transfer-status></span>
+              </div>
               <section class="archive-list" data-archive-list aria-label="映记结果列表"></section>
               <p class="archive-empty" data-archive-empty hidden>没有找到匹配的映记，换个关键词或筛选试试。</p>
             </section>
@@ -619,6 +625,7 @@
     <script src="src/data/seed-memories.js"></script>
     <script src="src/domain/memory.js"></script>
     <script src="src/storage/local-store.js"></script>
+    <script src="src/storage/archive-export.js"></script>
     <script src="src/main.js"></script>
   </body>
 </html>
