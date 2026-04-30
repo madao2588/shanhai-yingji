@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" role="img" aria-label="京都清水寺旅行照片">
+  <defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#243f43"/><stop offset="1" stop-color="#c07f4f"/></linearGradient></defs>
+  <rect width="900" height="620" fill="url(#g)"/>
+  <path d="M0 458c130-72 230-76 360-25s260 54 540-56v243H0z" fill="#0f1c20" opacity=".72"/>
+  <path d="M142 364h616l-92-88H234z" fill="#2a1611"/>
+  <path d="M202 364h496v168H202z" fill="#8f5033"/>
+  <path d="M244 404h78v128h-78zm167 0h78v128h-78zm167 0h78v128h-78z" fill="#191615"/>
+  <path d="M180 348l270-155 270 155z" fill="#d1a24d"/>
+  <circle cx="714" cy="128" r="54" fill="#f2d7a0" opacity=".72"/>
+</svg>

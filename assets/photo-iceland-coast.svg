@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" role="img" aria-label="冰岛海岸旅行照片">
+  <rect width="900" height="620" fill="#203940"/>
+  <path d="M0 360c160-40 275-14 410 28s282 62 490 8v224H0z" fill="#e8ece8" opacity=".88"/>
+  <path d="M0 430c180-56 306-24 448 18s272 48 452-12v184H0z" fill="#11191d"/>
+  <path d="M560 92l88 284h-176z" fill="#30383b"/>
+  <path d="M672 142l70 236H602z" fill="#596166"/>
+  <circle cx="180" cy="120" r="48" fill="#f2d7a0" opacity=".55"/>
+</svg>

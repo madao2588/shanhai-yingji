@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" role="img" aria-label="京都街巷旅行照片">
+  <rect width="900" height="620" fill="#17282d"/>
+  <path d="M0 620l245-410h410l245 410z" fill="#2d2420"/>
+  <path d="M330 210h240l90 410H240z" fill="#69594d"/>
+  <path d="M100 160h190v460H70zm510 10h210v450H650z" fill="#7b4631"/>
+  <path d="M126 205h120v55H126zm548 10h114v52H674z" fill="#d7ad65"/>
+  <path d="M450 210v410" stroke="#d6b56d" stroke-width="8" opacity=".55"/>
+  <circle cx="450" cy="120" r="36" fill="#f5efe4" opacity=".64"/>
+</svg>

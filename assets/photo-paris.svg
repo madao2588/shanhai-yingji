@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" role="img" aria-label="巴黎旅行照片">
+  <rect width="900" height="620" fill="#263238"/>
+  <path d="M0 458h900v162H0z" fill="#11181b"/>
+  <path d="M450 98l116 410h-42l-24-86H400l-24 86h-42zM414 372h72l-36-132z" fill="#d6b56d"/>
+  <path d="M270 508h360" stroke="#f5efe4" stroke-width="18" opacity=".48"/>
+  <circle cx="710" cy="126" r="44" fill="#f5efe4" opacity=".55"/>
+</svg>

@@ -2,11 +2,13 @@
   "name": "shanhai-yingji",
   "version": "0.1.0",
   "private": true,
-  "description": "Local-first static travel archive prototype.",
+  "description": "Production-oriented mobile travel journal and public travel community.",
   "scripts": {
-    "check": "node --check src/main.js && node --check src/data/seed-destinations.js && node --check src/data/seed-memories.js && node --check src/domain/memory.js && node --check src/storage/archive-export.js && node --check src/storage/local-store.js && node --check service-worker.js && node --check tests/archive-export.test.mjs && node --check tests/browser-flow.test.mjs && node --check tests/domain-memory.test.mjs && node --check tests/prototype.test.mjs && node --check tests/pwa.test.mjs && node --check tests/storage.test.mjs",
-    "test:node": "node tests/archive-export.test.mjs && node tests/domain-memory.test.mjs && node tests/prototype.test.mjs && node tests/pwa.test.mjs && node tests/storage.test.mjs",
-    "test:browser": "node tests/browser-flow.test.mjs",
+    "check": "node --check server/app.cjs && node --check server/auth.cjs && node --check server/config.cjs && node --check server/database.cjs && node --check server/index.cjs && node --check server/security.cjs && node --check server/validation.cjs && node --check src/api-client.js && node --check src/fullstack-panel.js && node --check src/main.js && node --check src/pwa-register.js && node --check src/data/seed-destinations.js && node --check src/data/seed-memories.js && node --check src/domain/memory.js && node --check src/storage/archive-export.js && node --check src/storage/local-store.js && node --check service-worker.js && node --check tests/api.test.mjs && node --check tests/community-api.test.mjs && node --check tests/production-completion-api.test.mjs && node --check tests/production-readiness-content.test.mjs && node --check tests/archive-export.test.mjs && node --check tests/browser-flow.test.mjs && node --check tests/community-browser-flow.test.mjs && node --check tests/ui-feedback-flow.test.mjs && node --check tests/domain-memory.test.mjs && node --check tests/fullstack-browser-flow.test.mjs && node --check tests/launch-readiness.test.mjs && node --check tests/prototype.test.mjs && node --check tests/pwa.test.mjs && node --check tests/storage.test.mjs",
+    "serve": "node server/index.cjs",
+    "test:api": "node tests/api.test.mjs",
+    "test:node": "node tests/archive-export.test.mjs && node tests/domain-memory.test.mjs && node tests/prototype.test.mjs && node tests/pwa.test.mjs && node tests/storage.test.mjs && node tests/api.test.mjs && node tests/community-api.test.mjs && node tests/production-completion-api.test.mjs && node tests/production-readiness-content.test.mjs && node tests/launch-readiness.test.mjs",
+    "test:browser": "node tests/browser-flow.test.mjs && node tests/fullstack-browser-flow.test.mjs && node tests/community-browser-flow.test.mjs && node tests/ui-feedback-flow.test.mjs",
     "test": "npm run check && npm run test:node && npm run test:browser"
   },
   "devDependencies": {

@@ -1,119 +1,139 @@
 # 山海映记
 
-线上地址：[https://madao2588.github.io/shanhai-yingji/](https://madao2588.github.io/shanhai-yingji/)
+山海映记是一款移动端优先的旅行日志与公开旅行社区应用。它包含可运行后端、账号体系、旅行日志持久化、照片上传与管理、公开/私密/仅链接可见发布、社区发现流、点赞、收藏、评论、关注、举报、通知、创作者统计、管理员审核、备份导出、测试验证和部署文档。
 
-山海映记是一个本地优先的移动端旅行影像档案原型。它把旅行地图、日记、目的地点评、照片导入、长图生成、个人档案管理，以及本地 JSON 导入/导出放在一个静态前端页面里。
+本仓库可以直接运行完整本地服务。默认地址是 `http://127.0.0.1:4173`。
 
-## 功能概览
+## 功能
 
-- 我的山海档案：查看年度旅行摘要、最近映记和个人旅行轨迹。
-- 全部映记：搜索、筛选、收藏、编辑、删除本地保存的映记；可编辑标题、正文、地点、路线、图片地址和标签，种子映记保持只读。
-- 映记详情：展示封面、正文、图册和路线回看。
-- 目的地点评：浏览目的地评分、推荐理由、优缺点、评价维度和真实短评。
-- 创建映记：编辑标题、地点和正文，选择或导入照片，并可调整照片顺序、移除误选照片，自动生成时间线。
-- 草稿续写：创建页会自动保存未完成内容，刷新后恢复标题、地点、正文和照片顺序；正式保存后清空草稿。
-- 分享长图：将当前映记绘制到 Canvas，并导出 PNG。
-- 本地档案：使用版本化 `localStorage` 对象保存映记、想去、计划、标签和收藏状态。
-- 导入/导出：把本地档案导出为 JSON，也可以从 JSON 合并恢复，默认不覆盖已有映记。
+- 账号：注册、登录、会话恢复、资料更新、账号注销。
+- 日志：创建、编辑、删除旅行日志，支持标题、正文、地点、国家、城市、标签、路线、季节、预算、人群和到访状态。
+- 发布：`private` 仅本人可见，`unlisted` 仅链接可见，`public` 进入社区发现流。
+- 媒体：上传照片、查看当前日志照片、删除已上传照片。
+- 社区：公开发现流、搜索、最新/热门排序、标签聚合、目的地聚合。
+- 互动：点赞、收藏、评论、关注作者、举报内容。
+- 创作者：公开日志数、喜欢数、收藏数、评论数和关注者统计。
+- 通知：喜欢、收藏、评论、关注等互动通知。
+- 管理员：举报列表、内容下架、运营指标、全量备份导出。
+- 备份恢复：用户档案导入/导出，管理员全量备份导出。
+- 移动端体验：手机尺寸优先的 HTML/CSS/JavaScript 前端，保留本地档案能力和 PWA 外壳。
 
-## 快速开始
-
-这个项目没有构建步骤，直接打开即可：
-
-```powershell
-start .\index.html
-```
-
-也可以用浏览器打开仓库里的 `index.html`。
-
-## 测试
-
-项目使用 npm 脚本做轻量验证，并把 Playwright 浏览器流程纳入 CI：
+## 快速运行
 
 ```powershell
 npm install
-npm test
+npm run serve
 ```
 
-也可以拆开运行：
-
-```powershell
-npm run check
-npm run test:node
-npm run test:browser
-```
-
-`prototype.test.mjs` 检查关键页面结构、样式选择器和核心函数是否存在。
-
-`storage.test.mjs`、`domain-memory.test.mjs` 和 `archive-export.test.mjs` 覆盖本地档案读写、旧数据迁移、版本化映记、导入导出和合并逻辑。
-
-`pwa.test.mjs` 检查移动端 manifest、主题色、service worker 注册和离线缓存清单。
-
-`browser-flow.test.mjs` 使用 Playwright 跑真实浏览器流程，覆盖创建表单回车不刷新、本地图片导入保存为 data URL、已选照片排序和移除、创建草稿刷新恢复、保存后清空草稿、保存映记、收藏筛选、地点/路线/图片/标签内联编辑、删除确认和 JSON 导入。
-
-GitHub Actions 会在 push 和 pull request 时自动安装依赖、安装 Chromium，并运行完整 `npm test`。
-
-## 项目结构
+打开：
 
 ```text
-.
-|-- assets/
-|   `-- app-icon.svg
-|-- docs/
-|   `-- superpowers/
-|-- src/
-|   |-- data/
-|   |   |-- seed-destinations.js
-|   |   `-- seed-memories.js
-|   |-- domain/
-|   |   `-- memory.js
-|   |-- storage/
-|   |   |-- archive-export.js
-|   |   `-- local-store.js
-|   `-- main.js
-|-- tests/
-|   |-- archive-export.test.mjs
-|   |-- browser-flow.test.mjs
-|   |-- domain-memory.test.mjs
-|   |-- prototype.test.mjs
-|   |-- pwa.test.mjs
-|   `-- storage.test.mjs
-|-- index.html
-|-- manifest.webmanifest
-|-- service-worker.js
-|-- styles.css
-`-- README.md
+http://127.0.0.1:4173
 ```
 
-## 技术说明
+## 环境变量
 
-- 纯 HTML/CSS/JavaScript，无框架、无打包器、无后端。
-- 保留经典脚本加载方式，确保 `index.html` 可以通过 `file://` 直接打开。
-- 目的地和种子映记数据拆在 `src/data/` 下，通过 `window` 暴露给入口脚本。
-- 映记模型在 `src/domain/memory.js` 中规范化，保证新旧数据都有 `createdAt`、`updatedAt`、`tags` 和 `favorite`。
-- 本地存储在 `src/storage/local-store.js` 中封装，兼容旧的分离 key，并写入新的版本化 `shanhai-archive`。
-- 导入导出逻辑在 `src/storage/archive-export.js` 中封装，导入时按 `id` 合并去重。
-- PWA 外壳由 `manifest.webmanifest` 和 `service-worker.js` 提供；service worker 只在 `http/https` 下注册，避免破坏 `file://` 直接打开。
-- 本地导入图片通过 `FileReader.readAsDataURL()` 转为 data URL，避免保存后依赖临时 `blob:` 地址。
-- 创建页草稿使用独立的 `shanhai-create-draft` key，不写入正式档案；保存映记成功后自动清理。
-- 分享长图通过隐藏 Canvas 绘制，再导出 PNG。
+复制 `.env.example` 后按部署环境设置：
 
-## GitHub Pages
+```powershell
+$env:PORT = "4173"
+$env:SHANHAI_DATA_DIR = "C:\shanhai-data"
+$env:SHANHAI_ALLOWED_ORIGIN = "https://example.com"
+$env:SHANHAI_ADMIN_EMAILS = "admin@example.com"
+npm run serve
+```
 
-这是静态站点，已通过 GitHub Pages 发布：
+使用 `SHANHAI_ADMIN_EMAILS` 中的邮箱注册账号后，该账号拥有管理员审核、指标和备份权限。
 
-[https://madao2588.github.io/shanhai-yingji/](https://madao2588.github.io/shanhai-yingji/)
+## 数据库与媒体存储
 
-如需重新配置：
+当前后端使用 `server/database.cjs` 中的 JSON 数据库适配器：
 
-1. 打开仓库 `Settings -> Pages`。
-2. Source 选择 `Deploy from a branch`。
-3. Branch 选择 `main`，目录选择 `/root`。
-4. 保存后等待 Pages 生成访问地址。
+- `.data/shanhai-db.json` 保存用户、会话、日志、照片元数据、点赞、收藏、评论、关注、举报、通知、审核动作和浏览记录。
+- `.data/uploads/` 保存上传图片文件。
 
-## 当前边界
+这套适配器适合本地开发、验收和单实例部署。生产多实例部署时，应把同一数据模型迁移到 PostgreSQL 或同等级托管数据库，并把上传目录迁移到对象存储和 CDN。迁移边界已经在 `docs/ARCHITECTURE.md`、`docs/DEPLOYMENT.md` 和 `docs/LAUNCH-CHECKLIST.md` 中列出。
 
-- 数据只保存在当前浏览器的 `localStorage`，没有账号、云同步或后端。
-- 目的地和种子映记仍是静态样例数据。
-- 编辑映记已支持档案页内联表单；复杂照片排序和地图式路线编辑仍可继续扩展。
-- 分享长图在部分远程图片跨域失败时会降级为渐变背景。
+## API
+
+核心接口包括：
+
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET/PATCH/DELETE /api/me`
+- `GET/POST /api/memories`
+- `GET/PATCH/DELETE /api/memories/:id`
+- `POST /api/memories/:id/photos`
+- `DELETE /api/memories/:id/photos/:photoId`
+- `GET /api/discover/memories`
+- `GET /api/tags`
+- `GET /api/destinations`
+- `POST /api/memories/:id/like`
+- `POST /api/memories/:id/bookmark`
+- `GET/POST /api/memories/:id/comments`
+- `POST /api/profile/:username/follow`
+- `GET /api/notifications`
+- `GET /api/creator/stats`
+- `POST /api/reports`
+- `GET /api/admin/reports`
+- `PATCH /api/admin/reports/:id`
+- `GET /api/admin/metrics`
+- `GET /api/admin/backup`
+- `GET /api/export`
+- `POST /api/import`
+
+完整说明见 `docs/API.md`。
+
+## 测试
+
+```powershell
+npm test
+npm audit --omit=dev
+```
+
+测试覆盖：
+
+- 语法检查：后端、前端、service worker、全部测试文件。
+- 数据逻辑：本地档案、导入导出、领域模型迁移。
+- API：账号、日志、媒体、公开发布、社区互动、举报、审核、备份、指标。
+- 浏览器流程：本地记录、云端发布、照片上传、社区发现和互动。
+- 上线检查：文档、配置、Docker、PWA、敏感文件不可访问。
+
+## 部署
+
+本地或单实例服务器：
+
+```powershell
+npm ci
+npm run serve
+```
+
+Docker：
+
+```powershell
+docker build -t shanhai-yingji .
+docker run -p 4173:4173 --env-file .env shanhai-yingji
+```
+
+上线前必须完成：
+
+- 生产必须替换开发适配器；鐢熶骇蹇呴』鏇挎崲 JSON 数据库和本地上传目录。
+- 配置 HTTPS、反向代理和真实域名。
+- 设置 `SHANHAI_ALLOWED_ORIGIN` 与 `SHANHAI_ADMIN_EMAILS`。
+- 准备持久化数据卷或托管数据库。
+- 准备对象存储/CDN 和上传扫描策略。
+- 配置备份、监控、告警和日志留存。
+- 运行 `npm test` 与 `npm audit --omit=dev`。
+
+## 文档
+
+- `docs/API.md`：API 合同。
+- `docs/ARCHITECTURE.md`：系统结构和数据边界。
+- `docs/SECURITY.md`：安全与隐私控制。
+- `docs/DEPLOYMENT.md`：部署流程。
+- `docs/LAUNCH-CHECKLIST.md`：上线检查清单。
+- `docs/RUNBOOK.md`：运行手册。
+- `docs/BACKUP-RESTORE.md`：备份恢复。
+- `docs/MONITORING.md`：监控告警。
+- `docs/TROUBLESHOOTING.md`：故障排查。
+- `docs/RELEASE-NOTES.md`：发布记录。

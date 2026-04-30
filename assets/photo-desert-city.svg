@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" role="img" aria-label="沙漠城市旅行照片">
+  <rect width="900" height="620" fill="#c78955"/>
+  <path d="M0 452c190-80 350-72 520-28s260 42 380 10v186H0z" fill="#9f6239"/>
+  <path d="M272 118h58v330h-58zm118-54h64v384h-64zm126 118h72v266h-72z" fill="#182328" opacity=".86"/>
+  <path d="M0 520c260-48 570-45 900 8v92H0z" fill="#6f4228"/>
+  <circle cx="136" cy="108" r="60" fill="#f7d990" opacity=".62"/>
+</svg>

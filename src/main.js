@@ -4,6 +4,13 @@ const ctx = canvas.getContext("2d");
 const modeTabs = document.querySelectorAll(".mode-tab");
 const mapView = document.querySelector("#mapView");
 const diaryView = document.querySelector("#diaryView");
+const recordBrowsePanel = document.querySelector("[data-browse-panel]");
+const recordBrowseKicker = document.querySelector("[data-browse-kicker]");
+const recordBrowseTitle = document.querySelector("[data-browse-title]");
+const recordBrowseContent = document.querySelector("[data-browse-content]");
+const recordBrowseClose = document.querySelector("[data-browse-close]");
+const openMapBrowseButton = document.querySelector("[data-open-map-browse]");
+const openDiaryBrowseButton = document.querySelector("[data-open-diary-browse]");
 const navButtons = document.querySelectorAll(".nav-button");
 const screens = document.querySelectorAll(".screen");
 const profileShortcut = document.querySelector("[data-open-profile]");
@@ -59,6 +66,12 @@ const editStatus = document.querySelector("[data-edit-status]");
 const searchShortcut = document.querySelector(".search-button");
 const destinationSearch = document.querySelector(".review-search input");
 const destinationSearchButton = document.querySelector(".review-search button");
+const communityTabs = document.querySelectorAll("[data-community-tab]");
+const communityPanels = document.querySelectorAll("[data-community-panel]");
+const communityChannelKicker = document.querySelector("[data-community-channel-kicker]");
+const communityChannelTitle = document.querySelector("[data-community-channel-title]");
+const communityChannelCopy = document.querySelector("[data-community-channel-copy]");
+const communityCityButtons = document.querySelectorAll("[data-city-query]");
 const reviewFilters = document.querySelectorAll(".review-filter");
 const reviewCards = document.querySelectorAll("[data-review-card]");
 const reviewEmpty = document.querySelector(".review-empty");
@@ -104,6 +117,25 @@ const memoryBody = document.querySelector("[data-memory-body]");
 const memoryGallery = document.querySelector("[data-memory-gallery]");
 const memoryRoute = document.querySelector("[data-memory-route]");
 const memoryOrigin = document.querySelector("[data-memory-origin]");
+const conversationItems = document.querySelectorAll("[data-conversation-item]");
+const conversationThread = document.querySelector("[data-conversation-thread]");
+const conversationTitle = document.querySelector("[data-conversation-title]");
+const conversationStatus = document.querySelector("[data-conversation-status]");
+const conversationMessages = document.querySelector("[data-conversation-messages]");
+const conversationInput = document.querySelector("[data-conversation-message-input]");
+const conversationSend = document.querySelector("[data-conversation-send]");
+const profileActionButtons = document.querySelectorAll("[data-profile-primary-action], [data-profile-quick-action]");
+const profileAvatarEdit = document.querySelector("[data-profile-avatar-edit]");
+const profileEditPanel = document.querySelector("[data-profile-edit-panel]");
+const profileEditClose = document.querySelector("[data-profile-edit-close]");
+const profileAvatarInput = document.querySelector("[data-profile-avatar-input]");
+const profileAvatarImage = document.querySelector("[data-profile-avatar-image]");
+const profileAvatarPreview = document.querySelector("[data-profile-avatar-preview]");
+const profileSpaceEntryButtons = document.querySelectorAll("[data-open-profile-space]");
+const profileSpaceBack = document.querySelector("[data-profile-space-back]");
+const profileSpaceEditButtons = document.querySelectorAll("[data-profile-space-edit], [data-profile-space-avatar-edit]");
+const profileSpaceTabs = document.querySelectorAll("[data-profile-space-tab]");
+const profileSpaceEmpty = document.querySelector("[data-profile-space-empty]");
 
 const particlePalette = [
   "rgba(214, 181, 109, 0.9)",
@@ -303,7 +335,13 @@ function activateScreen(target, hashTarget = target, updateHash = true) {
   });
 
   const navTarget =
-    nextTarget === "destination" ? "community" : nextTarget === "memory-detail" || nextTarget === "archive" ? "record" : nextTarget;
+    nextTarget === "destination"
+      ? "community"
+      : nextTarget === "memory-detail" || nextTarget === "archive"
+        ? "record"
+        : nextTarget === "profile-space"
+          ? "profile"
+          : nextTarget;
   navButtons.forEach((button) => {
     button.classList.toggle("is-active", button.dataset.target === navTarget);
   });
@@ -322,6 +360,242 @@ function activateMode(selectedMode) {
 
   mapView.classList.toggle("is-active", selectedMode === "map");
   diaryView.classList.toggle("is-active", selectedMode === "diary");
+}
+
+function openRecordBrowse(kind) {
+  if (!recordBrowsePanel || !recordBrowseContent) {
+    return;
+  }
+
+  const isDiary = kind === "diary";
+  const entries = isDiary
+    ? [
+        ["雨后的清水寺", "日记 · 1,240 字 · 12 张照片 · 已生成回望长图"],
+        ["冰岛环岛第 3 天", "映记 · 黑沙滩、海风和迟到的日落"],
+        ["巴黎左岸一小时", "回望 · 咖啡、旧书摊和塞纳河雨声"],
+      ]
+    : [
+        ["京都", "路线 · 清水寺 -> 二年坂 -> 八坂神社 · 4.8 km"],
+        ["雷克雅未克", "城市 · 南岸瀑布 -> 黑沙滩 -> 海岸线 · 312 km"],
+        ["巴黎", "路线 · 左岸 -> 旧书摊 -> 塞纳河 · 3.2 km"],
+      ];
+
+  recordBrowseKicker.textContent = isDiary ? "日记翻阅" : "足迹翻阅";
+  recordBrowseTitle.textContent = isDiary ? "映记与回望" : "城市路线";
+  recordBrowseContent.replaceChildren(
+    ...entries.map(([title, body]) => {
+      const item = document.createElement("article");
+      const strong = document.createElement("strong");
+      const span = document.createElement("span");
+
+      strong.textContent = title;
+      span.textContent = body;
+      item.append(strong, span);
+      return item;
+    }),
+  );
+  recordBrowsePanel.hidden = false;
+  recordBrowsePanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function switchCommunityTab(tabName) {
+  const channelCopy = {
+    reviews: ["当前频道", "目的地点评", "按城市、景区和真实体验筛选，先判断值不值得去。"],
+    featured: ["当前频道", "精选公开映记", "看编辑精选、热门路线和高质量公开日志，适合找灵感。"],
+    nearby: ["当前频道", "附近旅行动态", "查看身边正在发生的旅行记录、路线提醒和地点热度。"],
+    cities: ["当前频道", "城市索引", "按城市进入点评、公开日志和路线集合，方便连续翻阅。"],
+  };
+  const [kicker, title, copy] = channelCopy[tabName] || channelCopy.reviews;
+
+  communityTabs.forEach((tab) => {
+    const isActive = tab.dataset.communityTab === tabName;
+    tab.classList.toggle("is-active", isActive);
+    tab.setAttribute("aria-pressed", String(isActive));
+  });
+
+  communityPanels.forEach((panel) => {
+    const isActive = panel.dataset.communityPanel === tabName;
+    panel.hidden = !isActive;
+    panel.classList.toggle("is-active", isActive);
+  });
+
+  communityChannelKicker.textContent = kicker;
+  communityChannelTitle.textContent = title;
+  communityChannelCopy.textContent = copy;
+
+  if (destinationSearch) {
+    destinationSearch.placeholder =
+      tabName === "featured"
+        ? "搜索精选公开映记、路线或创作者"
+        : tabName === "nearby"
+          ? "搜索附近城市、路线或地点"
+          : tabName === "cities"
+            ? "搜索城市名"
+            : "搜索城市、景区或关键词";
+  }
+}
+
+function openConversation(conversationId) {
+  if (!conversationThread || !conversationMessages) {
+    return;
+  }
+
+  const conversations = {
+    "lin-che": {
+      title: "林澈",
+      status: "正在整理京都路线",
+      messages: [
+        ["from-friend", "我把清水寺到八坂神社的步行线补全了，你看要不要放进公开映记？"],
+        ["from-me", "可以，记得加上人流时间和拍照点。"],
+      ],
+    },
+    mori: {
+      title: "森野",
+      status: "想复用你的冰岛照片参数",
+      messages: [
+        ["from-friend", "黑沙滩那组颜色很好看，是清晨拍的吗？"],
+        ["from-me", "是清晨，风很大，快门要留一点余量。"],
+      ],
+    },
+    aya: {
+      title: "青禾",
+      status: "关注了你的公开主页",
+      messages: [
+        ["from-friend", "西湖晨雾那篇我收藏了，下次想照着走一遍。"],
+        ["from-me", "我把路线和备选咖啡店也补上。"],
+      ],
+    },
+  };
+  const data = conversations[conversationId] || conversations["lin-che"];
+
+  conversationItems.forEach((item) => item.classList.toggle("is-active", item.dataset.conversationItem === conversationId));
+  conversationTitle.textContent = data.title;
+  conversationStatus.textContent = data.status;
+  conversationMessages.replaceChildren(
+    ...data.messages.map(([className, text]) => {
+      const message = document.createElement("article");
+      const bubble = document.createElement("span");
+
+      message.className = className;
+      bubble.textContent = text;
+      message.append(bubble);
+      return message;
+    }),
+  );
+  conversationThread.hidden = false;
+}
+
+function sendConversationReply() {
+  const text = conversationInput?.value.trim();
+
+  if (!text || !conversationMessages) {
+    return;
+  }
+
+  const message = document.createElement("article");
+  const bubble = document.createElement("span");
+
+  message.className = "from-me";
+  bubble.textContent = text;
+  message.append(bubble);
+  conversationMessages.append(message);
+  conversationInput.value = "";
+}
+
+function activateProfileSpaceTab(tabName = "notes") {
+  profileSpaceTabs.forEach((button) => {
+    const isSelected = button.dataset.profileSpaceTab === tabName;
+    button.classList.toggle("is-active", isSelected);
+    button.setAttribute("aria-pressed", String(isSelected));
+  });
+
+  if (!profileSpaceEmpty) {
+    return;
+  }
+
+  const copy = {
+    notes: ["还没有公开内容", "编辑资料后，就可以从云端发布区把旅行映记发布到这里。"],
+    bookmarks: ["还没有收藏路线", "在社区收藏公开映记后，会集中出现在这里。"],
+    liked: ["还没有赞过内容", "你喜欢过的旅行记录会沉淀成个人灵感库。"],
+    comments: ["还没有评论互动", "公开映记收到的评论、赞和收藏会在这里汇总。"],
+    following: ["正在整理关注列表", "关注的旅行创作者会成为你的灵感来源。"],
+    followers: ["正在整理粉丝列表", "公开发布后，关注你的人会显示在这里。"],
+  }[tabName] || ["还没有公开内容", "编辑资料后，就可以从云端发布区把旅行映记发布到这里。"];
+
+  profileSpaceEmpty.querySelector("strong").textContent = copy[0];
+  profileSpaceEmpty.querySelector("p").textContent = copy[1];
+}
+
+function openProfileSpace(tabName = "notes") {
+  closeProfileEditPanel();
+  activateScreen("profile-space", "profile-space");
+  activateProfileSpaceTab(tabName);
+}
+
+function openProfileEditPanel() {
+  if (!profileEditPanel) {
+    return;
+  }
+
+  activateScreen("profile-space", "profile-space");
+  profileEditPanel.hidden = false;
+  requestAnimationFrame(() => {
+    profileEditPanel.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+}
+
+function closeProfileEditPanel() {
+  if (profileEditPanel) {
+    profileEditPanel.hidden = true;
+  }
+}
+
+function previewProfileAvatar() {
+  const file = profileAvatarInput?.files?.[0];
+
+  if (!file) {
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.addEventListener("load", () => {
+    const source = String(reader.result || "");
+    if (profileAvatarImage) {
+      profileAvatarImage.src = source;
+    }
+    if (profileAvatarPreview) {
+      profileAvatarPreview.src = source;
+    }
+  });
+  reader.readAsDataURL(file);
+}
+
+function handleProfileAction(event) {
+  const button = event.currentTarget;
+  const target = button.dataset.profileGo;
+
+  if (target === "profile-space") {
+    openProfileSpace();
+    return;
+  }
+
+  if (target === "archive") {
+    openArchiveLibrary();
+    return;
+  }
+
+  if (target) {
+    activateScreen(target);
+    return;
+  }
+
+  if (button.dataset.profileFocus === "photos") {
+    document.querySelector("[data-cloud-photo-list]")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  if (button.dataset.profileFocus === "export") {
+    document.querySelector("[data-cloud-panel]")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
 }
 
 function getPhotoData(option) {
@@ -1521,6 +1795,12 @@ modeTabs.forEach((tab) => {
   tab.addEventListener("click", () => activateMode(tab.dataset.mode));
 });
 
+openMapBrowseButton?.addEventListener("click", () => openRecordBrowse("map"));
+openDiaryBrowseButton?.addEventListener("click", () => openRecordBrowse("diary"));
+recordBrowseClose?.addEventListener("click", () => {
+  recordBrowsePanel.hidden = true;
+});
+
 navButtons.forEach((button) => {
   button.addEventListener("click", () => activateScreen(button.dataset.target));
 });
@@ -1571,8 +1851,18 @@ reviewFilters.forEach((filter) => {
 
 destinationSearch.addEventListener("input", filterReviews);
 destinationSearchButton.addEventListener("click", filterReviews);
+communityTabs.forEach((tab) => {
+  tab.addEventListener("click", () => switchCommunityTab(tab.dataset.communityTab));
+});
+communityCityButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    switchCommunityTab("reviews");
+    destinationSearch.value = button.dataset.cityQuery;
+    filterReviews();
+  });
+});
 
-searchShortcut.addEventListener("click", () => {
+searchShortcut?.addEventListener("click", () => {
   activateScreen("community");
   window.setTimeout(() => destinationSearch.focus(), 120);
 });
@@ -1597,6 +1887,32 @@ planClose.addEventListener("click", () => {
 });
 planSave.addEventListener("click", savePlanDraft);
 memoryAction.addEventListener("click", openMemoryLink);
+conversationItems.forEach((item) => {
+  item.addEventListener("click", () => openConversation(item.dataset.conversationItem));
+});
+conversationSend?.addEventListener("click", sendConversationReply);
+conversationInput?.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    sendConversationReply();
+  }
+});
+profileActionButtons.forEach((button) => {
+  button.addEventListener("click", handleProfileAction);
+});
+profileAvatarEdit?.addEventListener("click", () => openProfileSpace());
+profileSpaceEntryButtons.forEach((button) => {
+  button.addEventListener("click", () => openProfileSpace(button.dataset.profileSpaceFocus || "notes"));
+});
+profileSpaceBack?.addEventListener("click", () => activateScreen("profile"));
+profileSpaceEditButtons.forEach((button) => {
+  button.addEventListener("click", openProfileEditPanel);
+});
+profileSpaceTabs.forEach((button) => {
+  button.addEventListener("click", () => activateProfileSpaceTab(button.dataset.profileSpaceTab));
+});
+profileEditClose?.addEventListener("click", closeProfileEditPanel);
+profileAvatarInput?.addEventListener("change", previewProfileAvatar);
 
 window.addEventListener("resize", sizeCanvas);
 window.addEventListener("hashchange", handleHashRoute);

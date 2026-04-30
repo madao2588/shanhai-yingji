@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="林澈头像">
+  <defs>
+    <linearGradient id="bg" x1="20" y1="18" x2="142" y2="146" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#d6b56d"/>
+      <stop offset="0.48" stop-color="#6fc8bd"/>
+      <stop offset="1" stop-color="#ff7a5c"/>
+    </linearGradient>
+    <linearGradient id="coat" x1="48" y1="94" x2="120" y2="154" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#10282b"/>
+      <stop offset="1" stop-color="#1f6f6a"/>
+    </linearGradient>
+    <clipPath id="circle">
+      <circle cx="80" cy="80" r="76"/>
+    </clipPath>
+  </defs>
+  <circle cx="80" cy="80" r="78" fill="#10181b"/>
+  <g clip-path="url(#circle)">
+    <rect width="160" height="160" fill="url(#bg)"/>
+    <path d="M-5 126c34-22 69-24 105-7 22 10 43 10 66-6v47H-5z" fill="#0b1719" opacity=".42"/>
+    <path d="M20 137c29-18 58-19 88-6 18 8 35 7 54-5v34H20z" fill="#f5efe4" opacity=".28"/>
+    <path d="M37 160c3-29 20-52 43-52s40 23 43 52z" fill="url(#coat)"/>
+    <path d="M58 113c7 10 35 10 44 0-4 18-39 18-44 0z" fill="#f5efe4" opacity=".72"/>
+    <circle cx="80" cy="70" r="35" fill="#c98d63"/>
+    <path d="M50 66c2-27 18-43 43-39 18 3 29 17 31 39-15-10-34-13-57-10-7 1-13 4-17 10z" fill="#2b2524"/>
+    <path d="M48 77c0-8 4-13 9-12 3 1 4 7 2 14-2 8-7 12-10 9-1-2-1-6-1-11zM112 79c-2-8 0-14 4-15 5-1 9 4 9 12 0 6 0 10-2 12-3 3-8-1-11-9z" fill="#c98d63"/>
+    <path d="M67 83c8 8 18 8 26 0" fill="none" stroke="#653a2e" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="66" cy="68" r="3" fill="#2b2524"/>
+    <circle cx="94" cy="68" r="3" fill="#2b2524"/>
+    <path d="M62 60c6-4 13-4 19 0M88 60c7-4 14-3 19 1" fill="none" stroke="#2b2524" stroke-width="3" stroke-linecap="round" opacity=".68"/>
+  </g>
+  <circle cx="80" cy="80" r="76" fill="none" stroke="#f5efe4" stroke-opacity=".38" stroke-width="4"/>
+</svg>

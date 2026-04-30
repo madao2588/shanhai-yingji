@@ -1,0 +1,96 @@
+import assert from "node:assert/strict";
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import { createRequire } from "node:module";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { chromium } from "playwright";
+
+const require = createRequire(import.meta.url);
+const { createApp } = require("../server/app.cjs");
+const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
+const dataDir = await mkdtemp(join(tmpdir(), "shanhai-ui-feedback-"));
+const server = createApp({ dataDir, publicDir: projectRoot });
+
+function listen(app) {
+  return new Promise((resolveListen) => {
+    app.listen(0, "127.0.0.1", () => resolveListen(app.address().port));
+  });
+}
+
+const port = await listen(server);
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+const consoleErrors = [];
+const failedRequests = [];
+
+page.on("console", (message) => {
+  if (message.type() === "error") {
+    consoleErrors.push(message.text());
+  }
+});
+page.on("requestfailed", (request) => {
+  failedRequests.push(`${request.method()} ${request.url()} ${request.failure()?.errorText || ""}`);
+});
+
+try {
+  await page.goto(`http://127.0.0.1:${port}/index.html#record`, { waitUntil: "domcontentloaded" });
+  await page.waitForFunction(() => document.querySelector("#splash")?.classList.contains("is-hidden"));
+
+  await page.click("[data-open-map-browse]");
+  await page.waitForSelector('[data-browse-panel]:not([hidden])');
+  assert.match(await page.locator("[data-browse-panel]").textContent(), /足迹|城市|路线/, "map browse panel should show reviewable trip content");
+  await page.click("[data-browse-close]");
+
+  await page.click('[data-mode="diary"]');
+  await page.click("[data-open-diary-browse]");
+  await page.waitForSelector('[data-browse-panel]:not([hidden])');
+  assert.match(await page.locator("[data-browse-panel]").textContent(), /日记|映记|回望/, "diary browse panel should show diary content");
+  await page.click("[data-browse-close]");
+
+  await page.click('[data-target="community"]');
+  await page.click('[data-community-tab="featured"]');
+  await page.waitForSelector('[data-community-panel="featured"]:not([hidden])');
+  assert.match(await page.locator("[data-community-channel]").textContent(), /精选|公开/, "featured tab should visibly change the active channel");
+  await page.click('[data-community-tab="nearby"]');
+  await page.waitForSelector('[data-community-panel="nearby"]:not([hidden])');
+  assert.match(await page.locator("[data-community-channel]").textContent(), /附近|动态/, "nearby tab should visibly change the active channel");
+  await page.click('[data-community-tab="cities"]');
+  await page.waitForSelector('[data-community-panel="cities"]:not([hidden])');
+  assert.equal(await page.locator(".search-button").count(), 0, "community header should not keep a redundant empty search icon");
+
+  await page.click('[data-target="messages"]');
+  await page.click('[data-conversation-item="lin-che"]');
+  await page.waitForSelector('[data-conversation-thread]:not([hidden])');
+  await page.fill("[data-conversation-message-input]", "下次把路线发我");
+  await page.click("[data-conversation-send]");
+  await page.waitForFunction(() => document.querySelector("[data-conversation-thread]")?.textContent.includes("下次把路线发我"));
+
+  await page.click('[data-target="profile"]');
+  await page.waitForSelector("[data-profile-dashboard]");
+  assert.equal(await page.locator("[data-profile-avatar-image]").count(), 1, "profile should show a real avatar image");
+  assert.equal(await page.locator('[data-screen="profile"] [data-profile-edit-panel]').count(), 0, "profile dashboard should not contain the edit form directly");
+  await page.click("[data-profile-avatar-edit]");
+  await page.waitForSelector('[data-screen="profile-space"].is-active');
+  assert.equal(await page.locator("[data-profile-space]").count(), 1, "avatar click should navigate into personal space");
+  assert.equal(await page.locator("[data-profile-edit-panel]:not([hidden])").count(), 0, "personal space edit panel should stay closed until edit action");
+  await page.click("[data-profile-space-edit]");
+  await page.waitForSelector("[data-profile-edit-panel]:not([hidden])");
+  assert.equal(await page.locator("[data-profile-phone]").count(), 1, "profile edit panel should expose phone editing");
+  assert.equal(await page.locator("[data-profile-bio]").count(), 1, "profile edit panel should expose bio editing");
+  assert.equal(await page.locator(".file-picker").count(), 1, "cloud upload should use a styled file picker");
+  assert.equal(await page.locator(".cloud-danger-action").count(), 1, "photo deletion should use a styled danger action");
+  assert.equal(await page.locator(".cloud-account-module").count(), 0, "account identity should move out of the detached cloud module");
+  await page.click('[data-target="profile"]');
+  assert.equal(await page.locator("[data-profile-primary-action]").count() >= 2, true, "profile should expose practical primary actions");
+  assert.equal(await page.locator("[data-profile-quick-action]").count() >= 4, true, "profile should expose useful quick actions");
+  assert.equal(await page.locator(".cloud-module").count() >= 2, true, "cloud account area should be split into designed mobile modules");
+
+  assert.deepEqual(consoleErrors, [], "feedback flow should not log console errors");
+  assert.deepEqual(failedRequests, [], "feedback flow should not have failed resource requests");
+} finally {
+  await browser.close();
+  await new Promise((resolveClose) => server.close(resolveClose));
+  await rm(dataDir, { recursive: true, force: true });
+}

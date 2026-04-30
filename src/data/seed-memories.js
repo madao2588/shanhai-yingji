@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
   window.seedMemories = [
   {
     id: "seed-kyoto",
@@ -12,14 +12,14 @@
     body: "石板路还在反光，风里有樱花落下来的声音。",
     photoCount: 12,
     words: 1240,
-    cover: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=420&q=82",
+    cover: "assets/photo-kyoto-street.svg",
     alt: "京都街景照片",
     route: "清水寺 -> 二年坂 -> 八坂神社",
     origin: "来自最近映记",
     photos: [
-      "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=360&q=82",
-      "https://images.unsplash.com/photo-1528164344705-47542687000d?auto=format&fit=crop&w=360&q=82",
-      "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=360&q=82",
+      "assets/photo-kyoto-street.svg",
+      "assets/photo-kyoto-temple.svg",
+      "assets/photo-kyoto-street.svg",
     ],
   },
   {
@@ -34,14 +34,14 @@
     body: "黑沙滩、海风和一场迟到的日落。",
     photoCount: 9,
     words: 860,
-    cover: "https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?auto=format&fit=crop&w=420&q=82",
+    cover: "assets/photo-iceland-mountain.svg",
     alt: "冰岛山脉照片",
     route: "维克镇 -> 黑沙滩 -> Dyrholaey 灯塔",
     origin: "来自最近映记",
     photos: [
-      "https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?auto=format&fit=crop&w=360&q=82",
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=360&q=82",
-      "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=360&q=82",
+      "assets/photo-iceland-mountain.svg",
+      "assets/photo-iceland-coast.svg",
+      "assets/photo-alpine.svg",
     ],
   },
 ];

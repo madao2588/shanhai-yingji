@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" role="img" aria-label="冰岛山脉旅行照片">
+  <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#7ea4ad"/><stop offset="1" stop-color="#1d3037"/></linearGradient>
+  <rect width="900" height="620" fill="url(#sky)"/>
+  <path d="M0 420l210-230 180 182 112-132 175 180 92-92 131 130v162H0z" fill="#edf2ef"/>
+  <path d="M0 465l210-182 180 145 112-105 175 142 92-68 131 93v130H0z" fill="#1b252b"/>
+  <path d="M0 540c210-42 390-38 900 18v62H0z" fill="#10191d"/>
+</svg>

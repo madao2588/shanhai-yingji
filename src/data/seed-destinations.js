@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
   window.destinationData = {
   kiyomizu: {
     title: "清水寺与二年坂",
@@ -6,7 +6,7 @@
     score: "4.8",
     recommend: "89% 推荐 · 2,846 条点评",
     summary: "适合第一次来京都的人，把古寺、坡道、街巷和日落放在同一段行程里。",
-    image: "https://images.unsplash.com/photo-1528164344705-47542687000d?auto=format&fit=crop&w=900&q=84",
+    image: "assets/photo-kyoto-temple.svg",
     imageAlt: "清水寺与二年坂照片",
     season: "3-4 月 / 11 月",
     duration: "2.5-4 小时",
@@ -37,7 +37,7 @@
     score: "4.6",
     recommend: "84% 推荐 · 1,392 条点评",
     summary: "更适合慢走、写日记和看季节变化，不是强打卡型景点。",
-    image: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=900&q=84",
+    image: "assets/photo-kyoto-street.svg",
     imageAlt: "哲学之道樱花步道照片",
     season: "3 月底-4 月初",
     duration: "1.5-3 小时",
@@ -68,7 +68,7 @@
     score: "4.5",
     recommend: "81% 推荐 · 936 条点评",
     summary: "自然冲击力很强，但体验高度依赖天气、风浪和安全距离。",
-    image: "https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?auto=format&fit=crop&w=900&q=84",
+    image: "assets/photo-iceland-mountain.svg",
     imageAlt: "冰岛黑沙滩海岸照片",
     season: "全年 · 夏季更稳",
     duration: "45-90 分钟",

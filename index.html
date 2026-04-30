@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
@@ -11,7 +11,7 @@
     <link rel="icon" href="assets/app-icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="assets/app-icon.svg" />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=profile-edit-3" />
   </head>
   <body>
     <main class="stage" aria-label="山海映记移动端原型">
@@ -71,7 +71,10 @@
                         <p>足迹总览</p>
                         <strong>从东京到雷克雅未克</strong>
                       </div>
-                      <span>12 城市</span>
+                      <div class="map-header-actions">
+                        <span>12 城市</span>
+                        <button class="record-browse-button" type="button" data-open-map-browse>翻阅路线</button>
+                      </div>
                     </div>
 
                     <div class="archive-map" aria-label="个人世界地图">
@@ -115,11 +118,11 @@
                       </svg>
 
                       <div class="photo-fragment fragment-a">
-                        <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=260&q=80" alt="京都旅行照片" />
+                        <img src="assets/photo-kyoto-street.svg" alt="京都旅行照片" />
                         <span>Kyoto</span>
                       </div>
                       <div class="photo-fragment fragment-b">
-                        <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=260&q=80" alt="冰岛旅行照片" />
+                        <img src="assets/photo-iceland-coast.svg" alt="冰岛旅行照片" />
                         <span>Iceland</span>
                       </div>
                       <div class="year-chip">2026</div>
@@ -135,11 +138,12 @@
 
                 <div class="mode-view diary-view" id="diaryView">
                   <article class="diary-feature">
-                    <img src="https://images.unsplash.com/photo-1528164344705-47542687000d?auto=format&fit=crop&w=720&q=82" alt="京都清水寺照片" />
+                    <img src="assets/photo-kyoto-temple.svg" alt="京都清水寺照片" />
                     <div>
                       <p>04 月 12 日 · 京都</p>
                       <h3>雨后的清水寺</h3>
                       <span>石板路还在反光，风里有樱花落下来的声音。</span>
+                      <button class="record-browse-button" type="button" data-open-diary-browse>翻阅日记</button>
                     </div>
                   </article>
                   <div class="timeline" data-diary-timeline>
@@ -148,6 +152,21 @@
                     <article class="continue-card"><time>今天</time><div><h3>继续记录</h3><p>补完下一段山海。</p></div></article>
                   </div>
                 </div>
+
+                <section class="browse-panel" data-browse-panel hidden aria-live="polite">
+                  <div class="browse-panel-head">
+                    <div>
+                      <p data-browse-kicker>足迹翻阅</p>
+                      <h3 data-browse-title>旅行路线</h3>
+                    </div>
+                    <button class="browse-close" type="button" data-browse-close aria-label="关闭翻阅面板"></button>
+                  </div>
+                  <div class="browse-panel-body" data-browse-content>
+                    <article><strong>京都</strong><span>清水寺、二年坂、八坂神社</span></article>
+                    <article><strong>雷克雅未克</strong><span>黑沙滩、南岸瀑布、海岸线</span></article>
+                    <article><strong>巴黎</strong><span>左岸、旧书摊、塞纳河夜雨</span></article>
+                  </div>
+                </section>
               </section>
 
               <section class="memory-strip" aria-label="最近映记">
@@ -157,12 +176,12 @@
                 </div>
                 <div class="memory-row" data-memory-row>
                   <article>
-                    <img src="https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=420&q=82" alt="京都街景照片" />
+                    <img src="assets/photo-kyoto-street.svg" alt="京都街景照片" />
                     <h3>京都 · 雨后的清水寺</h3>
                     <p>12 张照片 · 1,240 字</p>
                   </article>
                   <article>
-                    <img src="https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?auto=format&fit=crop&w=420&q=82" alt="冰岛山脉照片" />
+                    <img src="assets/photo-iceland-mountain.svg" alt="冰岛山脉照片" />
                     <h3>冰岛环岛第 3 天</h3>
                     <p>9 张照片 · 860 字</p>
                   </article>
@@ -250,7 +269,7 @@
               </header>
 
               <article class="memory-detail-hero">
-                <img data-memory-hero src="https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=900&q=82" alt="映记封面照片" />
+                <img data-memory-hero src="assets/photo-kyoto-street.svg" alt="映记封面照片" />
                 <div>
                   <p data-memory-location>日本京都</p>
                   <h3 data-memory-meta>12 张照片 · 1,240 字</h3>
@@ -278,19 +297,26 @@
                   <p class="eyebrow">山海之间的公开回望</p>
                   <h2>社区</h2>
                 </div>
-                <button class="icon-button search-button" type="button" aria-label="搜索目的地点评"></button>
               </header>
               <div class="topic-tabs" aria-label="社区分类">
-                <button class="is-active" type="button">点评</button>
-                <button type="button">精选</button>
-                <button type="button">附近</button>
-                <button type="button">城市</button>
+                <button class="is-active" type="button" data-community-tab="reviews" aria-pressed="true">点评</button>
+                <button type="button" data-community-tab="featured" aria-pressed="false">精选</button>
+                <button type="button" data-community-tab="nearby" aria-pressed="false">附近</button>
+                <button type="button" data-community-tab="cities" aria-pressed="false">城市</button>
               </div>
+              <section class="community-channel-card" data-community-channel aria-live="polite">
+                <div>
+                  <p data-community-channel-kicker>当前频道</p>
+                  <h3 data-community-channel-title>目的地点评</h3>
+                  <span data-community-channel-copy>按城市、景区和真实体验筛选，先判断值不值得去。</span>
+                </div>
+              </section>
+              <section class="community-panel is-active" data-community-panel="reviews" aria-label="目的地点评">
               <section class="destination-review" aria-label="目的地点评搜索">
                 <div class="review-search">
                   <span class="search-glyph" aria-hidden="true"></span>
-                  <input type="search" value="京都" placeholder="搜索城市、景区或关键词" aria-label="搜索城市、景区或关键词" />
-                  <button type="button">搜索</button>
+                  <input type="search" value="京都" placeholder="搜索城市、景区或关键词" aria-label="搜索城市、景区或关键词" data-community-search-input />
+                  <button type="button" data-community-search-action>搜索</button>
                 </div>
                 <div class="review-filters" aria-label="点评筛选">
                   <button class="review-filter is-active" type="button" data-review-filter="all">全部</button>
@@ -298,6 +324,10 @@
                   <button class="review-filter" type="button" data-review-filter="quiet">安静</button>
                   <button class="review-filter" type="button" data-review-filter="culture">人文</button>
                   <button class="review-filter" type="button" data-review-filter="nature">自然</button>
+                  <select data-community-sort aria-label="社区排序">
+                    <option value="latest">最新</option>
+                    <option value="popular">热门</option>
+                  </select>
                 </div>
                 <article class="review-overview">
                   <div>
@@ -357,32 +387,71 @@
                 </div>
                 <p class="review-empty" hidden>没有找到匹配的点评，换个城市、景区或关键词试试。</p>
               </section>
+              </section>
+              <section class="community-panel" data-community-panel="featured" hidden aria-label="精选公开映记">
+                <div class="community-panel-grid featured-grid">
+                  <article>
+                    <img src="assets/photo-iceland-coast.svg" alt="冰岛公开映记封面" />
+                    <strong>北大西洋的第七次日落</strong>
+                    <span>冰岛 · 6 城市 · 42 张照片 · 本周编辑精选</span>
+                  </article>
+                  <article>
+                    <img src="assets/photo-kyoto-street.svg" alt="京都公开映记封面" />
+                    <strong>京都雨后步行线</strong>
+                    <span>清水寺 -> 二年坂 -> 八坂神社 · 89% 推荐</span>
+                  </article>
+                </div>
+              </section>
+              <section class="community-panel" data-community-panel="nearby" hidden aria-label="附近旅行动态">
+                <div class="nearby-list">
+                  <article><strong>西湖晨雾</strong><span>1.8 km · 今天 07:30 · 适合慢走和拍水面倒影</span></article>
+                  <article><strong>良渚文化村</strong><span>18 km · 周末热度上升 · 亲子和建筑路线较多</span></article>
+                  <article><strong>灵隐山路</strong><span>7.6 km · 雨后人少 · 建议上午出发</span></article>
+                </div>
+              </section>
+              <section class="community-panel" data-community-panel="cities" hidden aria-label="城市索引">
+                <div class="city-cloud">
+                  <button type="button" data-city-query="京都">京都<span>2,846 条点评</span></button>
+                  <button type="button" data-city-query="冰岛">冰岛南岸<span>812 篇映记</span></button>
+                  <button type="button" data-city-query="巴黎">巴黎<span>1,204 条路线</span></button>
+                  <button type="button" data-city-query="杭州">杭州<span>326 条附近动态</span></button>
+                  <button type="button" data-city-query="里斯本">里斯本<span>196 篇公开映记</span></button>
+                </div>
+              </section>
               <article class="community-hero">
-                <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=84" alt="冰岛公开回顾封面" />
+                <img src="assets/photo-iceland-coast.svg" alt="冰岛公开回顾封面" />
                 <div>
                   <p>精选公开映记</p>
                   <h3>北大西洋的第七次日落</h3>
                   <span>冰岛 · 6 城市 · 42 张照片</span>
                 </div>
               </article>
-              <div class="community-feed">
+              <div class="community-feed" data-community-feed>
                 <article>
-                  <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=420&q=82" alt="巴黎照片" />
+                  <img src="assets/photo-paris.svg" alt="巴黎照片" />
                   <h3>巴黎左岸的雨</h3>
                   <p>2.1k 喜欢 · 186 评论</p>
+                  <div class="community-actions">
+                    <button type="button" data-community-like>喜欢</button>
+                    <button type="button" data-community-bookmark>收藏</button>
+                    <input type="text" data-community-comment-input aria-label="评论" />
+                    <button type="button" data-community-comment-submit>评论</button>
+                    <button type="button" data-community-follow>关注</button>
+                    <button type="button" data-community-report>举报</button>
+                  </div>
                 </article>
                 <article>
-                  <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=420&q=82" alt="迪拜照片" />
+                  <img src="assets/photo-desert-city.svg" alt="迪拜照片" />
                   <h3>沙漠边缘的夜航</h3>
                   <p>846 喜欢 · 72 评论</p>
                 </article>
                 <article>
-                  <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=420&q=82" alt="山脉照片" />
+                  <img src="assets/photo-alpine.svg" alt="山脉照片" />
                   <h3>阿尔卑斯清晨</h3>
                   <p>1.4k 喜欢 · 98 评论</p>
                 </article>
                 <article>
-                  <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=420&q=82" alt="海岸照片" />
+                  <img src="assets/photo-ocean.svg" alt="海岸照片" />
                   <h3>海岸线上的慢镜头</h3>
                   <p>983 喜欢 · 64 评论</p>
                 </article>
@@ -399,7 +468,7 @@
               </header>
 
               <article class="destination-hero">
-                <img data-destination-image src="https://images.unsplash.com/photo-1528164344705-47542687000d?auto=format&fit=crop&w=900&q=84" alt="清水寺与二年坂照片" />
+                <img data-destination-image src="assets/photo-kyoto-temple.svg" alt="清水寺与二年坂照片" />
                 <div class="destination-hero-copy">
                   <p data-destination-location>日本 · 京都 · 东山</p>
                   <div class="destination-rating">
@@ -563,16 +632,16 @@
                 </div>
                 <input class="photo-input" type="file" accept="image/*" multiple data-photo-input aria-label="导入本地照片" />
                 <div class="media-grid" data-photo-library>
-                  <button class="photo-option is-selected" type="button" data-photo-option data-photo-id="temple" data-photo-place="清水寺" data-photo-time="07:42" data-photo-src="https://images.unsplash.com/photo-1528164344705-47542687000d?auto=format&fit=crop&w=360&q=82" aria-pressed="true">
-                    <img src="https://images.unsplash.com/photo-1528164344705-47542687000d?auto=format&fit=crop&w=360&q=82" alt="清水寺雨后照片" />
+                  <button class="photo-option is-selected" type="button" data-photo-option data-photo-id="temple" data-photo-place="清水寺" data-photo-time="07:42" data-photo-src="assets/photo-kyoto-temple.svg" aria-pressed="true">
+                    <img src="assets/photo-kyoto-temple.svg" alt="清水寺雨后照片" />
                     <span>清水寺 · 07:42</span>
                   </button>
-                  <button class="photo-option is-selected" type="button" data-photo-option data-photo-id="slope" data-photo-place="二年坂" data-photo-time="08:18" data-photo-src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=360&q=82" aria-pressed="true">
-                    <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=360&q=82" alt="京都街巷照片" />
+                  <button class="photo-option is-selected" type="button" data-photo-option data-photo-id="slope" data-photo-place="二年坂" data-photo-time="08:18" data-photo-src="assets/photo-kyoto-street.svg" aria-pressed="true">
+                    <img src="assets/photo-kyoto-street.svg" alt="京都街巷照片" />
                     <span>二年坂 · 08:18</span>
                   </button>
-                  <button class="photo-option" type="button" data-photo-option data-photo-id="lantern" data-photo-place="八坂神社" data-photo-time="18:04" data-photo-src="https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=360&q=82" aria-pressed="false">
-                    <img src="https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=360&q=82" alt="京都黄昏照片" />
+                  <button class="photo-option" type="button" data-photo-option data-photo-id="lantern" data-photo-place="八坂神社" data-photo-time="18:04" data-photo-src="assets/photo-kyoto-street.svg" aria-pressed="false">
+                    <img src="assets/photo-kyoto-street.svg" alt="京都黄昏照片" />
                     <span>八坂神社 · 18:04</span>
                   </button>
                 </div>
@@ -583,7 +652,7 @@
 
               <article class="recap-preview share-poster" data-share-poster>
                 <div class="poster-frame">
-                  <img data-poster-image src="https://images.unsplash.com/photo-1528164344705-47542687000d?auto=format&fit=crop&w=720&q=82" alt="映记分享长图主图" />
+                  <img data-poster-image src="assets/photo-kyoto-temple.svg" alt="映记分享长图主图" />
                   <div class="poster-copy">
                     <span data-poster-location>2026.04.12 · 日本京都</span>
                     <h3 data-poster-title>京都 · 雨后的清水寺</h3>
@@ -609,29 +678,232 @@
                   <h2>消息</h2>
                 </div>
               </header>
-              <div class="message-list">
-                <article><span class="message-dot"></span><div><h3>你的「冰岛环岛第 3 天」收到 28 个喜欢</h3><p>刚刚</p></div></article>
-                <article><span></span><div><h3>山海映记已为你生成 2026 春日回顾草稿</h3><p>昨天 21:40</p></div></article>
-                <article><span></span><div><h3>社区精选：有 3 篇映记提到了京都</h3><p>周日</p></div></article>
-              </div>
+              <section class="conversation-layout" aria-label="好友对话与提醒">
+                <div class="conversation-list" data-conversation-list aria-label="好友对话">
+                  <button class="conversation-item is-active" type="button" data-conversation-item="lin-che">
+                    <span class="conversation-avatar">林</span>
+                    <span><strong>林澈</strong><em>刚分享了京都路线</em></span>
+                    <small>现在</small>
+                  </button>
+                  <button class="conversation-item" type="button" data-conversation-item="mori">
+                    <span class="conversation-avatar alt">森</span>
+                    <span><strong>森野</strong><em>问你冰岛照片参数</em></span>
+                    <small>12:08</small>
+                  </button>
+                  <button class="conversation-item" type="button" data-conversation-item="aya">
+                    <span class="conversation-avatar warm">青</span>
+                    <span><strong>青禾</strong><em>收藏了你的西湖晨雾</em></span>
+                    <small>昨天</small>
+                  </button>
+                </div>
+                <section class="conversation-thread" data-conversation-thread aria-label="好友对话线程">
+                  <div class="thread-head">
+                    <div>
+                      <p>好友对话</p>
+                      <h3 data-conversation-title>林澈</h3>
+                    </div>
+                    <span data-conversation-status>正在整理京都路线</span>
+                  </div>
+                  <div class="thread-messages" data-conversation-messages>
+                    <article class="from-friend"><span>我把清水寺到八坂神社的步行线补全了，你看要不要放进公开映记？</span></article>
+                    <article class="from-me"><span>可以，记得加上人流时间和拍照点。</span></article>
+                  </div>
+                  <div class="thread-reply">
+                    <input type="text" placeholder="回复好友" aria-label="回复好友" data-conversation-message-input />
+                    <button type="button" data-conversation-send>发送</button>
+                  </div>
+                </section>
+                <div class="message-list notification-list" data-notification-list>
+                  <article><span class="message-dot"></span><div><h3>你的「冰岛环岛第 3 天」收到 28 个喜欢</h3><p>刚刚</p></div></article>
+                  <article><span></span><div><h3>山海映记已为你生成 2026 春日回顾草稿</h3><p>昨天 21:40</p></div></article>
+                  <article><span></span><div><h3>社区精选：有 3 篇映记提到了京都</h3><p>周日</p></div></article>
+                </div>
+              </section>
             </section>
 
             <section class="screen profile-screen" data-screen="profile" aria-label="我的">
-              <header class="profile-hero">
-                <div class="profile-avatar"></div>
-                <p>林澈</p>
-                <h2>把走过的山海，映成自己的记忆。</h2>
+              <section class="profile-dashboard" data-profile-dashboard aria-label="我的工作台">
+                <header class="profile-summary">
+                  <button class="profile-avatar" type="button" data-profile-avatar-edit data-open-profile-space aria-label="进入个人空间">
+                    <img src="assets/avatar-lin-che.svg" alt="林澈头像" data-profile-avatar-image />
+                    <span class="avatar-edit-badge">空间</span>
+                  </button>
+                  <div>
+                    <p>林澈</p>
+                    <h2>旅行档案与公开主页</h2>
+                    <span>把走过的山海，整理成可发布、可备份、可回看的记忆。</span>
+                  </div>
+                </header>
+                <div class="profile-stats">
+                  <div><strong>28</strong><span>映记</span></div>
+                  <div><strong>12</strong><span>城市</span></div>
+                  <div><strong>4</strong><span>国家</span></div>
+                </div>
+                <div class="profile-primary-actions" aria-label="常用操作">
+                  <button type="button" data-profile-primary-action data-profile-go="create">写一篇映记</button>
+                  <button type="button" data-profile-primary-action data-profile-go="profile-space" data-open-profile-space>查看公开主页</button>
+                </div>
+                <div class="profile-quick-grid" aria-label="账户快捷入口">
+                  <button type="button" data-profile-quick-action data-profile-go="archive"><strong>私密草稿</strong><span>6 篇待整理</span></button>
+                  <button type="button" data-profile-quick-action data-profile-go="messages"><strong>好友对话</strong><span>3 条新消息</span></button>
+                  <button type="button" data-profile-quick-action data-profile-focus="photos"><strong>照片权限</strong><span>管理上传与删除</span></button>
+                  <button type="button" data-profile-quick-action data-profile-focus="export"><strong>备份恢复</strong><span>导出 JSON / 长图</span></button>
+                </div>
+              </section>
+              <section class="cloud-panel" data-cloud-panel aria-label="云端账户与发布">
+                <div class="cloud-panel-header">
+                  <div>
+                    <p class="eyebrow">上线账户</p>
+                    <h3>云端记录与公开主页</h3>
+                  </div>
+                  <span class="cloud-profile-pill" data-cloud-profile>未登录</span>
+                </div>
+                <section class="creator-stats" data-creator-stats aria-label="创作者统计">
+                  <div><strong data-creator-public-memories>0</strong><span>公开映记</span></div>
+                  <div><strong data-creator-total-likes>0</strong><span>喜欢</span></div>
+                  <div><strong data-creator-total-bookmarks>0</strong><span>收藏</span></div>
+                  <button type="button" data-open-profile-space data-profile-space-focus="comments"><strong data-creator-total-comments>0</strong><span>评论</span></button>
+                  <div><strong data-creator-followers>0</strong><span>关注者</span></div>
+                </section>
+                <div class="cloud-module cloud-editor">
+                  <div class="cloud-module-head">
+                    <strong>发布草稿</strong>
+                    <span>保存为私密、仅链接可见或公开发布</span>
+                  </div>
+                  <input type="text" value="杭州 · 西湖晨雾" placeholder="云端日志标题" data-cloud-title />
+                  <input type="text" value="中国杭州" placeholder="地点" data-cloud-location />
+                  <textarea placeholder="写下这段旅行记录" data-cloud-body>湖面还没有完全亮起来，第一班船从薄雾里穿过去。</textarea>
+                  <div class="cloud-editor-row">
+                    <select data-cloud-privacy aria-label="发布状态">
+                      <option value="private">私密保存</option>
+                      <option value="unlisted">仅链接可见</option>
+                      <option value="public">公开发布</option>
+                    </select>
+                    <input type="text" value="清晨,西湖" placeholder="标签，用逗号分隔" data-cloud-tags />
+                  </div>
+                  <div class="cloud-upload-row">
+                    <label class="file-picker">
+                      <input type="file" accept="image/*" data-cloud-photo-input />
+                      <span>选择照片</span>
+                      <em data-cloud-photo-file-name>未选择文件</em>
+                    </label>
+                    <button type="button" data-cloud-upload-photo>上传照片</button>
+                  </div>
+                  <button class="cloud-save-action" type="button" data-cloud-save-memory>保存到云端档案</button>
+                </div>
+                <p class="cloud-status" data-cloud-status>启动后端后可注册、保存、上传和发布。</p>
+                <div class="cloud-module cloud-library-grid">
+                  <section class="cloud-list" aria-label="我的云端映记">
+                    <h4>我的云端档案</h4>
+                    <div data-cloud-memory-list></div>
+                  </section>
+                  <section class="cloud-list" aria-label="照片管理">
+                    <h4>当前映记照片</h4>
+                    <div data-cloud-photo-list></div>
+                    <button class="cloud-danger-action" type="button" data-cloud-delete-photo>删除选中照片</button>
+                  </section>
+                  <section class="cloud-list" aria-label="公开映记">
+                    <h4>公开映记</h4>
+                    <div data-public-memory-list></div>
+                  </section>
+                </div>
+              </section>
+            </section>
+
+            <section class="screen profile-space-screen" data-screen="profile-space" data-profile-space aria-label="个人空间">
+              <header class="profile-space-hero">
+                <div class="profile-space-top">
+                  <button type="button" data-profile-space-back aria-label="返回我的"></button>
+                  <button type="button" data-profile-space-background>设置背景</button>
+                  <button type="button" data-profile-space-share aria-label="分享个人空间"></button>
+                </div>
+                <div class="profile-space-identity">
+                  <button class="space-avatar" type="button" data-profile-space-avatar-edit aria-label="上传头像">
+                    <img src="assets/avatar-lin-che.svg" alt="林澈头像" data-profile-space-avatar />
+                    <span>上传头像</span>
+                  </button>
+                  <div>
+                    <h2>林澈</h2>
+                    <p>山海号：6615055951</p>
+                    <span>把走过的山海，整理成可发布、可备份、可回看的记忆。</span>
+                  </div>
+                </div>
+                <div class="profile-space-stats">
+                  <button type="button" data-profile-space-tab="following"><strong>1</strong><span>关注</span></button>
+                  <button type="button" data-profile-space-tab="followers"><strong>1</strong><span>粉丝</span></button>
+                  <button type="button" data-profile-space-tab="comments"><strong data-profile-space-comments>0</strong><span>获赞与评论</span></button>
+                  <button class="profile-space-edit-action" type="button" data-profile-space-edit>编辑资料</button>
+                </div>
               </header>
-              <div class="profile-stats">
-                <div><strong>28</strong><span>映记</span></div>
-                <div><strong>12</strong><span>城市</span></div>
-                <div><strong>4</strong><span>国家</span></div>
+
+              <section class="profile-edit-panel" data-profile-edit-panel hidden aria-label="编辑个人资料">
+                <div class="profile-edit-head">
+                  <div>
+                    <p>账号身份</p>
+                    <h3>编辑资料与登录状态</h3>
+                  </div>
+                  <button type="button" data-profile-edit-close aria-label="收起资料编辑"></button>
+                </div>
+                <div class="profile-edit-body">
+                  <label class="avatar-picker">
+                    <span class="avatar-picker-preview">
+                      <img src="assets/avatar-lin-che.svg" alt="头像预览" data-profile-avatar-preview />
+                    </span>
+                    <input type="file" accept="image/*" data-profile-avatar-input />
+                    <em>更换头像</em>
+                  </label>
+                  <div class="profile-edit-fields">
+                    <input type="text" placeholder="昵称" autocomplete="name" data-cloud-name />
+                    <input type="tel" placeholder="手机号" autocomplete="tel" data-profile-phone />
+                    <input type="email" placeholder="邮箱" autocomplete="email" data-cloud-email />
+                    <input type="password" placeholder="密码" autocomplete="current-password" data-cloud-password />
+                    <textarea placeholder="个人简介" data-profile-bio>把走过的山海，整理成可发布、可备份、可回看的记忆。</textarea>
+                  </div>
+                </div>
+                <div class="profile-auth-actions">
+                  <button type="button" data-cloud-register>注册</button>
+                  <button type="button" data-cloud-login>登录</button>
+                  <button type="button" data-cloud-update-profile>更新资料</button>
+                  <button type="button" data-cloud-logout>退出</button>
+                  <button type="button" class="account-danger-action" data-cloud-delete-account>注销账号</button>
+                </div>
+              </section>
+
+              <section class="profile-suggestion-card" aria-label="可能感兴趣的人">
+                <div class="profile-suggestion-head">
+                  <h3>你可能感兴趣的人</h3>
+                  <button type="button" aria-label="关闭推荐"></button>
+                </div>
+                <div class="profile-suggestion-row">
+                  <article><img src="assets/photo-paris.svg" alt="旅行创作者头像" /><strong>在睡伊会</strong><span>城市漫游创作者</span><button type="button">关注</button></article>
+                  <article><img src="assets/photo-iceland-coast.svg" alt="旅行创作者头像" /><strong>慢热电影</strong><span>影像路线创作者</span><button type="button">关注</button></article>
+                  <article><img src="assets/photo-kyoto-temple.svg" alt="旅行创作者头像" /><strong>古咕</strong><span>文化路线创作者</span><button type="button">关注</button></article>
+                </div>
+              </section>
+
+              <div class="profile-space-tools" aria-label="个人空间快捷工具">
+                <button type="button"><strong>创作灵感</strong><span>按城市找选题</span></button>
+                <button type="button"><strong>发布活动</strong><span>公开映记征集</span></button>
+                <button type="button"><strong>浏览记录</strong><span>看过的路线</span></button>
               </div>
-              <section class="settings-list" aria-label="个人设置">
-                <button type="button"><span>私密草稿</span><em>6 篇</em></button>
-                <button type="button"><span>公开主页</span><em>已开启</em></button>
-                <button type="button"><span>照片与位置权限</span><em>管理</em></button>
-                <button type="button"><span>导出旅行档案</span><em>PDF / 长图</em></button>
+
+              <section class="profile-space-content">
+                <div class="profile-space-tabs" role="tablist" aria-label="个人空间内容">
+                  <button class="is-active" type="button" data-profile-space-tab="notes" aria-pressed="true">笔记</button>
+                  <button type="button" data-profile-space-tab="bookmarks" aria-pressed="false">收藏</button>
+                  <button type="button" data-profile-space-tab="liked" aria-pressed="false">赞过</button>
+                  <button type="button" data-profile-space-tab="comments" aria-pressed="false">评论</button>
+                </div>
+                <div class="profile-space-counters">
+                  <span>公开 0</span>
+                  <span>私密 0</span>
+                  <span>合集 0</span>
+                </div>
+                <div class="profile-space-empty" data-profile-space-empty>
+                  <span></span>
+                  <strong>还没有公开内容</strong>
+                  <p>编辑资料后，就可以从云端发布区把旅行映记发布到这里。</p>
+                </div>
               </section>
             </section>
           </div>
@@ -662,16 +934,14 @@
       </section>
     </main>
 
-    <script src="src/data/seed-destinations.js"></script>
-    <script src="src/data/seed-memories.js"></script>
-    <script src="src/domain/memory.js"></script>
-    <script src="src/storage/local-store.js"></script>
-    <script src="src/storage/archive-export.js"></script>
-    <script src="src/main.js"></script>
-    <script>
-      if ("serviceWorker" in navigator && window.location.protocol.startsWith("http")) {
-        navigator.serviceWorker.register("service-worker.js");
-      }
-    </script>
+    <script src="src/data/seed-destinations.js?v=profile-edit-3"></script>
+    <script src="src/data/seed-memories.js?v=profile-edit-3"></script>
+    <script src="src/domain/memory.js?v=profile-edit-3"></script>
+    <script src="src/storage/local-store.js?v=profile-edit-3"></script>
+    <script src="src/storage/archive-export.js?v=profile-edit-3"></script>
+    <script src="src/api-client.js?v=profile-edit-3"></script>
+    <script src="src/main.js?v=profile-edit-3"></script>
+    <script src="src/fullstack-panel.js?v=profile-edit-3"></script>
+    <script src="src/pwa-register.js?v=profile-edit-3"></script>
   </body>
 </html>

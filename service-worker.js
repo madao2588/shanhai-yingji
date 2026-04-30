@@ -1,16 +1,28 @@
-const cacheName = "shanhai-yingji-v1";
+﻿const cacheName = "shanhai-yingji-v6";
 const coreAssets = [
   "./",
   "./index.html",
-  "./styles.css",
+  "./styles.css?v=profile-edit-3",
   "./manifest.webmanifest",
   "./assets/app-icon.svg",
-  "./src/data/seed-destinations.js",
-  "./src/data/seed-memories.js",
-  "./src/domain/memory.js",
-  "./src/storage/local-store.js",
-  "./src/storage/archive-export.js",
-  "./src/main.js",
+  "./assets/avatar-lin-che.svg",
+  "./assets/photo-kyoto-temple.svg",
+  "./assets/photo-kyoto-street.svg",
+  "./assets/photo-iceland-mountain.svg",
+  "./assets/photo-iceland-coast.svg",
+  "./assets/photo-paris.svg",
+  "./assets/photo-desert-city.svg",
+  "./assets/photo-alpine.svg",
+  "./assets/photo-ocean.svg",
+  "./src/data/seed-destinations.js?v=profile-edit-3",
+  "./src/data/seed-memories.js?v=profile-edit-3",
+  "./src/domain/memory.js?v=profile-edit-3",
+  "./src/storage/local-store.js?v=profile-edit-3",
+  "./src/storage/archive-export.js?v=profile-edit-3",
+  "./src/api-client.js?v=profile-edit-3",
+  "./src/main.js?v=profile-edit-3",
+  "./src/fullstack-panel.js?v=profile-edit-3",
+  "./src/pwa-register.js?v=profile-edit-3",
 ];
 
 self.addEventListener("install", (event) => {

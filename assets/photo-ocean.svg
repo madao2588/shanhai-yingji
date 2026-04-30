@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" role="img" aria-label="海岸旅行照片">
+  <rect width="900" height="620" fill="#255b68"/>
+  <path d="M0 380c180-70 315-58 470-5s245 70 430 6v239H0z" fill="#eaf0e9"/>
+  <path d="M0 432c180-52 310-37 468 9s250 50 432-7v186H0z" fill="#14343c"/>
+  <path d="M0 520c200-35 418-28 900 20v80H0z" fill="#0d2026"/>
+  <circle cx="690" cy="128" r="52" fill="#f2d7a0" opacity=".7"/>
+</svg>
