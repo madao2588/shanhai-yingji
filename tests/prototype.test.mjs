@@ -218,6 +218,14 @@ assert.match(css, /--screen-bg-image:\s*url\("assets\/bg-profile-ink\.png"\)/, "
 assert.match(css, /\.screen\s*\{[\s\S]*background:\s*transparent/, "active screens should not hide the app-level ink landscape");
 assert.match(css, /\.screens\s*\{[\s\S]*z-index:\s*1/, "screens should stay above the decorative ink landscape");
 assert.match(css, /\.ink-wash\s*\{[\s\S]*pointer-events:\s*none/, "ink landscape should not intercept app interaction");
+assert.match(css, /--button-surface/, "visual system should expose button surface tokens");
+assert.match(css, /--button-glow/, "visual system should expose button glow tokens");
+assert.match(css, /button\s*\{[\s\S]*touch-action:\s*manipulation/, "buttons should use mobile-friendly touch handling");
+assert.match(css, /button:not\(\.create-action\):active/, "buttons should expose tactile press feedback");
+assert.match(css, /@media\s*\(hover:\s*hover\)/, "buttons should expose pointer hover feedback without forcing touch hover");
+assert.match(css, /\.bottom-nav button::before/, "bottom nav buttons should have an active pill surface");
+assert.match(css, /\.bottom-nav button\.is-active::before/, "active bottom nav buttons should reveal the active pill");
+assert.match(css, /\.button-feedback-surface/, "shared button polish should be grouped under a named interaction layer");
 
 assert.doesNotMatch(js, /const destinationData = \{/, "destination data should be extracted out of the app entry");
 assert.doesNotMatch(js, /const seedMemories = \[/, "seed memories should be extracted out of the app entry");

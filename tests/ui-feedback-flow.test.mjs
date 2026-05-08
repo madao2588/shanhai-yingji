@@ -67,6 +67,21 @@ try {
     /bg-record-ink\.png/,
     "record screen should use the generated ink painting background"
   );
+  assert.match(
+    await page.locator(".bottom-nav button").first().evaluate((node) => getComputedStyle(node).transitionProperty),
+    /transform|box-shadow|background|color/,
+    "navigation buttons should have animated interaction feedback"
+  );
+  assert.notEqual(
+    await page.locator('.bottom-nav button.is-active').evaluate((node) => getComputedStyle(node, "::before").opacity),
+    "0",
+    "active navigation button should reveal a visual pill"
+  );
+  assert.match(
+    await page.locator("[data-record-next-action]").evaluate((node) => getComputedStyle(node).boxShadow),
+    /rgb|rgba/,
+    "record action buttons should have tactile elevation"
+  );
   assert.equal(await page.locator("[data-record-overview]").count(), 1, "record home should show a normal app overview");
   assert.match(await page.locator("[data-record-latest-title]").textContent(), /京都|映记|memory/i, "record overview should show latest memory");
   assert.match(await page.locator("[data-record-visibility]").textContent(), /私密|公开|待创建|private|public/i, "record overview should show visibility mix or an empty local state");

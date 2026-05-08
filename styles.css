@@ -21,6 +21,12 @@
   --glass: rgba(243, 234, 216, 0.09);
   --line: rgba(243, 234, 216, 0.16);
   --shadow: 0 30px 86px rgba(5, 8, 7, 0.5);
+  --button-surface: rgba(243, 234, 216, 0.105);
+  --button-surface-strong: rgba(243, 234, 216, 0.18);
+  --button-border: rgba(243, 234, 216, 0.18);
+  --button-highlight: rgba(243, 234, 216, 0.34);
+  --button-glow: 0 12px 28px rgba(5, 8, 7, 0.28), inset 0 1px 0 rgba(243, 234, 216, 0.12);
+  --button-press-glow: 0 7px 18px rgba(5, 8, 7, 0.24), inset 0 1px 0 rgba(243, 234, 216, 0.16);
 }
 
 * {
@@ -60,6 +66,16 @@ textarea {
 button {
   border: 0;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 150ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease,
+    opacity 180ms ease,
+    filter 180ms ease;
 }
 
 img {
@@ -5165,6 +5181,220 @@ button:focus-visible {
   box-shadow:
     0 12px 28px rgba(169, 72, 52, 0.28),
     inset 0 0 0 1px rgba(243, 234, 216, 0.34);
+}
+
+/* Shared interaction polish for tappable controls. */
+.button-feedback-surface,
+:where(
+  .icon-button,
+  .mode-tab,
+  .topic-tabs button,
+  .record-browse-button,
+  .record-overview-side button,
+  .community-actions button,
+  .community-comment-row button,
+  .memory-comment-compose button,
+  .reply-box button,
+  .browse-close,
+  .profile-primary-actions button,
+  .profile-quick-grid button,
+  .profile-task-list button,
+  .profile-space-tools button,
+  .profile-space-top button,
+  .profile-space-tabs button,
+  .profile-auth-actions button,
+  .archive-actions button,
+  .archive-filter-row button,
+  .archive-transfer button,
+  .poster-export-actions button,
+  .save-memory-action,
+  .download-poster-action,
+  .file-picker,
+  .conversation-item,
+  .photo-option,
+  .bottom-nav button
+) {
+  box-shadow: var(--button-glow);
+}
+
+:where(
+  .icon-button,
+  .mode-tab,
+  .topic-tabs button,
+  .record-browse-button,
+  .record-overview-side button,
+  .community-actions button,
+  .community-comment-row button,
+  .memory-comment-compose button,
+  .reply-box button,
+  .profile-primary-actions button,
+  .profile-quick-grid button,
+  .profile-task-list button,
+  .profile-space-tools button,
+  .profile-space-top button,
+  .profile-space-tabs button,
+  .profile-auth-actions button,
+  .archive-actions button,
+  .archive-filter-row button,
+  .archive-transfer button,
+  .poster-export-actions button,
+  .save-memory-action,
+  .download-poster-action
+) {
+  border-color: var(--button-border);
+  background:
+    linear-gradient(180deg, var(--button-surface-strong), rgba(8, 13, 11, 0.46)),
+    rgba(8, 13, 11, 0.58);
+}
+
+button:not(.create-action):active,
+.conversation-item:active,
+.photo-option:active {
+  transform: translateY(1px) scale(0.985);
+  box-shadow: var(--button-press-glow);
+  filter: brightness(1.05);
+}
+
+.create-action {
+  transition:
+    transform 150ms ease,
+    filter 180ms ease;
+}
+
+.create-action:active {
+  transform: translateY(-6px) scale(0.98);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :where(
+    .icon-button,
+    .mode-tab,
+    .topic-tabs button,
+    .record-browse-button,
+    .record-overview-side button,
+    .community-actions button,
+    .community-comment-row button,
+    .memory-comment-compose button,
+    .reply-box button,
+    .browse-close,
+    .profile-primary-actions button,
+    .profile-quick-grid button,
+    .profile-task-list button,
+    .profile-space-tools button,
+    .profile-space-top button,
+    .profile-space-tabs button,
+    .profile-auth-actions button,
+    .archive-actions button,
+    .archive-filter-row button,
+    .archive-transfer button,
+    .poster-export-actions button,
+    .save-memory-action,
+    .download-poster-action,
+    .conversation-item,
+    .photo-option
+  ):not(:disabled):hover {
+    border-color: rgba(243, 234, 216, 0.32);
+    box-shadow:
+      0 16px 34px rgba(5, 8, 7, 0.32),
+      inset 0 1px 0 rgba(243, 234, 216, 0.2);
+    filter: brightness(1.08);
+  }
+
+  .bottom-nav button:not(.is-active):hover {
+    color: rgba(243, 234, 216, 0.82);
+  }
+
+  .create-action:hover {
+    filter: brightness(1.08);
+  }
+}
+
+.mode-tab.is-active,
+.topic-tabs button.is-active,
+.profile-space-tabs button.is-active {
+  box-shadow:
+    0 12px 28px rgba(5, 8, 7, 0.26),
+    inset 0 0 0 1px rgba(201, 169, 95, 0.34),
+    inset 0 1px 0 rgba(243, 234, 216, 0.2);
+}
+
+.record-browse-button,
+.record-overview-side button,
+.memory-comment-compose button,
+.reply-box button,
+.community-comment-row button {
+  min-height: 36px;
+  font-weight: 650;
+}
+
+.profile-primary-actions button {
+  min-height: 46px;
+  box-shadow:
+    0 18px 34px rgba(169, 72, 52, 0.28),
+    inset 0 1px 0 rgba(243, 234, 216, 0.38);
+}
+
+.bottom-nav button {
+  position: relative;
+  z-index: 0;
+  min-height: 50px;
+  border-radius: 14px;
+  isolation: isolate;
+  transition:
+    transform 150ms ease,
+    color 180ms ease,
+    filter 180ms ease;
+}
+
+.bottom-nav button::before {
+  content: "";
+  position: absolute;
+  inset: 3px 5px;
+  z-index: -1;
+  border: 1px solid rgba(243, 234, 216, 0.14);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(243, 234, 216, 0.18), transparent 34%),
+    linear-gradient(180deg, rgba(243, 234, 216, 0.13), rgba(8, 13, 11, 0.34));
+  box-shadow: inset 0 1px 0 rgba(243, 234, 216, 0.12);
+  opacity: 0;
+  transform: scale(0.86);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease,
+    border-color 180ms ease;
+}
+
+.bottom-nav button.is-active::before {
+  border-color: rgba(201, 169, 95, 0.28);
+  opacity: 1;
+  transform: scale(1);
+}
+
+.bottom-nav button:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.bottom-nav .nav-icon,
+.bottom-nav em {
+  position: relative;
+  z-index: 1;
+}
+
+.create-action > span {
+  width: 50px;
+  height: 50px;
+  box-shadow:
+    0 16px 34px rgba(169, 72, 52, 0.34),
+    0 0 0 5px rgba(201, 169, 95, 0.1),
+    inset 0 1px 0 rgba(243, 234, 216, 0.46);
+}
+
+button:disabled,
+button[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.48;
+  filter: saturate(0.72);
 }
 
 @keyframes spin {
