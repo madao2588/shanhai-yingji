@@ -67,6 +67,7 @@ assert.equal(upload.storageKey.startsWith("uploads/"), true, "R2 uploads should 
 await mediaStore.delete(upload);
 assert.deepEqual(sentCommands, ["PutObjectCommand", "DeleteObjectCommand"], "R2 store should write and delete objects through S3-compatible commands");
 assert.equal(await mediaStore.health(), "r2", "R2 media store should expose a production health probe label");
+assert.deepEqual(sentCommands, ["PutObjectCommand", "DeleteObjectCommand", "HeadBucketCommand"], "R2 health should probe bucket access through S3-compatible commands");
 
 const pgQueries = [];
 const postgres = new PostgresDatabase({

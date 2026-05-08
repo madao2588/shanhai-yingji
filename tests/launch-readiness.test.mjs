@@ -44,12 +44,14 @@ assert.match(apiDocs, /checks\.database/, "API docs should cover structured heal
 
 const launchChecklist = readFileSync("docs/LAUNCH-CHECKLIST.md", "utf8");
 assert.match(launchChecklist, /checks\.database\.status=ok/, "launch checklist should require dependency health checks");
+assert.match(launchChecklist, /checks\.media\.status=error/, "launch checklist should mention failing R2 health probes");
 assert.match(launchChecklist, /备份/, "launch checklist should cover backups");
 assert.match(launchChecklist, /HTTPS/, "launch checklist should cover HTTPS");
 assert.match(launchChecklist, /回滚/, "launch checklist should cover rollback");
 
 const runbook = readFileSync("docs/RUNBOOK.md", "utf8");
 assert.match(runbook, /checks\.media\.status=ok/, "runbook should cover media health checks");
+assert.match(runbook, /checks\.media\.status=error/, "runbook should cover media health failures");
 assert.match(runbook, /巡检/, "runbook should cover routine checks");
 assert.match(runbook, /上传/, "runbook should cover upload incidents");
 

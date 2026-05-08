@@ -84,6 +84,35 @@ try {
     await rm(failingHealthServer.shanhai.dataDir, { recursive: true, force: true });
   }
 
+  const failingR2DataDir = await mkdtemp(join(tmpdir(), "shanhai-failing-r2-health-"));
+  const failingR2Server = createApp({
+    dataDir: failingR2DataDir,
+    publicDir: projectRoot,
+    mediaStore: "r2",
+    r2: {
+      endpoint: "https://account.r2.cloudflarestorage.com",
+      accessKeyId: "key",
+      secretAccessKey: "secret",
+      bucket: "shanhai",
+      publicBaseUrl: "https://media.example.com",
+    },
+    r2Client: {
+      async send() {
+        throw new Error("head bucket denied");
+      },
+    },
+  });
+  const failingR2Port = await listen(failingR2Server);
+  try {
+    const failingR2Health = await request(failingR2Port, "GET", "/api/health");
+    assert.equal(failingR2Health.response.status, 503, "R2 bucket probe failures should degrade health");
+    assert.equal(failingR2Health.payload.checks.media.store, "r2");
+    assert.equal(failingR2Health.payload.checks.media.status, "error");
+  } finally {
+    await new Promise((resolveClose) => failingR2Server.close(resolveClose));
+    await rm(failingR2DataDir, { recursive: true, force: true });
+  }
+
   const packageProbe = await fetch(`http://127.0.0.1:${port}/package.json`);
   assert.equal(packageProbe.status, 404, "server should not expose package metadata");
 

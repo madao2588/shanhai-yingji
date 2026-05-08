@@ -1,6 +1,6 @@
 const fs = require("node:fs/promises");
 const path = require("node:path");
-const { DeleteObjectCommand, PutObjectCommand, S3Client } = require("@aws-sdk/client-s3");
+const { DeleteObjectCommand, HeadBucketCommand, PutObjectCommand, S3Client } = require("@aws-sdk/client-s3");
 
 const uploadExtensions = new Map([
   ["image/png", ".png"],
@@ -117,6 +117,11 @@ class R2MediaStore {
   }
 
   async health() {
+    await this.client.send(
+      new HeadBucketCommand({
+        Bucket: this.bucket,
+      }),
+    );
     return "r2";
   }
 }
