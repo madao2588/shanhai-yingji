@@ -344,9 +344,75 @@ img {
   position: absolute;
   inset: 0;
   display: none;
+  isolation: isolate;
   padding: 28px 20px 102px;
   overflow-y: auto;
   scrollbar-width: none;
+  --screen-bg-image: url("assets/bg-record-ink.png");
+}
+
+.screen::before,
+.screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.screen::before {
+  background-image:
+    linear-gradient(180deg, rgba(8, 12, 11, 0.16), rgba(8, 12, 11, 0.42) 58%, rgba(5, 8, 7, 0.66)),
+    radial-gradient(circle at 50% 18%, rgba(243, 234, 216, 0.1), transparent 28%),
+    var(--screen-bg-image);
+  background-position: center;
+  background-size: cover;
+  opacity: 0.98;
+  transform: scale(1.01);
+}
+
+.screen::after {
+  background:
+    linear-gradient(90deg, rgba(5, 8, 7, 0.14), transparent 22%, transparent 78%, rgba(5, 8, 7, 0.18)),
+    radial-gradient(circle at 50% 52%, transparent 45%, rgba(5, 8, 7, 0.34) 100%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(243, 234, 216, 0.024) 0,
+      rgba(243, 234, 216, 0.024) 1px,
+      transparent 1px,
+      transparent 5px
+    );
+  mix-blend-mode: soft-light;
+  opacity: 0.72;
+}
+
+.screen > * {
+  position: relative;
+  z-index: 1;
+}
+
+.record-screen,
+.archive-screen,
+.memory-detail-screen {
+  --screen-bg-image: url("assets/bg-record-ink.png");
+}
+
+.community-screen,
+.destination-screen {
+  --screen-bg-image: url("assets/bg-community-ink.png");
+}
+
+.create-screen {
+  --screen-bg-image: url("assets/bg-create-ink.png");
+}
+
+.messages-screen {
+  --screen-bg-image: url("assets/bg-messages-ink.png");
+}
+
+.profile-screen,
+.profile-space-screen {
+  --screen-bg-image: url("assets/bg-profile-ink.png");
 }
 
 .screen::-webkit-scrollbar {

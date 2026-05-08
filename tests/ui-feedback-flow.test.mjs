@@ -62,6 +62,11 @@ try {
     "rgba(0, 0, 0, 0)",
     "active screen should stay transparent so the ink landscape remains visible"
   );
+  assert.match(
+    await page.locator(".screen.is-active").evaluate((node) => getComputedStyle(node).getPropertyValue("--screen-bg-image")),
+    /bg-record-ink\.png/,
+    "record screen should use the generated ink painting background"
+  );
   assert.equal(await page.locator("[data-record-overview]").count(), 1, "record home should show a normal app overview");
   assert.match(await page.locator("[data-record-latest-title]").textContent(), /京都|映记|memory/i, "record overview should show latest memory");
   assert.match(await page.locator("[data-record-visibility]").textContent(), /私密|公开|待创建|private|public/i, "record overview should show visibility mix or an empty local state");
@@ -79,6 +84,11 @@ try {
   await page.click("[data-browse-close]");
 
   await page.click('[data-target="community"]');
+  assert.match(
+    await page.locator(".screen.is-active").evaluate((node) => getComputedStyle(node).getPropertyValue("--screen-bg-image")),
+    /bg-community-ink\.png/,
+    "community screen should use its generated ink painting background"
+  );
   await page.click('[data-community-tab="featured"]');
   await page.waitForSelector('[data-community-panel="featured"]:not([hidden])');
   assert.match(await page.locator("[data-community-channel]").textContent(), /精选|公开/, "featured tab should visibly change the active channel");
@@ -90,6 +100,11 @@ try {
   assert.equal(await page.locator(".search-button").count(), 0, "community header should not keep a redundant empty search icon");
 
   await page.click('[data-target="messages"]');
+  assert.match(
+    await page.locator(".screen.is-active").evaluate((node) => getComputedStyle(node).getPropertyValue("--screen-bg-image")),
+    /bg-messages-ink\.png/,
+    "messages screen should use its generated ink painting background"
+  );
   assert.equal(await page.locator("[data-message-inbox-summary]").count(), 1, "messages should show a normal inbox summary");
   assert.equal(await page.locator("[data-message-unread-count]").count(), 1, "messages should show unread counts");
   assert.equal(await page.locator("[data-conversation-preview]").count() >= 3, true, "conversation rows should expose mutable previews");
@@ -111,6 +126,11 @@ try {
 
   await page.click('[data-target="create"]');
   await page.waitForSelector("[data-create-readiness]");
+  assert.match(
+    await page.locator(".screen.is-active").evaluate((node) => getComputedStyle(node).getPropertyValue("--screen-bg-image")),
+    /bg-create-ink\.png/,
+    "create screen should use its generated ink painting background"
+  );
   assert.equal(await page.locator("[data-create-draft-state]").count(), 1, "create flow should show draft state");
   assert.match(await page.locator("[data-create-photo-count]").textContent(), /2|照片|photo/i, "create flow should show selected photo count");
   assert.match(await page.locator("[data-create-publish-target]").textContent(), /私密|private/i, "create flow should show current publish target");
@@ -119,6 +139,11 @@ try {
 
   await page.click('[data-target="profile"]');
   await page.waitForSelector("[data-profile-dashboard]");
+  assert.match(
+    await page.locator(".screen.is-active").evaluate((node) => getComputedStyle(node).getPropertyValue("--screen-bg-image")),
+    /bg-profile-ink\.png/,
+    "profile screen should use its generated ink painting background"
+  );
   const profileScreenHeight = await page.locator('[data-screen="profile"]').evaluate((node) => node.getBoundingClientRect().height);
   assert.equal(profileScreenHeight >= 800, true, "profile screen should fill the mobile viewport instead of clipping content");
   assert.equal(await page.locator("[data-profile-avatar-image]").count(), 1, "profile should show a real avatar image");

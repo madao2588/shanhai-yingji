@@ -4,8 +4,16 @@ import { existsSync, readFileSync } from "node:fs";
 const html = readFileSync("index.html", "utf8");
 const css = readFileSync("styles.css", "utf8");
 const js = readFileSync("src/main.js", "utf8");
+const serverApp = readFileSync("server/app.cjs", "utf8");
 const seedDestinationsPath = "src/data/seed-destinations.js";
 const seedMemoriesPath = "src/data/seed-memories.js";
+const screenBackgroundAssets = [
+  "assets/bg-record-ink.png",
+  "assets/bg-community-ink.png",
+  "assets/bg-create-ink.png",
+  "assets/bg-messages-ink.png",
+  "assets/bg-profile-ink.png",
+];
 
 assert.match(html, /<script src="src\/main\.js\?v=profile-edit-3"><\/script>/, "prototype should load the app through the src entry while keeping direct file-open support");
 assert.match(html, /<script src="src\/data\/seed-destinations\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/data\/seed-memories\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/domain\/memory\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/storage\/local-store\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/storage\/archive-export\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/api-client\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/main\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/fullstack-panel\.js\?v=profile-edit-3"><\/script>/, "seed, domain, storage, API, app, and fullstack scripts should load in order while keeping classic script support");
@@ -16,6 +24,10 @@ assert.match(html, /ink-landscape-art/, "ink landscape should include explicit S
 assert.match(html, /ink-pine-stroke/, "ink landscape should include an unmistakable ink brush stroke");
 assert.equal(existsSync(seedDestinationsPath), true, "destination seed data should live in src/data");
 assert.equal(existsSync(seedMemoriesPath), true, "memory seed data should live in src/data");
+for (const assetPath of screenBackgroundAssets) {
+  assert.equal(existsSync(assetPath), true, `${assetPath} should exist as a generated ink background asset`);
+  assert.match(serverApp, new RegExp(assetPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), `${assetPath} should be allowed by the static file server`);
+}
 
 const seedDestinations = readFileSync(seedDestinationsPath, "utf8");
 const seedMemories = readFileSync(seedMemoriesPath, "utf8");
@@ -197,6 +209,12 @@ assert.match(css, /\.ink-cloud-bank/, "app shell should style the visible cloud 
 assert.match(css, /\.ink-landscape-art/, "app shell should style explicit shanshui SVG artwork");
 assert.match(css, /\.ink-ridge-near/, "app shell should style near mountain ridges");
 assert.match(css, /\.ink-pine-stroke/, "app shell should style ink brush strokes");
+assert.match(css, /\.screen::before/, "screens should render page-specific image backgrounds behind content");
+assert.match(css, /--screen-bg-image:\s*url\("assets\/bg-record-ink\.png"\)/, "record-style screens should use the generated record ink background");
+assert.match(css, /--screen-bg-image:\s*url\("assets\/bg-community-ink\.png"\)/, "community-style screens should use the generated community ink background");
+assert.match(css, /--screen-bg-image:\s*url\("assets\/bg-create-ink\.png"\)/, "create screen should use the generated create ink background");
+assert.match(css, /--screen-bg-image:\s*url\("assets\/bg-messages-ink\.png"\)/, "messages screen should use the generated messages ink background");
+assert.match(css, /--screen-bg-image:\s*url\("assets\/bg-profile-ink\.png"\)/, "profile screens should use the generated profile ink background");
 assert.match(css, /\.screen\s*\{[\s\S]*background:\s*transparent/, "active screens should not hide the app-level ink landscape");
 assert.match(css, /\.screens\s*\{[\s\S]*z-index:\s*1/, "screens should stay above the decorative ink landscape");
 assert.match(css, /\.ink-wash\s*\{[\s\S]*pointer-events:\s*none/, "ink landscape should not intercept app interaction");
