@@ -8,6 +8,7 @@ import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
 const { createApp } = require("../server/app.cjs");
+const { loadConfig } = require("../server/config.cjs");
 
 const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const dataDir = await mkdtemp(join(tmpdir(), "shanhai-api-"));
@@ -42,6 +43,18 @@ try {
   assert.equal(health.payload.status, "ok", "health check should report ok");
   assert.equal(health.response.headers.get("x-content-type-options"), "nosniff", "responses should include security headers");
   assert.equal(health.response.headers.get("referrer-policy"), "no-referrer", "responses should include a referrer policy");
+
+  const configuredDataDir = await mkdtemp(join(tmpdir(), "shanhai-configured-api-"));
+  const configuredServer = createApp(loadConfig({ dataDir: configuredDataDir, publicDir: projectRoot }));
+  const configuredPort = await listen(configuredServer);
+  try {
+    const configuredHealth = await request(configuredPort, "GET", "/api/health");
+    assert.equal(configuredHealth.response.status, 200, "health check should work when createApp receives a loaded config");
+    assert.equal(configuredHealth.payload.uploads, "local", "loaded local config should create a local media store");
+  } finally {
+    await new Promise((resolveClose) => configuredServer.close(resolveClose));
+    await rm(configuredDataDir, { recursive: true, force: true });
+  }
 
   const packageProbe = await fetch(`http://127.0.0.1:${port}/package.json`);
   assert.equal(packageProbe.status, 404, "server should not expose package metadata");

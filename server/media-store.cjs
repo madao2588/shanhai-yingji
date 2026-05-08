@@ -122,7 +122,7 @@ class R2MediaStore {
 }
 
 function createMediaStore(config, overrides = {}) {
-  if (overrides.mediaStore) {
+  if (overrides.mediaStore && typeof overrides.mediaStore !== "string") {
     return overrides.mediaStore;
   }
   if (config.mediaStore === "r2") {
