@@ -104,3 +104,16 @@ assert.equal((await limiter(fakeRequest)).limited, false, "first shared rate-lim
 assert.equal((await limiter(fakeRequest)).limited, true, "hits above the limit should be rejected");
 assert.equal(redisCalls[0].url, "https://redis.example.com/pipeline", "Upstash limiter should use the REST pipeline endpoint");
 assert.match(redisCalls[0].options.headers.authorization, /^Bearer token$/, "Upstash limiter should authenticate with the REST token");
+assert.equal(await limiter.health(), "upstash", "Upstash limiter should expose a health probe");
+assert.match(redisCalls.at(-1).options.body, /PING/, "Upstash health should probe Redis through the REST pipeline");
+
+const failingLimiter = createRateLimiter({
+  store: "upstash",
+  redisRestUrl: "https://redis.example.com",
+  redisRestToken: "token",
+  fetchImpl: async () => {
+    throw new Error("redis internal endpoint leaked");
+  },
+});
+await assert.rejects(failingLimiter(fakeRequest), /rate limiter unavailable/, "Upstash failures should produce a stable public error");
+await assert.rejects(failingLimiter.health(), /rate limiter unavailable/, "Upstash health failures should produce a stable public error");

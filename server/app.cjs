@@ -316,12 +316,6 @@ function createApp(options = {}) {
         return;
       }
 
-      const rateLimit = await checkRateLimit(request);
-      if (rateLimit.limited) {
-        sendJson(response, 429, { error: "too many requests" }, { "retry-after": String(Math.ceil((rateLimit.resetAt - Date.now()) / 1000)) });
-        return;
-      }
-
       if (request.method === "OPTIONS") {
         sendNoContent(response);
         return;
@@ -330,6 +324,7 @@ function createApp(options = {}) {
       if (request.method === "GET" && pathname === "/api/health") {
         const databaseCheck = await probeDependency(config.databaseAdapter, () => (typeof db.health === "function" ? db.health() : db.ensureLoaded().then(() => config.databaseAdapter)));
         const mediaCheck = await probeDependency(config.mediaStore, () => mediaStore.health());
+        const rateLimitCheck = await probeDependency(config.rateLimit.store || "memory", () => (typeof checkRateLimit.health === "function" ? checkRateLimit.health() : "memory"));
         const checks = {
           database: {
             adapter: databaseCheck.adapter,
@@ -339,8 +334,12 @@ function createApp(options = {}) {
             store: mediaCheck.adapter,
             status: mediaCheck.status,
           },
+          rateLimit: {
+            store: rateLimitCheck.adapter,
+            status: rateLimitCheck.status,
+          },
         };
-        const isHealthy = databaseCheck.status === "ok" && mediaCheck.status === "ok";
+        const isHealthy = databaseCheck.status === "ok" && mediaCheck.status === "ok" && rateLimitCheck.status === "ok";
         sendJson(response, isHealthy ? 200 : 503, {
           status: isHealthy ? "ok" : "degraded",
           service: "shanhai-yingji",
@@ -350,6 +349,12 @@ function createApp(options = {}) {
           checks,
           timestamp: new Date().toISOString(),
         });
+        return;
+      }
+
+      const rateLimit = await checkRateLimit(request);
+      if (rateLimit.limited) {
+        sendJson(response, 429, { error: "too many requests" }, { "retry-after": String(Math.ceil((rateLimit.resetAt - Date.now()) / 1000)) });
         return;
       }
 

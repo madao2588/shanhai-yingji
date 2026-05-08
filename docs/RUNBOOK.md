@@ -33,8 +33,9 @@
 
 ## Daily checks
 
-- Confirm `GET /api/health` returns `status=ok`, `database=postgres`, `mediaStore=r2`, `checks.database.status=ok`, and `checks.media.status=ok`.
+- Confirm `GET /api/health` returns `status=ok`, `database=postgres`, `mediaStore=r2`, `checks.database.status=ok`, `checks.media.status=ok`, and `checks.rateLimit.status=ok`.
 - Treat `checks.media.status=error` as an R2 bucket access failure; verify endpoint, bucket, access key, secret key, and public base URL before accepting traffic.
+- Treat `checks.rateLimit.status=error` as an Upstash Redis failure; verify REST URL, token, and command quota before accepting traffic.
 - Review Render deploy/runtime logs for 5xx responses and startup configuration failures.
 - Review Upstash request limits and Cloudflare R2 storage growth.
 - Confirm latest PostgreSQL automated backup is present.

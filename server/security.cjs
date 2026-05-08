@@ -18,7 +18,7 @@ function rateLimitKey(request) {
 function createMemoryRateLimiter({ windowMs = 60000, max = 240 } = {}) {
   const hits = new Map();
 
-  return function checkRateLimit(request) {
+  function checkRateLimit(request) {
     const now = Date.now();
     const key = request.socket.remoteAddress || "unknown";
     const entry = hits.get(key) || { count: 0, resetAt: now + windowMs };
@@ -36,39 +36,58 @@ function createMemoryRateLimiter({ windowMs = 60000, max = 240 } = {}) {
       remaining: Math.max(max - entry.count, 0),
       resetAt: entry.resetAt,
     };
-  };
+  }
+
+  checkRateLimit.health = async () => "memory";
+  return checkRateLimit;
 }
 
 function createUpstashRateLimiter({ windowMs = 60000, max = 240, redisRestUrl, redisRestToken, fetchImpl = fetch } = {}) {
-  return async function checkRateLimit(request) {
-    const now = Date.now();
-    const resetAt = now + windowMs;
-    const response = await fetchImpl(`${String(redisRestUrl || "").replace(/\/+$/, "")}/pipeline`, {
-      method: "POST",
-      headers: {
-        authorization: `Bearer ${redisRestToken}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify([
-        ["INCR", rateLimitKey(request)],
-        ["PEXPIRE", rateLimitKey(request), String(windowMs), "NX"],
-      ]),
-    });
+  const pipelineUrl = `${String(redisRestUrl || "").replace(/\/+$/, "")}/pipeline`;
 
-    if (!response.ok) {
+  async function runPipeline(commands) {
+    try {
+      const response = await fetchImpl(pipelineUrl, {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${redisRestToken}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(commands),
+      });
+
+      if (!response.ok) {
+        throw new Error("upstash request failed");
+      }
+
+      return response.json();
+    } catch {
       const error = new Error("rate limiter unavailable");
       error.status = 503;
       throw error;
     }
+  }
 
-    const payload = await response.json();
+  async function checkRateLimit(request) {
+    const now = Date.now();
+    const resetAt = now + windowMs;
+    const payload = await runPipeline([
+      ["INCR", rateLimitKey(request)],
+      ["PEXPIRE", rateLimitKey(request), String(windowMs), "NX"],
+    ]);
     const count = Number(payload?.[0]?.result || 0);
     return {
       limited: count > max,
       remaining: Math.max(max - count, 0),
       resetAt,
     };
+  }
+
+  checkRateLimit.health = async () => {
+    await runPipeline([["PING"]]);
+    return "upstash";
   };
+  return checkRateLimit;
 }
 
 function createRateLimiter(config = {}) {

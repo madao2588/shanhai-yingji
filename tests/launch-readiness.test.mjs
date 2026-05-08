@@ -41,10 +41,12 @@ assert.match(apiDocs, /POST \/api\/auth\/register/, "API docs should cover regis
 assert.match(apiDocs, /POST \/api\/memories\/:id\/photos/, "API docs should cover media upload");
 assert.match(apiDocs, /GET \/api\/health/, "API docs should cover health checks");
 assert.match(apiDocs, /checks\.database/, "API docs should cover structured health checks");
+assert.match(apiDocs, /checks\.rateLimit/, "API docs should cover rate limit health checks");
 
 const launchChecklist = readFileSync("docs/LAUNCH-CHECKLIST.md", "utf8");
 assert.match(launchChecklist, /checks\.database\.status=ok/, "launch checklist should require dependency health checks");
 assert.match(launchChecklist, /checks\.media\.status=error/, "launch checklist should mention failing R2 health probes");
+assert.match(launchChecklist, /checks\.rateLimit\.status=error/, "launch checklist should mention failing Upstash health probes");
 assert.match(launchChecklist, /备份/, "launch checklist should cover backups");
 assert.match(launchChecklist, /HTTPS/, "launch checklist should cover HTTPS");
 assert.match(launchChecklist, /回滚/, "launch checklist should cover rollback");
@@ -52,6 +54,7 @@ assert.match(launchChecklist, /回滚/, "launch checklist should cover rollback"
 const runbook = readFileSync("docs/RUNBOOK.md", "utf8");
 assert.match(runbook, /checks\.media\.status=ok/, "runbook should cover media health checks");
 assert.match(runbook, /checks\.media\.status=error/, "runbook should cover media health failures");
+assert.match(runbook, /checks\.rateLimit\.status=error/, "runbook should cover rate limit health failures");
 assert.match(runbook, /巡检/, "runbook should cover routine checks");
 assert.match(runbook, /上传/, "runbook should cover upload incidents");
 

@@ -20,3 +20,4 @@
 2026-05-08: Continued community polish. Added global discovery result feedback, quick query chips, backend discovery summary updates, and pressed states for like/bookmark actions so the community page feels more like a real discovery surface.
 2026-05-08: Continued production readiness after approval. Strengthening `/api/health` into a real dependency probe with structured database/media checks, explicit degraded status, and launch/runbook documentation.
 2026-05-08: Continued production health hardening. R2 health now performs a bucket access probe instead of only returning the adapter label, with degraded health coverage for failing R2 credentials or bucket configuration.
+2026-05-08: Continued production dependency hardening. Upstash rate limiting now has a health probe, `/api/health` reports `checks.rateLimit`, health bypasses ordinary rate limits, and Redis failures return explicit 503 responses.

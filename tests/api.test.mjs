@@ -43,6 +43,8 @@ try {
   assert.equal(health.payload.status, "ok", "health check should report ok");
   assert.equal(health.payload.checks.database.status, "ok", "health check should probe the database");
   assert.equal(health.payload.checks.media.status, "ok", "health check should probe the media store");
+  assert.equal(health.payload.checks.rateLimit.status, "ok", "health check should probe the rate limiter");
+  assert.equal(health.payload.checks.rateLimit.store, "memory", "local health should report memory rate limiting");
   assert.equal(health.response.headers.get("x-content-type-options"), "nosniff", "responses should include security headers");
   assert.equal(health.response.headers.get("referrer-policy"), "no-referrer", "responses should include a referrer policy");
 
@@ -54,6 +56,7 @@ try {
     assert.equal(configuredHealth.response.status, 200, "health check should work when createApp receives a loaded config");
     assert.equal(configuredHealth.payload.uploads, "local", "loaded local config should create a local media store");
     assert.equal(configuredHealth.payload.checks.media.store, "local", "loaded local config should report local media health");
+    assert.equal(configuredHealth.payload.checks.rateLimit.store, "memory", "loaded local config should report local rate limiting");
   } finally {
     await new Promise((resolveClose) => configuredServer.close(resolveClose));
     await rm(configuredDataDir, { recursive: true, force: true });
@@ -111,6 +114,34 @@ try {
   } finally {
     await new Promise((resolveClose) => failingR2Server.close(resolveClose));
     await rm(failingR2DataDir, { recursive: true, force: true });
+  }
+
+  const failingRedisDataDir = await mkdtemp(join(tmpdir(), "shanhai-failing-redis-health-"));
+  const failingRedisServer = createApp({
+    dataDir: failingRedisDataDir,
+    publicDir: projectRoot,
+    rateLimit: {
+      store: "upstash",
+      redisRestUrl: "https://redis.example.com",
+      redisRestToken: "token",
+      fetchImpl: async () => {
+        throw new Error("redis secret endpoint leaked");
+      },
+    },
+  });
+  const failingRedisPort = await listen(failingRedisServer);
+  try {
+    const failingRedisHealth = await request(failingRedisPort, "GET", "/api/health");
+    assert.equal(failingRedisHealth.response.status, 503, "Redis health failures should degrade health");
+    assert.equal(failingRedisHealth.payload.checks.rateLimit.store, "upstash");
+    assert.equal(failingRedisHealth.payload.checks.rateLimit.status, "error");
+    assert.doesNotMatch(JSON.stringify(failingRedisHealth.payload), /secret endpoint/, "Redis health should not leak dependency errors");
+    const blockedRequest = await request(failingRedisPort, "GET", "/api/me");
+    assert.equal(blockedRequest.response.status, 503, "Redis failures should produce explicit API errors");
+    assert.equal(blockedRequest.payload.error, "rate limiter unavailable");
+  } finally {
+    await new Promise((resolveClose) => failingRedisServer.close(resolveClose));
+    await rm(failingRedisDataDir, { recursive: true, force: true });
   }
 
   const packageProbe = await fetch(`http://127.0.0.1:${port}/package.json`);
@@ -371,10 +402,12 @@ const limitedServer = createApp({
 const limitedPort = await listen(limitedServer);
 
 try {
-  await request(limitedPort, "GET", "/api/health");
-  await request(limitedPort, "GET", "/api/health");
-  const limited = await request(limitedPort, "GET", "/api/health");
+  await request(limitedPort, "GET", "/api/me");
+  await request(limitedPort, "GET", "/api/me");
+  const limited = await request(limitedPort, "GET", "/api/me");
   assert.equal(limited.response.status, 429, "rate limit should reject excessive requests");
+  const healthAfterLimit = await request(limitedPort, "GET", "/api/health");
+  assert.equal(healthAfterLimit.response.status, 200, "health checks should remain available after ordinary API rate limits");
 } finally {
   await new Promise((resolveClose) => limitedServer.close(resolveClose));
   await rm(limitedDataDir, { recursive: true, force: true });

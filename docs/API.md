@@ -107,6 +107,6 @@ Public discovery accepts `q`, `tag`, `city`, `country`, `destinationId`, and `so
 
 ## Production Health Contract
 
-`GET /api/health` returns structured dependency probes in addition to the legacy `database`, `mediaStore`, and `uploads` fields. Production should return HTTP `200`, `status=ok`, `checks.database.status=ok`, and `checks.media.status=ok`.
+`GET /api/health` returns structured dependency probes in addition to the legacy `database`, `mediaStore`, and `uploads` fields. Production should return HTTP `200`, `status=ok`, `checks.database.status=ok`, `checks.media.status=ok`, and `checks.rateLimit.status=ok`.
 
-If a database or media probe fails, the endpoint returns HTTP `503` with `status=degraded`; the failed dependency is marked with `status=error`. The R2 media probe performs a bucket access check, so invalid credentials, endpoint, or bucket names fail before launch. The response intentionally avoids exposing internal dependency error details.
+If a database, media, or shared rate-limit probe fails, the endpoint returns HTTP `503` with `status=degraded`; the failed dependency is marked with `status=error`. The R2 media probe performs a bucket access check, so invalid credentials, endpoint, or bucket names fail before launch. The Upstash probe sends a Redis `PING`, so invalid Redis REST URL or token values fail before launch. The response intentionally avoids exposing internal dependency error details.
