@@ -138,6 +138,11 @@ const profileAvatarInput = document.querySelector("[data-profile-avatar-input]")
 const profileAvatarImage = document.querySelector("[data-profile-avatar-image]");
 const profileAvatarPreview = document.querySelector("[data-profile-avatar-preview]");
 const profileSpaceEntryButtons = document.querySelectorAll("[data-open-profile-space]");
+const profileLocalMemories = document.querySelector("[data-profile-local-memories]");
+const profileLocalMeta = document.querySelector("[data-profile-local-meta]");
+const profileDraftMemories = document.querySelector("[data-profile-draft-memories]");
+const profileDraftMeta = document.querySelector("[data-profile-draft-meta]");
+const profileArchiveSummary = document.querySelector("[data-profile-archive-summary]");
 const profileSpaceBack = document.querySelector("[data-profile-space-back]");
 const profileSpaceEditButtons = document.querySelectorAll("[data-profile-space-edit], [data-profile-space-avatar-edit]");
 const profileSpaceTabs = document.querySelectorAll("[data-profile-space-tab]");
@@ -492,6 +497,29 @@ function openConversation(conversationId) {
     }),
   );
   conversationThread.hidden = false;
+}
+
+function renderProfileDashboardStats() {
+  const localEntries = savedMemories.filter((memory) => isSavedMemory(memory));
+  const cityCount = new Set(localEntries.map((memory) => memory.city || memory.location).filter(Boolean)).size;
+  const draftCount = localEntries.filter((memory) => !["public", "unlisted"].includes(memory.status || memory.visibility)).length;
+  const publicCount = localEntries.filter((memory) => (memory.status || memory.visibility) === "public").length;
+
+  if (profileLocalMemories) {
+    profileLocalMemories.textContent = String(localEntries.length);
+  }
+  if (profileLocalMeta) {
+    profileLocalMeta.textContent = `${cityCount} 座城市`;
+  }
+  if (profileDraftMemories) {
+    profileDraftMemories.textContent = String(draftCount);
+  }
+  if (profileDraftMeta) {
+    profileDraftMeta.textContent = publicCount ? `${publicCount} 篇已公开` : "私密和草稿";
+  }
+  if (profileArchiveSummary) {
+    profileArchiveSummary.textContent = `${localEntries.length} 篇本机映记`;
+  }
 }
 
 function sendConversationReply() {
@@ -870,6 +898,7 @@ function renderPersonalArchive() {
   diaryTimeline.replaceChildren(...entries.slice(0, 3).map(renderDiaryEntry), renderContinueEntry());
   summaryMemory.textContent = `${baseArchiveStats.memories + savedMemories.length} 篇映记`;
   summaryCity.textContent = `${baseArchiveStats.cities + savedCities.size} 座城市`;
+  renderProfileDashboardStats();
 }
 
 function getMemoryCountry(memory) {
@@ -1305,6 +1334,7 @@ window.shanhaiOpenExternalMemory = function openExternalMemory(memory = {}) {
 window.addEventListener("shanhai:cloud-space-updated", (event) => {
   cloudSpaceMemories = Array.isArray(event.detail?.memories) ? event.detail.memories : [];
   renderProfileSpaceList("notes");
+  renderProfileDashboardStats();
 });
 
 function renderSelectedPhotos() {

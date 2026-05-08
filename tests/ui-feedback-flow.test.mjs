@@ -69,7 +69,15 @@ try {
 
   await page.click('[data-target="profile"]');
   await page.waitForSelector("[data-profile-dashboard]");
+  const profileScreenHeight = await page.locator('[data-screen="profile"]').evaluate((node) => node.getBoundingClientRect().height);
+  assert.equal(profileScreenHeight >= 800, true, "profile screen should fill the mobile viewport instead of clipping content");
   assert.equal(await page.locator("[data-profile-avatar-image]").count(), 1, "profile should show a real avatar image");
+  assert.equal(await page.locator("[data-profile-account-state]").count(), 1, "profile should show account state");
+  assert.equal(await page.locator("[data-profile-local-memories]").count(), 1, "profile should show local content stats");
+  assert.equal(await page.locator("[data-profile-public-memories]").count(), 1, "profile should show public content stats");
+  assert.equal(await page.locator("[data-profile-interactions]").count(), 1, "profile should show interaction stats");
+  assert.equal(await page.locator("[data-profile-task-list]").count(), 1, "profile should group normal account tasks");
+  assert.equal(await page.locator("[data-profile-task-list] [data-profile-quick-action]").count() >= 4, true, "profile task list should expose useful app actions");
   assert.equal(await page.locator('[data-screen="profile"] [data-profile-edit-panel]').count(), 0, "profile dashboard should not contain the edit form directly");
   await page.click("[data-profile-avatar-edit]");
   await page.waitForSelector('[data-screen="profile-space"].is-active');

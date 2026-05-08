@@ -3063,6 +3063,72 @@ img {
     rgba(10, 13, 15, 0.72);
 }
 
+.profile-account-card {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 16px;
+  background:
+    linear-gradient(180deg, rgba(245, 239, 228, 0.085), rgba(245, 239, 228, 0.025)),
+    rgba(7, 10, 12, 0.74);
+}
+
+.profile-account-main {
+  min-width: 0;
+}
+
+.profile-account-main h2,
+.profile-account-main p {
+  margin: 0;
+}
+
+.profile-account-main h2 {
+  margin-top: 5px;
+  overflow: hidden;
+  color: var(--ivory);
+  font-size: 22px;
+  line-height: 1.18;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-account-main > span {
+  display: block;
+  margin-top: 6px;
+  color: rgba(245, 239, 228, 0.58);
+  font-size: 12px;
+  line-height: 1.42;
+}
+
+.profile-account-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.profile-account-badges span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 8px;
+  border: 1px solid rgba(111, 200, 189, 0.2);
+  border-radius: 999px;
+  background: rgba(111, 200, 189, 0.08);
+  color: rgba(245, 239, 228, 0.74);
+  font-size: 11px;
+}
+
+.profile-settings-action {
+  grid-column: 1 / -1;
+  min-height: 38px;
+  border: 1px solid rgba(245, 239, 228, 0.13);
+  border-radius: 8px;
+  background: rgba(245, 239, 228, 0.055);
+  color: rgba(245, 239, 228, 0.86);
+}
+
 .profile-summary {
   position: relative;
   display: grid;
@@ -3108,6 +3174,11 @@ img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.profile-account-card .profile-avatar {
+  width: 68px;
+  height: 68px;
 }
 
 .avatar-edit-badge {
@@ -3175,6 +3246,37 @@ img {
   font-size: 11px;
 }
 
+.profile-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  padding: 0 16px;
+}
+
+.profile-overview-grid div {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(245, 239, 228, 0.1);
+  border-radius: 8px;
+  background: rgba(245, 239, 228, 0.045);
+}
+
+.profile-overview-grid span,
+.profile-overview-grid em {
+  display: block;
+  color: rgba(245, 239, 228, 0.52);
+  font-size: 11px;
+  font-style: normal;
+}
+
+.profile-overview-grid strong {
+  display: block;
+  margin: 5px 0;
+  color: var(--ivory);
+  font-size: 23px;
+  line-height: 1;
+}
+
 .profile-primary-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3228,6 +3330,58 @@ img {
   color: rgba(245, 239, 228, 0.52);
   font-size: 11px;
   line-height: 1.35;
+}
+
+.profile-task-list {
+  display: grid;
+  gap: 8px;
+  padding: 0 16px 16px;
+}
+
+.profile-task-list button {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 4px 11px;
+  align-items: center;
+  min-height: 64px;
+  padding: 10px 11px;
+  border: 1px solid rgba(245, 239, 228, 0.1);
+  border-radius: 8px;
+  background: rgba(245, 239, 228, 0.05);
+  color: var(--ivory);
+  text-align: left;
+}
+
+.profile-task-list button > span {
+  grid-row: 1 / 3;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: rgba(111, 200, 189, 0.12);
+  color: rgba(111, 200, 189, 0.88);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.profile-task-list strong,
+.profile-task-list em {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-task-list strong {
+  align-self: end;
+  font-size: 13px;
+}
+
+.profile-task-list em {
+  align-self: start;
+  color: rgba(245, 239, 228, 0.52);
+  font-size: 11px;
+  font-style: normal;
 }
 
 .profile-space-screen {
@@ -4363,6 +4517,7 @@ img {
 
   .phone {
     width: 100vw;
+    height: 100svh;
     min-height: 100svh;
     aspect-ratio: auto;
     border: 0;
@@ -4372,8 +4527,13 @@ img {
   }
 
   .app {
+    height: 100svh;
     min-height: 100svh;
     border-radius: 0;
+  }
+
+  .screens {
+    height: 100svh;
   }
 
   .screen {

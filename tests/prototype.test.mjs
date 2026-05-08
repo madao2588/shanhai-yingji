@@ -117,6 +117,12 @@ assert.match(html, /data-cloud-photo-file-name/, "cloud photo upload should expo
 assert.doesNotMatch(html, /cloud-module cloud-account-module/, "account identity should not remain as a detached cloud module");
 assert.match(html, /data-profile-primary-action/, "profile should expose primary actions");
 assert.match(html, /data-profile-quick-action/, "profile should expose quick actions");
+assert.match(html, /data-profile-account-state/, "profile dashboard should show the current account state");
+assert.match(html, /data-profile-local-memories/, "profile dashboard should show local memory counts");
+assert.match(html, /data-profile-public-memories/, "profile dashboard should show public memory counts");
+assert.match(html, /data-profile-interactions/, "profile dashboard should show interaction counts");
+assert.match(html, /data-profile-task-list/, "profile dashboard should expose a grouped app task list");
+assert.doesNotMatch(html, /<strong>28<\/strong><span>映记<\/span>/, "profile dashboard should not show hard-coded archive stats");
 assert.match(html, /<option value="unlisted">/, "cloud publishing should support unlisted visibility");
 
 assert.match(css, /\.destination-screen/, "destination screen should have dedicated styling");

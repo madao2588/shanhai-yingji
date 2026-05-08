@@ -21,6 +21,13 @@
     deleteAccount: $("[data-cloud-delete-account]"),
     status: $("[data-cloud-status]"),
     profile: $("[data-cloud-profile]"),
+    profileDisplayName: $("[data-profile-display-name]"),
+    profileAccountCopy: $("[data-profile-account-copy]"),
+    profileAccountState: $("[data-profile-account-state]"),
+    profileSyncState: $("[data-profile-sync-state]"),
+    profilePublicMemories: $("[data-profile-public-memories]"),
+    profileInteractions: $("[data-profile-interactions]"),
+    profileInteractionMeta: $("[data-profile-interaction-meta]"),
     title: $("[data-cloud-title]"),
     location: $("[data-cloud-location]"),
     body: $("[data-cloud-body]"),
@@ -87,6 +94,18 @@
   function renderProfile(user) {
     currentUser = user;
     elements.profile.textContent = user ? `${user.name} · @${user.username}` : "未登录";
+    if (elements.profileDisplayName) {
+      elements.profileDisplayName.textContent = user?.name || "未登录旅人";
+    }
+    if (elements.profileAccountCopy) {
+      elements.profileAccountCopy.textContent = user ? `@${user.username} · 云端同步已开启` : "本机记录可用，登录后同步云端发布和互动数据。";
+    }
+    if (elements.profileAccountState) {
+      elements.profileAccountState.textContent = user ? "已登录" : "本机模式";
+    }
+    if (elements.profileSyncState) {
+      elements.profileSyncState.textContent = user ? "云端可用" : "未同步";
+    }
   }
 
   function renderPhotoList(photos = []) {
@@ -231,6 +250,18 @@
       elements.profileSpaceComments.textContent = String(stats.totalComments || 0);
     }
     elements.creatorFollowers.textContent = String(stats.followers || 0);
+    if (elements.profilePublicMemories) {
+      elements.profilePublicMemories.textContent = String(stats.publicMemories || 0);
+    }
+    if (elements.profileInteractions) {
+      elements.profileInteractions.textContent = String((stats.totalLikes || 0) + (stats.totalBookmarks || 0) + (stats.totalComments || 0));
+    }
+    if (elements.profileInteractionMeta) {
+      elements.profileInteractionMeta.textContent = `${stats.followers || 0} 位关注者`;
+    }
+    if (elements.profileSyncState && currentUser) {
+      elements.profileSyncState.textContent = `${stats.publicMemories || 0} 篇公开`;
+    }
   }
 
   function notificationTitle(type) {

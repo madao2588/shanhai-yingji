@@ -763,38 +763,76 @@
 
             <section class="screen profile-screen" data-screen="profile" aria-label="我的">
               <section class="profile-dashboard" data-profile-dashboard aria-label="我的工作台">
-                <header class="profile-summary">
+                <header class="profile-account-card">
                   <button class="profile-avatar" type="button" data-profile-avatar-edit data-open-profile-space aria-label="进入个人空间">
                     <img src="assets/avatar-lin-che.svg" alt="林澈头像" data-profile-avatar-image />
-                    <span class="avatar-edit-badge">空间</span>
+                    <span class="avatar-edit-badge">主页</span>
                   </button>
-                  <div>
-                    <p>林澈</p>
-                    <h2>旅行档案与公开主页</h2>
-                    <span>把走过的山海，整理成可发布、可备份、可回看的记忆。</span>
+                  <div class="profile-account-main">
+                    <p class="eyebrow">我的账户</p>
+                    <h2 data-profile-display-name>未登录旅人</h2>
+                    <span data-profile-account-copy>本机记录可用，登录后同步云端发布和互动数据。</span>
+                    <div class="profile-account-badges">
+                      <span data-profile-account-state>本机模式</span>
+                      <span data-profile-sync-state>未同步</span>
+                    </div>
                   </div>
+                  <button class="profile-settings-action" type="button" data-profile-primary-action data-profile-go="profile-space" data-open-profile-space>个人主页</button>
                 </header>
-                <div class="profile-stats">
-                  <div><strong>28</strong><span>映记</span></div>
-                  <div><strong>12</strong><span>城市</span></div>
-                  <div><strong>4</strong><span>国家</span></div>
+                <div class="profile-overview-grid" aria-label="账户数据概览">
+                  <div>
+                    <span>本机映记</span>
+                    <strong data-profile-local-memories>0</strong>
+                    <em data-profile-local-meta>0 座城市</em>
+                  </div>
+                  <div>
+                    <span>待整理</span>
+                    <strong data-profile-draft-memories>0</strong>
+                    <em data-profile-draft-meta>私密和草稿</em>
+                  </div>
+                  <div>
+                    <span>公开内容</span>
+                    <strong data-profile-public-memories>0</strong>
+                    <em>社区可见</em>
+                  </div>
+                  <div>
+                    <span>互动</span>
+                    <strong data-profile-interactions>0</strong>
+                    <em data-profile-interaction-meta>喜欢/收藏/评论</em>
+                  </div>
                 </div>
                 <div class="profile-primary-actions" aria-label="常用操作">
-                  <button type="button" data-profile-primary-action data-profile-go="create">写一篇映记</button>
-                  <button type="button" data-profile-primary-action data-profile-go="profile-space" data-open-profile-space>查看公开主页</button>
+                  <button type="button" data-profile-primary-action data-profile-go="create">新建映记</button>
+                  <button type="button" data-profile-primary-action data-profile-go="archive">管理档案</button>
                 </div>
-                <div class="profile-quick-grid" aria-label="账户快捷入口">
-                  <button type="button" data-profile-quick-action data-profile-go="archive"><strong>私密草稿</strong><span>6 篇待整理</span></button>
-                  <button type="button" data-profile-quick-action data-profile-go="messages"><strong>好友对话</strong><span>3 条新消息</span></button>
-                  <button type="button" data-profile-quick-action data-profile-focus="photos"><strong>照片权限</strong><span>管理上传与删除</span></button>
-                  <button type="button" data-profile-quick-action data-profile-focus="export"><strong>备份恢复</strong><span>导出 JSON / 长图</span></button>
-                </div>
+                <section class="profile-task-list" data-profile-task-list aria-label="账户任务">
+                  <button type="button" data-profile-quick-action data-profile-go="archive">
+                    <span>内容</span>
+                    <strong>档案与草稿</strong>
+                    <em data-profile-archive-summary>0 篇本机映记</em>
+                  </button>
+                  <button type="button" data-profile-quick-action data-profile-go="messages">
+                    <span>互动</span>
+                    <strong>消息与通知</strong>
+                    <em data-profile-message-summary>查看评论、喜欢和关注</em>
+                  </button>
+                  <button type="button" data-profile-quick-action data-profile-focus="photos">
+                    <span>媒体</span>
+                    <strong>照片管理</strong>
+                    <em>上传、选择和删除照片</em>
+                  </button>
+                  <button type="button" data-profile-quick-action data-profile-focus="export">
+                    <span>安全</span>
+                    <strong>备份与账户</strong>
+                    <em>导出、恢复和登录状态</em>
+                  </button>
+                </section>
               </section>
-              <section class="cloud-panel" data-cloud-panel aria-label="云端账户与发布">
+              <section class="cloud-panel" data-cloud-panel aria-label="同步与发布管理">
                 <div class="cloud-panel-header">
                   <div>
-                    <p class="eyebrow">上线账户</p>
-                    <h3>云端记录与公开主页</h3>
+                    <p class="eyebrow">同步管理</p>
+                    <h3>发布与云端档案</h3>
                   </div>
                   <span class="cloud-profile-pill" data-cloud-profile>未登录</span>
                 </div>
@@ -807,8 +845,8 @@
                 </section>
                 <div class="cloud-module cloud-editor">
                   <div class="cloud-module-head">
-                    <strong>发布草稿</strong>
-                    <span>保存为私密、仅链接可见或公开发布</span>
+                    <strong>当前编辑</strong>
+                    <span>私密、仅链接或公开</span>
                   </div>
                   <input type="text" value="杭州 · 西湖晨雾" placeholder="云端日志标题" data-cloud-title />
                   <input type="text" value="中国杭州" placeholder="地点" data-cloud-location />
