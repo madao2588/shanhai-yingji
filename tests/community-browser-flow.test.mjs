@@ -93,9 +93,11 @@ try {
   await page.fill("[data-community-search-input]", "Lisbon");
   await page.click("[data-community-search-action]");
   await page.waitForFunction(() => document.querySelector("[data-community-feed]")?.textContent.includes("Lisbon tile route"));
+  await page.waitForFunction(() => document.querySelector("[data-community-discovery-summary]")?.textContent.includes("Lisbon"));
 
   await page.click("[data-community-like]");
   await page.waitForFunction(() => document.querySelector("[data-community-feed]")?.textContent.includes("1 喜欢"));
+  await page.waitForFunction(() => document.querySelector("[data-community-like]")?.getAttribute("aria-pressed") === "true");
   await page.click("[data-community-bookmark]");
   await page.waitForFunction(() => document.querySelector("[data-community-feed]")?.textContent.includes("已收藏"));
   await page.fill("[data-community-comment-input]", "Saving this for my next city walk.");

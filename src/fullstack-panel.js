@@ -47,6 +47,7 @@
     communitySearch: $("[data-community-search-input]"),
     communitySearchAction: $("[data-community-search-action]"),
     communitySort: $("[data-community-sort]"),
+    communityDiscoverySummary: $("[data-community-discovery-summary]"),
     creatorStats: $("[data-creator-stats]"),
     creatorPublicMemories: $("[data-creator-public-memories]"),
     creatorTotalLikes: $("[data-creator-total-likes]"),
@@ -409,10 +410,12 @@
         like.dataset.communityAction = "like";
         like.dataset.communityLike = memory.id;
         like.textContent = memory.likedByViewer ? "已喜欢" : "喜欢";
+        like.setAttribute("aria-pressed", String(Boolean(memory.likedByViewer)));
         bookmark.type = "button";
         bookmark.dataset.communityAction = "bookmark";
         bookmark.dataset.communityBookmark = memory.id;
         bookmark.textContent = memory.bookmarkedByViewer ? "已收藏" : "收藏";
+        bookmark.setAttribute("aria-pressed", String(Boolean(memory.bookmarkedByViewer)));
         follow.type = "button";
         follow.dataset.communityAction = "follow";
         follow.dataset.communityFollow = memory.author?.username || "";
@@ -459,6 +462,10 @@
       q: elements.communitySearch?.value || "",
       sort: elements.communitySort?.value || "latest",
     });
+    if (elements.communityDiscoverySummary) {
+      const query = elements.communitySearch?.value?.trim() || "全部";
+      elements.communityDiscoverySummary.textContent = `${query} · ${(payload.memories || []).length} 篇公开映记`;
+    }
     renderCommunityFeed(payload.memories);
   }
 

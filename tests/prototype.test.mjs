@@ -115,6 +115,8 @@ assert.doesNotMatch(html, /class="icon-button search-button"/, "community should
 assert.match(html, /data-community-search-input/, "community should expose a discovery search input");
 assert.match(html, /data-community-search-action/, "community should expose a discovery search action");
 assert.match(html, /data-community-sort/, "community should expose discovery sorting");
+assert.match(html, /data-community-discovery-summary/, "community should expose discovery result feedback");
+assert.match(html, /data-community-quick-query/, "community should expose quick discovery queries");
 assert.match(html, /data-community-like/, "community cards should expose like actions");
 assert.match(html, /data-community-bookmark/, "community cards should expose bookmark actions");
 assert.match(html, /data-community-comment-input/, "community cards should expose comment input");
@@ -187,6 +189,7 @@ assert.match(css, /\.save-status/, "save feedback should be styled");
 assert.match(css, /\.cloud-panel/, "cloud account panel should be styled");
 assert.match(css, /\.community-actions/, "community interaction actions should be styled");
 assert.match(css, /\.community-channel-card/, "community tab active channel summary should be styled");
+assert.match(css, /\.community-discovery-bar/, "community discovery feedback should be styled");
 assert.match(css, /\.creator-stats/, "creator stats should be styled");
 assert.match(css, /\.notification-list/, "notification list should be styled");
 assert.match(css, /\.conversation-layout/, "friend conversation layout should be styled");
@@ -261,6 +264,8 @@ assert.match(js, /window\.shanhaiArchiveTransfer/, "app entry should use archive
 assert.match(js, /function openMemoryDetail/, "memory cards should open a personal memory detail");
 assert.match(js, /function openRecordBrowse/, "record summary should open browse panels");
 assert.match(js, /function switchCommunityTab/, "community topic tabs should switch panels");
+assert.match(js, /function applyCommunityQuery/, "community should apply quick discovery queries");
+assert.match(js, /function updateCommunityDiscoverySummary/, "community should update local review result feedback");
 assert.match(js, /function openConversation/, "messages should open friend conversations");
 assert.match(js, /function startDirectConversation/, "messages should start cloud direct conversations");
 assert.match(js, /function renderCloudConversationItems/, "messages should render dynamic cloud conversations");

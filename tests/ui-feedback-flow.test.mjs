@@ -112,6 +112,9 @@ try {
   assert.match(await page.locator("[data-community-channel]").textContent(), /附近|动态/, "nearby tab should visibly change the active channel");
   await page.click('[data-community-tab="cities"]');
   await page.waitForSelector('[data-community-panel="cities"]:not([hidden])');
+  await page.click('[data-community-quick-query="冰岛"]');
+  await page.waitForFunction(() => document.querySelector("[data-community-discovery-summary]")?.textContent.includes("冰岛"));
+  assert.match(await page.locator("[data-community-discovery-summary]").textContent(), /冰岛|结果|点评/, "quick queries should update discovery feedback");
   assert.equal(await page.locator(".search-button").count(), 0, "community header should not keep a redundant empty search icon");
 
   await page.click('[data-target="messages"]');

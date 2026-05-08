@@ -83,6 +83,8 @@ const communityChannelKicker = document.querySelector("[data-community-channel-k
 const communityChannelTitle = document.querySelector("[data-community-channel-title]");
 const communityChannelCopy = document.querySelector("[data-community-channel-copy]");
 const communityCityButtons = document.querySelectorAll("[data-city-query]");
+const communityDiscoverySummary = document.querySelector("[data-community-discovery-summary]");
+const communityQuickQueries = document.querySelectorAll("[data-community-quick-query]");
 const reviewFilters = document.querySelectorAll(".review-filter");
 const reviewCards = document.querySelectorAll("[data-review-card]");
 const reviewEmpty = document.querySelector(".review-empty");
@@ -2281,6 +2283,32 @@ function filterReviews() {
   });
 
   reviewEmpty.hidden = visibleCount > 0;
+  updateCommunityDiscoverySummary(visibleCount, destinationSearch.value.trim());
+}
+
+function updateCommunityDiscoverySummary(count, query = "") {
+  if (!communityDiscoverySummary) {
+    return;
+  }
+  const label = query || "全部";
+  communityDiscoverySummary.textContent = `${label} · ${count} 个点评结果`;
+  communityQuickQueries.forEach((button) => {
+    const isActive = button.dataset.communityQuickQuery === query;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+}
+
+function applyCommunityQuery(query) {
+  if (!destinationSearch) {
+    return;
+  }
+  switchCommunityTab("reviews");
+  destinationSearch.value = query;
+  activeReviewFilter = "all";
+  reviewFilters.forEach((item) => item.classList.toggle("is-active", item.dataset.reviewFilter === "all"));
+  filterReviews();
+  destinationSearch.focus();
 }
 
 function renderList(container, items) {
@@ -2513,10 +2541,11 @@ communityTabs.forEach((tab) => {
 });
 communityCityButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    switchCommunityTab("reviews");
-    destinationSearch.value = button.dataset.cityQuery;
-    filterReviews();
+    applyCommunityQuery(button.dataset.cityQuery);
   });
+});
+communityQuickQueries.forEach((button) => {
+  button.addEventListener("click", () => applyCommunityQuery(button.dataset.communityQuickQuery));
 });
 
 searchShortcut?.addEventListener("click", () => {
