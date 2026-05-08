@@ -2505,6 +2505,38 @@ img {
   gap: 12px;
 }
 
+.create-readiness {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.create-readiness div {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid rgba(245, 239, 228, 0.1);
+  border-radius: 8px;
+  background: rgba(245, 239, 228, 0.055);
+}
+
+.create-readiness span,
+.create-readiness strong {
+  display: block;
+}
+
+.create-readiness span {
+  color: rgba(245, 239, 228, 0.5);
+  font-size: 10px;
+}
+
+.create-readiness strong {
+  margin-top: 4px;
+  color: rgba(245, 239, 228, 0.88);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
 .create-form label {
   display: grid;
   gap: 7px;

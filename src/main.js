@@ -22,6 +22,9 @@ const createRoute = document.querySelector("[data-create-route]");
 const createTags = document.querySelector("[data-create-tags]");
 const createVisibility = document.querySelector("[data-create-visibility]");
 const createBody = document.querySelector("[data-create-body]");
+const createDraftState = document.querySelector("[data-create-draft-state]");
+const createPhotoCount = document.querySelector("[data-create-photo-count]");
+const createPublishTarget = document.querySelector("[data-create-publish-target]");
 const stepItems = document.querySelectorAll(".step-rail span");
 const generateButton = document.querySelector("[data-generate-recap]");
 const recapPreviewText = document.querySelector("[data-recap-status]");
@@ -809,6 +812,28 @@ function getLocalPhotoDrafts() {
     .map(getPhotoData);
 }
 
+function getCreatePublishLabel() {
+  return (
+    {
+      private: "私密保存",
+      unlisted: "仅链接可见",
+      public: "公开发布",
+    }[createVisibility?.value] || "私密保存"
+  );
+}
+
+function renderCreateReadiness(state = "已自动保存") {
+  if (createDraftState) {
+    createDraftState.textContent = state;
+  }
+  if (createPhotoCount) {
+    createPhotoCount.textContent = selectedPhotoIds.length ? `${selectedPhotoIds.length} 张已选` : "还未选择";
+  }
+  if (createPublishTarget) {
+    createPublishTarget.textContent = getCreatePublishLabel();
+  }
+}
+
 function saveCreateDraft() {
   if (isRestoringCreateDraft) {
     return;
@@ -828,7 +853,10 @@ function saveCreateDraft() {
 
   if (!result.ok) {
     saveStatus.textContent = "草稿暂时无法自动保存，本机存储空间可能不足。";
+    renderCreateReadiness("草稿未保存");
+    return;
   }
+  renderCreateReadiness("已自动保存");
 }
 
 function clearCreateDraft() {
@@ -1675,6 +1703,7 @@ function updateCreateProgress() {
     step.classList.toggle("is-active", index <= activeIndex);
   });
 
+  renderCreateReadiness();
   syncCreateFlow(false);
 }
 

@@ -80,6 +80,14 @@ try {
   assert.match(await page.locator('[data-conversation-item="lin-che"] [data-conversation-preview]').textContent(), /我：|route-note|涓嬫/, "sent replies should update the conversation preview");
   assert.match(await page.locator("[data-message-thread-state]").textContent(), /已发送|sent/i, "sent replies should update thread delivery state");
 
+  await page.click('[data-target="create"]');
+  await page.waitForSelector("[data-create-readiness]");
+  assert.equal(await page.locator("[data-create-draft-state]").count(), 1, "create flow should show draft state");
+  assert.match(await page.locator("[data-create-photo-count]").textContent(), /2|照片|photo/i, "create flow should show selected photo count");
+  assert.match(await page.locator("[data-create-publish-target]").textContent(), /私密|private/i, "create flow should show current publish target");
+  await page.selectOption("[data-create-visibility]", "public");
+  assert.match(await page.locator("[data-create-publish-target]").textContent(), /公开|public/i, "publish target should update when visibility changes");
+
   await page.click('[data-target="profile"]');
   await page.waitForSelector("[data-profile-dashboard]");
   const profileScreenHeight = await page.locator('[data-screen="profile"]').evaluate((node) => node.getBoundingClientRect().height);

@@ -56,6 +56,10 @@ assert.match(html, /data-plan-status/, "plan draft should expose a status target
 assert.match(html, /data-create-title/, "create flow should expose a title input");
 assert.match(html, /data-create-location/, "create flow should expose a location input");
 assert.match(html, /data-create-body/, "create flow should expose a body input");
+assert.match(html, /data-create-readiness/, "create flow should expose publishing readiness");
+assert.match(html, /data-create-draft-state/, "create flow should expose draft save state");
+assert.match(html, /data-create-photo-count/, "create flow should expose selected photo count");
+assert.match(html, /data-create-publish-target/, "create flow should expose publish target");
 assert.match(html, /data-photo-option/, "create flow should include selectable photo assets");
 assert.match(html, /data-selected-photos/, "create flow should render selected photos");
 assert.match(html, /data-auto-timeline/, "create flow should render an automatic timeline");
