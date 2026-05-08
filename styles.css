@@ -1,17 +1,26 @@
 :root {
   color-scheme: dark;
-  --obsidian: #101214;
-  --obsidian-2: #15191d;
+  --ink-black: #0c1110;
+  --ink-deep: #151c1a;
+  --ink-gray: #52615d;
+  --paper-warm: #f3ead8;
+  --paper-soft: #e8dcc6;
+  --paper-wash: rgba(243, 234, 216, 0.09);
+  --mist-jade: #84b8a8;
+  --seal-red: #a94834;
+  --warm-gold: #c9a95f;
+  --obsidian: var(--ink-black);
+  --obsidian-2: var(--ink-deep);
   --ink: #1d2529;
-  --ivory: #f5efe4;
-  --muted: #b9afa0;
-  --teal: #1f6f6a;
-  --teal-soft: #6fc8bd;
-  --coral: #ff7a5c;
-  --gold: #d6b56d;
-  --glass: rgba(245, 239, 228, 0.075);
-  --line: rgba(245, 239, 228, 0.14);
-  --shadow: 0 28px 80px rgba(0, 0, 0, 0.42);
+  --ivory: var(--paper-warm);
+  --muted: #c8bba5;
+  --teal: #2e6f63;
+  --teal-soft: var(--mist-jade);
+  --coral: var(--seal-red);
+  --gold: var(--warm-gold);
+  --glass: rgba(243, 234, 216, 0.09);
+  --line: rgba(243, 234, 216, 0.16);
+  --shadow: 0 30px 86px rgba(5, 8, 7, 0.5);
 }
 
 * {
@@ -26,9 +35,9 @@ body {
 body {
   margin: 0;
   background:
-    radial-gradient(circle at 18% 12%, rgba(214, 181, 109, 0.14), transparent 30%),
-    radial-gradient(circle at 82% 78%, rgba(31, 111, 106, 0.24), transparent 34%),
-    linear-gradient(135deg, #08090a 0%, #12161a 52%, #0b0d0f 100%);
+    radial-gradient(circle at 18% 12%, rgba(243, 234, 216, 0.18), transparent 31%),
+    radial-gradient(circle at 82% 72%, rgba(132, 184, 168, 0.22), transparent 34%),
+    linear-gradient(135deg, #0a0f0e 0%, #18211f 50%, #080b0a 100%);
   color: var(--ivory);
   font-family:
     "Inter",
@@ -68,13 +77,13 @@ img {
 .phone {
   width: min(430px, calc(100vw - 32px));
   aspect-ratio: 430 / 932;
-  border: 1px solid rgba(245, 239, 228, 0.2);
+  border: 1px solid rgba(243, 234, 216, 0.23);
   border-radius: 44px;
   padding: 11px;
   background:
-    linear-gradient(145deg, rgba(245, 239, 228, 0.18), transparent 22%),
-    linear-gradient(320deg, rgba(111, 200, 189, 0.14), transparent 20%),
-    #060708;
+    linear-gradient(145deg, rgba(243, 234, 216, 0.2), transparent 22%),
+    linear-gradient(320deg, rgba(132, 184, 168, 0.16), transparent 20%),
+    #050706;
   box-shadow: var(--shadow);
 }
 
@@ -84,7 +93,8 @@ img {
   overflow: hidden;
   border-radius: 34px;
   background:
-    linear-gradient(180deg, rgba(21, 25, 29, 0.82), rgba(12, 14, 16, 0.96)),
+    radial-gradient(circle at 58% 4%, rgba(243, 234, 216, 0.14), transparent 24%),
+    linear-gradient(180deg, rgba(25, 33, 30, 0.84), rgba(8, 12, 11, 0.98)),
     var(--obsidian);
 }
 
@@ -93,16 +103,132 @@ img {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.55;
+  z-index: 0;
+  opacity: 0.68;
   background-image:
-    linear-gradient(rgba(245, 239, 228, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(245, 239, 228, 0.026) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1), transparent 72%);
+    radial-gradient(circle at 18% 9%, rgba(243, 234, 216, 0.13), transparent 20%),
+    repeating-linear-gradient(
+      92deg,
+      rgba(243, 234, 216, 0.034) 0,
+      rgba(243, 234, 216, 0.034) 1px,
+      transparent 1px,
+      transparent 7px
+    ),
+    linear-gradient(rgba(243, 234, 216, 0.028) 1px, transparent 1px);
+  background-size: auto, auto, 58px 58px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1), transparent 78%);
+}
+
+.ink-wash {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ink-wash::before,
+.ink-wash::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.ink-wash::before {
+  inset: -20% -24% 48% -20%;
+  background:
+    radial-gradient(ellipse at 28% 48%, rgba(243, 234, 216, 0.16), transparent 34%),
+    radial-gradient(ellipse at 72% 38%, rgba(132, 184, 168, 0.14), transparent 36%),
+    radial-gradient(ellipse at 50% 75%, rgba(82, 97, 93, 0.25), transparent 42%);
+  filter: blur(18px);
+  opacity: 0.95;
+}
+
+.ink-wash::after {
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(243, 234, 216, 0.06), transparent 18%),
+    repeating-linear-gradient(
+      0deg,
+      rgba(243, 234, 216, 0.022) 0,
+      rgba(243, 234, 216, 0.022) 1px,
+      transparent 1px,
+      transparent 5px
+    );
+  mix-blend-mode: screen;
+  opacity: 0.42;
+}
+
+.ink-mountain-layer {
+  position: absolute;
+  left: -12%;
+  right: -12%;
+  display: block;
+  pointer-events: none;
+  filter: blur(0.2px);
+}
+
+.ink-mountain-back {
+  top: 8%;
+  height: 180px;
+  background:
+    linear-gradient(180deg, rgba(243, 234, 216, 0.2), rgba(82, 97, 93, 0.2)),
+    rgba(82, 97, 93, 0.22);
+  clip-path: polygon(0 68%, 11% 48%, 21% 58%, 33% 28%, 45% 55%, 56% 38%, 69% 63%, 79% 43%, 91% 59%, 100% 36%, 100% 100%, 0 100%);
+  opacity: 0.6;
+}
+
+.ink-mountain-mid {
+  top: 21%;
+  height: 210px;
+  background:
+    linear-gradient(180deg, rgba(132, 184, 168, 0.22), rgba(12, 17, 16, 0.06)),
+    rgba(21, 28, 26, 0.54);
+  clip-path: polygon(0 64%, 9% 52%, 18% 62%, 31% 34%, 41% 60%, 53% 42%, 62% 68%, 73% 31%, 84% 56%, 94% 43%, 100% 55%, 100% 100%, 0 100%);
+  opacity: 0.78;
+}
+
+.ink-river {
+  position: absolute;
+  left: -18%;
+  right: -18%;
+  bottom: 12%;
+  height: 170px;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 30% 48%, rgba(243, 234, 216, 0.14), transparent 32%),
+    radial-gradient(ellipse at 62% 45%, rgba(132, 184, 168, 0.18), transparent 36%),
+    repeating-linear-gradient(
+      172deg,
+      transparent 0,
+      transparent 16px,
+      rgba(243, 234, 216, 0.055) 17px,
+      transparent 20px
+    );
+  filter: blur(7px);
+  opacity: 0.78;
+  transform: rotate(-7deg);
+}
+
+.ink-seal {
+  position: absolute;
+  right: 24px;
+  top: 86px;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(169, 72, 52, 0.72);
+  background:
+    linear-gradient(90deg, transparent 46%, rgba(169, 72, 52, 0.32) 47% 52%, transparent 53%),
+    linear-gradient(0deg, transparent 46%, rgba(169, 72, 52, 0.3) 47% 52%, transparent 53%),
+    rgba(169, 72, 52, 0.16);
+  box-shadow: inset 0 0 0 4px rgba(169, 72, 52, 0.1);
+  opacity: 0.58;
+  transform: rotate(8deg);
 }
 
 .screens {
   position: relative;
+  z-index: 1;
   height: 100%;
 }
 
@@ -4594,6 +4720,263 @@ img {
 .create-action > span::after {
   width: 2px;
   height: 18px;
+}
+
+/* Ink wash theme layer: keeps the existing app structure, changes the material. */
+.screen {
+  background:
+    linear-gradient(180deg, rgba(12, 17, 16, 0.12), rgba(12, 17, 16, 0.34)),
+    radial-gradient(circle at 85% 8%, rgba(243, 234, 216, 0.055), transparent 25%);
+}
+
+.topbar h2,
+.profile-account-main h2,
+.profile-summary h2,
+.profile-space-identity h2 {
+  text-shadow: 0 8px 30px rgba(5, 8, 7, 0.42);
+}
+
+.eyebrow,
+.topbar.compact .eyebrow {
+  color: rgba(201, 169, 95, 0.9);
+  letter-spacing: 0;
+}
+
+.icon-button,
+.mode-switch,
+.year-summary,
+.record-overview,
+.message-overview,
+.create-readiness div,
+.conversation-item,
+.conversation-thread,
+.timeline article,
+.message-list article,
+.settings-list button,
+.profile-dashboard,
+.profile-space-content,
+.profile-overview-grid div,
+.profile-quick-grid button,
+.profile-task-list button,
+.cloud-panel,
+.cloud-module,
+.profile-suggestion-card,
+.profile-space-tools button,
+.profile-space-list article,
+.archive-list article,
+.archive-edit-panel,
+.memory-comments-list article,
+.browse-panel,
+.review-card,
+.community-channel-card,
+.notification-list article {
+  border-color: rgba(243, 234, 216, 0.14);
+  background:
+    linear-gradient(145deg, rgba(243, 234, 216, 0.092), rgba(243, 234, 216, 0.034)),
+    rgba(10, 15, 14, 0.72);
+  box-shadow:
+    inset 0 1px 0 rgba(243, 234, 216, 0.075),
+    0 18px 42px rgba(5, 8, 7, 0.24);
+  backdrop-filter: blur(14px);
+}
+
+.profile-dashboard,
+.profile-space-content,
+.community-hero,
+.recap-preview {
+  position: relative;
+}
+
+.record-overview,
+.message-overview,
+.conversation-item.is-active,
+.timeline article.is-new-memory,
+.cloud-list button[data-cloud-photo-id].is-active {
+  border-color: rgba(132, 184, 168, 0.32);
+  background:
+    linear-gradient(135deg, rgba(132, 184, 168, 0.16), rgba(243, 234, 216, 0.052)),
+    rgba(10, 15, 14, 0.76);
+}
+
+.mode-tab.is-active,
+.topic-tabs button.is-active,
+.step-rail span.is-active,
+.record-browse-button,
+.record-overview-side button,
+.memory-comment-compose button,
+.poster-export-actions a.is-ready,
+.profile-primary-actions button:last-child {
+  border-color: rgba(201, 169, 95, 0.34);
+  background:
+    linear-gradient(135deg, rgba(201, 169, 95, 0.2), rgba(132, 184, 168, 0.09)),
+    rgba(243, 234, 216, 0.045);
+  color: rgba(243, 234, 216, 0.92);
+}
+
+.profile-primary-actions button,
+.create-action > span {
+  background:
+    radial-gradient(circle at 35% 24%, rgba(243, 234, 216, 0.64), transparent 13%),
+    linear-gradient(145deg, #d8bf78, #a94834);
+  color: #17110b;
+}
+
+.map-card,
+.diary-feature,
+.community-hero,
+.recap-preview,
+.profile-hero,
+.profile-summary,
+.profile-space-hero {
+  position: relative;
+  border-color: rgba(243, 234, 216, 0.16);
+  background:
+    linear-gradient(180deg, rgba(243, 234, 216, 0.11), rgba(10, 15, 14, 0.82)),
+    rgba(10, 15, 14, 0.8);
+  box-shadow:
+    inset 0 1px 0 rgba(243, 234, 216, 0.08),
+    0 22px 54px rgba(5, 8, 7, 0.28);
+}
+
+.map-card::before,
+.community-hero::before,
+.recap-preview::before,
+.profile-dashboard::before,
+.profile-space-content::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 72% 18%, rgba(201, 169, 95, 0.11), transparent 28%),
+    linear-gradient(160deg, rgba(243, 234, 216, 0.05), transparent 38%);
+  opacity: 0.9;
+}
+
+.map-header,
+.map-metrics,
+.profile-dashboard > *,
+.profile-space-content > * {
+  position: relative;
+  z-index: 1;
+}
+
+.archive-map {
+  isolation: isolate;
+}
+
+.archive-map::before {
+  content: "";
+  position: absolute;
+  inset: 12px -18px 42px;
+  z-index: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 44% 45%, rgba(243, 234, 216, 0.1), transparent 44%),
+    repeating-linear-gradient(
+      178deg,
+      transparent 0,
+      transparent 18px,
+      rgba(243, 234, 216, 0.045) 19px,
+      transparent 23px
+    );
+  filter: blur(5px);
+}
+
+.archive-map svg,
+.photo-fragment,
+.year-chip {
+  z-index: 1;
+}
+
+.grid path {
+  stroke: rgba(243, 234, 216, 0.075);
+}
+
+.continents path {
+  fill: rgba(82, 97, 93, 0.68);
+  stroke: rgba(243, 234, 216, 0.15);
+}
+
+.visited path {
+  fill: rgba(132, 184, 168, 0.24);
+  stroke: rgba(132, 184, 168, 0.45);
+}
+
+.photo-fragment,
+.year-chip,
+.photo-option,
+.selected-card,
+.profile-avatar {
+  border-color: rgba(243, 234, 216, 0.22);
+  background: rgba(10, 15, 14, 0.74);
+  box-shadow: 0 16px 34px rgba(5, 8, 7, 0.32);
+}
+
+.photo-fragment img,
+.diary-feature img,
+.memory-row img,
+.community-feed img,
+.profile-summary,
+.profile-space-hero {
+  filter: saturate(0.74) sepia(0.18) contrast(0.98);
+}
+
+.create-form input,
+.create-form textarea,
+.create-form select,
+.memory-comment-compose input,
+.reply-box input,
+.archive-search input,
+.profile-edit-fields input,
+.profile-edit-fields textarea {
+  border-color: rgba(243, 234, 216, 0.16);
+  background:
+    linear-gradient(180deg, rgba(243, 234, 216, 0.075), rgba(243, 234, 216, 0.036)),
+    rgba(8, 12, 11, 0.72);
+  box-shadow: inset 0 1px 0 rgba(243, 234, 216, 0.055);
+}
+
+.create-form input:focus,
+.create-form textarea:focus,
+.create-form select:focus,
+.memory-comment-compose input:focus,
+.reply-box input:focus,
+.archive-search input:focus,
+.profile-edit-fields input:focus,
+.profile-edit-fields textarea:focus,
+button:focus-visible {
+  outline: 2px solid rgba(201, 169, 95, 0.48);
+  outline-offset: 2px;
+}
+
+.bottom-nav {
+  border-color: rgba(243, 234, 216, 0.18);
+  background:
+    linear-gradient(180deg, rgba(30, 38, 35, 0.9), rgba(8, 12, 11, 0.88)),
+    rgba(8, 12, 11, 0.86);
+  box-shadow:
+    inset 0 1px 0 rgba(243, 234, 216, 0.08),
+    0 18px 40px rgba(5, 8, 7, 0.42);
+}
+
+.bottom-nav button.is-active {
+  color: var(--paper-warm);
+}
+
+.bottom-nav button.is-active .nav-icon::before,
+.bottom-nav button.is-active .nav-icon::after {
+  filter: drop-shadow(0 0 8px rgba(201, 169, 95, 0.42));
+}
+
+.bottom-nav button.is-active em {
+  color: rgba(243, 234, 216, 0.96);
+}
+
+.create-action > span {
+  box-shadow:
+    0 12px 28px rgba(169, 72, 52, 0.28),
+    inset 0 0 0 1px rgba(243, 234, 216, 0.34);
 }
 
 @keyframes spin {

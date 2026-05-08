@@ -42,6 +42,17 @@ try {
     true,
     "hidden splash should not cover the active screen"
   );
+  assert.equal(await page.locator("[data-ink-landscape]").count(), 1, "app should render the ink landscape layer");
+  assert.equal(
+    await page.locator("[data-ink-landscape]").evaluate((node) => getComputedStyle(node).pointerEvents),
+    "none",
+    "ink landscape should not intercept taps"
+  );
+  assert.equal(
+    await page.locator(".screens").evaluate((node) => Number(getComputedStyle(node).zIndex) >= 1),
+    true,
+    "screens should render above the ink landscape"
+  );
   assert.equal(await page.locator("[data-record-overview]").count(), 1, "record home should show a normal app overview");
   assert.match(await page.locator("[data-record-latest-title]").textContent(), /京都|映记|memory/i, "record overview should show latest memory");
   assert.match(await page.locator("[data-record-visibility]").textContent(), /私密|公开|待创建|private|public/i, "record overview should show visibility mix or an empty local state");

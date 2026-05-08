@@ -9,6 +9,7 @@ const seedMemoriesPath = "src/data/seed-memories.js";
 
 assert.match(html, /<script src="src\/main\.js\?v=profile-edit-3"><\/script>/, "prototype should load the app through the src entry while keeping direct file-open support");
 assert.match(html, /<script src="src\/data\/seed-destinations\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/data\/seed-memories\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/domain\/memory\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/storage\/local-store\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/storage\/archive-export\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/api-client\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/main\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/fullstack-panel\.js\?v=profile-edit-3"><\/script>/, "seed, domain, storage, API, app, and fullstack scripts should load in order while keeping classic script support");
+assert.match(html, /data-ink-landscape/, "app shell should include a non-interactive ink landscape layer");
 assert.equal(existsSync(seedDestinationsPath), true, "destination seed data should live in src/data");
 assert.equal(existsSync(seedMemoriesPath), true, "memory seed data should live in src/data");
 
@@ -180,6 +181,15 @@ assert.match(css, /\.cloud-danger-action/, "photo delete action should be styled
 assert.match(css, /\.public-memory-card/, "public memories should render as designed cards");
 assert.match(css, /\.cloud-module/, "cloud account publishing should be styled as mobile product modules");
 assert.match(css, /\.browse-panel/, "record browse panel should be styled");
+assert.match(css, /--ink-black/, "visual system should expose ink color tokens");
+assert.match(css, /--paper-warm/, "visual system should expose paper color tokens");
+assert.match(css, /--mist-jade/, "visual system should expose mist accent tokens");
+assert.match(css, /\.ink-wash/, "app shell should style the ink wash background");
+assert.match(css, /\.ink-mountain-layer/, "app shell should style layered mountain silhouettes");
+assert.match(css, /\.ink-river/, "app shell should style a river-like wash");
+assert.match(css, /\.ink-seal/, "app shell should style a seal accent");
+assert.match(css, /\.screens\s*\{[\s\S]*z-index:\s*1/, "screens should stay above the decorative ink landscape");
+assert.match(css, /\.ink-wash\s*\{[\s\S]*pointer-events:\s*none/, "ink landscape should not intercept app interaction");
 
 assert.doesNotMatch(js, /const destinationData = \{/, "destination data should be extracted out of the app entry");
 assert.doesNotMatch(js, /const seedMemories = \[/, "seed memories should be extracted out of the app entry");
