@@ -10,6 +10,8 @@ const seedMemoriesPath = "src/data/seed-memories.js";
 assert.match(html, /<script src="src\/main\.js\?v=profile-edit-3"><\/script>/, "prototype should load the app through the src entry while keeping direct file-open support");
 assert.match(html, /<script src="src\/data\/seed-destinations\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/data\/seed-memories\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/domain\/memory\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/storage\/local-store\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/storage\/archive-export\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/api-client\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/main\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/fullstack-panel\.js\?v=profile-edit-3"><\/script>/, "seed, domain, storage, API, app, and fullstack scripts should load in order while keeping classic script support");
 assert.match(html, /data-ink-landscape/, "app shell should include a non-interactive ink landscape layer");
+assert.match(html, /ink-moon/, "ink landscape should include a visible moon/sun wash");
+assert.match(html, /ink-cloud-bank/, "ink landscape should include a visible cloud and water wash");
 assert.equal(existsSync(seedDestinationsPath), true, "destination seed data should live in src/data");
 assert.equal(existsSync(seedMemoriesPath), true, "memory seed data should live in src/data");
 
@@ -188,6 +190,9 @@ assert.match(css, /\.ink-wash/, "app shell should style the ink wash background"
 assert.match(css, /\.ink-mountain-layer/, "app shell should style layered mountain silhouettes");
 assert.match(css, /\.ink-river/, "app shell should style a river-like wash");
 assert.match(css, /\.ink-seal/, "app shell should style a seal accent");
+assert.match(css, /\.ink-moon/, "app shell should style the visible moon/sun wash");
+assert.match(css, /\.ink-cloud-bank/, "app shell should style the visible cloud and water wash");
+assert.match(css, /\.screen\s*\{[\s\S]*background:\s*transparent/, "active screens should not hide the app-level ink landscape");
 assert.match(css, /\.screens\s*\{[\s\S]*z-index:\s*1/, "screens should stay above the decorative ink landscape");
 assert.match(css, /\.ink-wash\s*\{[\s\S]*pointer-events:\s*none/, "ink landscape should not intercept app interaction");
 

@@ -124,6 +124,9 @@ img {
   inset: 0;
   z-index: 0;
   overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(68, 86, 80, 0.42), rgba(9, 13, 12, 0.18) 38%, rgba(6, 9, 8, 0.62)),
+    radial-gradient(circle at 12% 16%, rgba(243, 234, 216, 0.1), transparent 28%);
   pointer-events: none;
 }
 
@@ -135,13 +138,13 @@ img {
 }
 
 .ink-wash::before {
-  inset: -20% -24% 48% -20%;
+  inset: -15% -22% 42% -18%;
   background:
-    radial-gradient(ellipse at 28% 48%, rgba(243, 234, 216, 0.16), transparent 34%),
-    radial-gradient(ellipse at 72% 38%, rgba(132, 184, 168, 0.14), transparent 36%),
-    radial-gradient(ellipse at 50% 75%, rgba(82, 97, 93, 0.25), transparent 42%);
-  filter: blur(18px);
-  opacity: 0.95;
+    radial-gradient(ellipse at 25% 42%, rgba(243, 234, 216, 0.24), transparent 34%),
+    radial-gradient(ellipse at 72% 38%, rgba(132, 184, 168, 0.23), transparent 38%),
+    radial-gradient(ellipse at 50% 78%, rgba(82, 97, 93, 0.36), transparent 44%);
+  filter: blur(14px);
+  opacity: 1;
 }
 
 .ink-wash::after {
@@ -156,7 +159,22 @@ img {
       transparent 5px
     );
   mix-blend-mode: screen;
-  opacity: 0.42;
+  opacity: 0.5;
+}
+
+.ink-moon {
+  position: absolute;
+  left: 34px;
+  top: 72px;
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 38% 38%, rgba(243, 234, 216, 0.62), rgba(243, 234, 216, 0.22) 38%, transparent 66%),
+    radial-gradient(circle at 50% 50%, rgba(201, 169, 95, 0.26), transparent 68%);
+  filter: blur(0.4px);
+  opacity: 0.76;
+  transform: rotate(-12deg);
 }
 
 .ink-mountain-layer {
@@ -169,44 +187,70 @@ img {
 }
 
 .ink-mountain-back {
-  top: 8%;
-  height: 180px;
+  top: 10%;
+  height: 210px;
   background:
-    linear-gradient(180deg, rgba(243, 234, 216, 0.2), rgba(82, 97, 93, 0.2)),
-    rgba(82, 97, 93, 0.22);
+    linear-gradient(180deg, rgba(243, 234, 216, 0.26), rgba(82, 97, 93, 0.28)),
+    rgba(82, 97, 93, 0.34);
   clip-path: polygon(0 68%, 11% 48%, 21% 58%, 33% 28%, 45% 55%, 56% 38%, 69% 63%, 79% 43%, 91% 59%, 100% 36%, 100% 100%, 0 100%);
-  opacity: 0.6;
+  opacity: 0.82;
 }
 
 .ink-mountain-mid {
-  top: 21%;
-  height: 210px;
+  top: 22%;
+  height: 240px;
   background:
-    linear-gradient(180deg, rgba(132, 184, 168, 0.22), rgba(12, 17, 16, 0.06)),
-    rgba(21, 28, 26, 0.54);
+    linear-gradient(180deg, rgba(132, 184, 168, 0.28), rgba(12, 17, 16, 0.14)),
+    rgba(21, 28, 26, 0.72);
   clip-path: polygon(0 64%, 9% 52%, 18% 62%, 31% 34%, 41% 60%, 53% 42%, 62% 68%, 73% 31%, 84% 56%, 94% 43%, 100% 55%, 100% 100%, 0 100%);
-  opacity: 0.78;
+  opacity: 0.92;
+}
+
+.ink-mountain-front {
+  top: 38%;
+  height: 250px;
+  background:
+    linear-gradient(180deg, rgba(21, 28, 26, 0.2), rgba(8, 12, 11, 0.72)),
+    rgba(9, 13, 12, 0.74);
+  clip-path: polygon(0 46%, 12% 58%, 24% 35%, 36% 62%, 51% 31%, 64% 60%, 76% 42%, 88% 66%, 100% 48%, 100% 100%, 0 100%);
+  opacity: 0.84;
+}
+
+.ink-cloud-bank {
+  position: absolute;
+  left: -16%;
+  right: -16%;
+  top: 32%;
+  height: 150px;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 12% 50%, rgba(243, 234, 216, 0.18), transparent 30%),
+    radial-gradient(ellipse at 44% 42%, rgba(132, 184, 168, 0.18), transparent 34%),
+    radial-gradient(ellipse at 76% 55%, rgba(243, 234, 216, 0.13), transparent 30%),
+    linear-gradient(90deg, transparent, rgba(243, 234, 216, 0.08), transparent);
+  filter: blur(13px);
+  opacity: 0.92;
 }
 
 .ink-river {
   position: absolute;
   left: -18%;
   right: -18%;
-  bottom: 12%;
-  height: 170px;
+  bottom: 8%;
+  height: 230px;
   pointer-events: none;
   background:
-    radial-gradient(ellipse at 30% 48%, rgba(243, 234, 216, 0.14), transparent 32%),
-    radial-gradient(ellipse at 62% 45%, rgba(132, 184, 168, 0.18), transparent 36%),
+    radial-gradient(ellipse at 30% 48%, rgba(243, 234, 216, 0.2), transparent 34%),
+    radial-gradient(ellipse at 62% 45%, rgba(132, 184, 168, 0.24), transparent 38%),
     repeating-linear-gradient(
       172deg,
       transparent 0,
       transparent 16px,
-      rgba(243, 234, 216, 0.055) 17px,
+      rgba(243, 234, 216, 0.08) 17px,
       transparent 20px
     );
-  filter: blur(7px);
-  opacity: 0.78;
+  filter: blur(6px);
+  opacity: 0.9;
   transform: rotate(-7deg);
 }
 
@@ -4724,9 +4768,7 @@ img {
 
 /* Ink wash theme layer: keeps the existing app structure, changes the material. */
 .screen {
-  background:
-    linear-gradient(180deg, rgba(12, 17, 16, 0.12), rgba(12, 17, 16, 0.34)),
-    radial-gradient(circle at 85% 8%, rgba(243, 234, 216, 0.055), transparent 25%);
+  background: transparent;
 }
 
 .topbar h2,

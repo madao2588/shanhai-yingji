@@ -53,6 +53,13 @@ try {
     true,
     "screens should render above the ink landscape"
   );
+  assert.equal(await page.locator(".ink-moon").count(), 1, "ink landscape should include a visible moon/sun wash");
+  assert.equal(await page.locator(".ink-cloud-bank").count(), 1, "ink landscape should include a visible cloud and water wash");
+  assert.equal(
+    await page.locator(".screen.is-active").evaluate((node) => getComputedStyle(node).backgroundColor),
+    "rgba(0, 0, 0, 0)",
+    "active screen should stay transparent so the ink landscape remains visible"
+  );
   assert.equal(await page.locator("[data-record-overview]").count(), 1, "record home should show a normal app overview");
   assert.match(await page.locator("[data-record-latest-title]").textContent(), /京都|映记|memory/i, "record overview should show latest memory");
   assert.match(await page.locator("[data-record-visibility]").textContent(), /私密|公开|待创建|private|public/i, "record overview should show visibility mix or an empty local state");
