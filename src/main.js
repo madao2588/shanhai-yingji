@@ -460,7 +460,7 @@ function switchCommunityTab(tabName) {
   }
 }
 
-const conversationState = {
+const baseConversationState = {
   "lin-che": {
     title: "林澈",
     status: "正在整理京都路线",
@@ -495,6 +495,55 @@ const conversationState = {
     ],
   },
 };
+
+function isConversationMessage(message) {
+  return Array.isArray(message) && typeof message[0] === "string" && typeof message[1] === "string";
+}
+
+function normalizeConversationState(conversations) {
+  if (!conversations || typeof conversations !== "object" || Array.isArray(conversations)) {
+    return {};
+  }
+
+  return Object.fromEntries(
+    Object.entries(conversations).map(([id, conversation]) => {
+      const fallback = baseConversationState[id] || {};
+      const messages = Array.isArray(conversation?.messages) ? conversation.messages.filter(isConversationMessage) : fallback.messages || [];
+
+      return [
+        id,
+        {
+          ...fallback,
+          title: typeof conversation?.title === "string" ? conversation.title : fallback.title,
+          status: typeof conversation?.status === "string" ? conversation.status : fallback.status,
+          preview: typeof conversation?.preview === "string" ? conversation.preview : fallback.preview,
+          lastTime: typeof conversation?.lastTime === "string" ? conversation.lastTime : fallback.lastTime,
+          unreadCount: Number.isFinite(conversation?.unreadCount) ? Math.max(0, conversation.unreadCount) : fallback.unreadCount || 0,
+          messages: messages.length ? messages : fallback.messages || [],
+        },
+      ];
+    }),
+  );
+}
+
+function hydrateConversationState() {
+  const savedConversations = normalizeConversationState(localStore.loadConversationState?.());
+  return Object.fromEntries(
+    Object.entries(baseConversationState).map(([id, conversation]) => [
+      id,
+      {
+        ...conversation,
+        ...(savedConversations[id] || {}),
+      },
+    ]),
+  );
+}
+
+function persistConversationState() {
+  localStore.persistConversationState?.(conversationState);
+}
+
+const conversationState = hydrateConversationState();
 
 let activeConversationId = "lin-che";
 
@@ -571,6 +620,7 @@ function openConversation(conversationId) {
     conversationInput.setAttribute("aria-invalid", "false");
   }
   conversationThread.hidden = false;
+  persistConversationState();
 }
 
 function renderProfileDashboardStats() {

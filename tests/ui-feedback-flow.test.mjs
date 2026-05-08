@@ -138,6 +138,27 @@ try {
   assert.equal(await page.locator("[data-conversation-message-input]").getAttribute("aria-invalid"), "false", "valid replies should clear invalid state");
   assert.match(await page.locator('[data-conversation-item="lin-che"] [data-conversation-preview]').textContent(), /我：|route-note|涓嬫/, "sent replies should update the conversation preview");
   assert.match(await page.locator("[data-message-thread-state]").textContent(), /已发送|sent/i, "sent replies should update thread delivery state");
+  const persistedReply = "route-note-persist-0508";
+  await page.fill("[data-conversation-message-input]", persistedReply);
+  await page.click("[data-conversation-send]");
+  await page.waitForFunction(
+    (reply) => document.querySelector("[data-conversation-thread]")?.textContent.includes(reply),
+    persistedReply,
+  );
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await page.waitForSelector(".splash.is-hidden");
+  await page.click('[data-target="messages"]');
+  await page.click('[data-conversation-item="lin-che"]');
+  await page.waitForSelector('[data-conversation-thread]:not([hidden])');
+  await page.waitForFunction(
+    (reply) => document.querySelector("[data-conversation-thread]")?.textContent.includes(reply),
+    persistedReply,
+  );
+  assert.match(
+    await page.locator('[data-conversation-item="lin-che"] [data-conversation-preview]').textContent(),
+    /route-note-persist-0508/,
+    "sent replies should persist in the conversation preview after reload",
+  );
 
   await page.click('[data-target="create"]');
   await page.waitForSelector("[data-create-readiness]");
@@ -175,6 +196,10 @@ try {
   assert.equal(await page.locator("[data-profile-edit-panel]:not([hidden])").count(), 0, "personal space edit panel should stay closed until edit action");
   await page.click("[data-profile-space-edit]");
   await page.waitForSelector("[data-profile-edit-panel]:not([hidden])");
+  assert.equal(await page.locator(".profile-edit-avatar-card").count(), 1, "profile edit should present avatar changes as a designed card");
+  assert.equal(await page.locator(".profile-edit-section").count() >= 2, true, "profile edit should group identity and account actions");
+  const profileEditColumnCount = await page.locator(".profile-edit-fields").evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(" ").length);
+  assert.equal(profileEditColumnCount, 1, "profile edit fields should use one readable column on the mobile surface");
   assert.equal(await page.locator("[data-profile-phone]").count(), 1, "profile edit panel should expose phone editing");
   assert.equal(await page.locator("[data-profile-bio]").count(), 1, "profile edit panel should expose bio editing");
   assert.equal(await page.locator(".file-picker").count(), 1, "cloud upload should use a styled file picker");

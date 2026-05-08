@@ -30,6 +30,8 @@ assert.equal(typeof store.clearCreateDraft, "function", "store should expose cre
 assert.equal(typeof store.saveDestinationState, "function", "store should expose destination state saving");
 assert.equal(typeof store.loadSavedMemories, "function", "store should expose memory loading");
 assert.equal(typeof store.persistSavedMemories, "function", "store should expose memory saving");
+assert.equal(typeof store.loadConversationState, "function", "store should expose conversation state loading");
+assert.equal(typeof store.persistConversationState, "function", "store should expose conversation state saving");
 
 function fakeStorage(initial = {}) {
   const values = new Map(Object.entries(initial));
@@ -80,6 +82,21 @@ assert.deepEqual(plain(store.saveCreateDraft(draft, draftStorage)), { ok: true }
 assert.deepEqual(plain(store.loadCreateDraft(draftStorage)), draft, "create drafts should round-trip through the storage adapter");
 assert.deepEqual(plain(store.clearCreateDraft(draftStorage)), { ok: true }, "create drafts should report successful clearing");
 assert.equal(store.loadCreateDraft(draftStorage), null, "cleared create drafts should load as null");
+
+const conversationStorage = fakeStorage();
+const conversationState = {
+  "lin-che": {
+    title: "Lin",
+    status: "sent",
+    preview: "Me: hi",
+    lastTime: "now",
+    unreadCount: 0,
+    messages: [["from-me", "hi"]],
+  },
+};
+assert.deepEqual(plain(store.persistConversationState(conversationState, conversationStorage)), { ok: true }, "conversation writes should report successful persistence");
+assert.deepEqual(plain(store.loadConversationState(conversationStorage)), conversationState, "conversation state should round-trip through the storage adapter");
+assert.equal(store.loadConversationState(fakeStorage({ "shanhai-conversation-state": "{broken" })), null, "broken conversation JSON should fall back to null");
 
 const failingStorage = {
   getItem() {

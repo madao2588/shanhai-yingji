@@ -15,8 +15,8 @@ const screenBackgroundAssets = [
   "assets/bg-profile-ink.png",
 ];
 
-assert.match(html, /<script src="src\/main\.js\?v=profile-edit-3"><\/script>/, "prototype should load the app through the src entry while keeping direct file-open support");
-assert.match(html, /<script src="src\/data\/seed-destinations\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/data\/seed-memories\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/domain\/memory\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/storage\/local-store\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/storage\/archive-export\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/api-client\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/main\.js\?v=profile-edit-3"><\/script>\s*<script src="src\/fullstack-panel\.js\?v=profile-edit-3"><\/script>/, "seed, domain, storage, API, app, and fullstack scripts should load in order while keeping classic script support");
+assert.match(html, /<script src="src\/main\.js\?v=profile-message-polish-1"><\/script>/, "prototype should load the app through the src entry while keeping direct file-open support");
+assert.match(html, /<script src="src\/data\/seed-destinations\.js\?v=profile-message-polish-1"><\/script>\s*<script src="src\/data\/seed-memories\.js\?v=profile-message-polish-1"><\/script>\s*<script src="src\/domain\/memory\.js\?v=profile-message-polish-1"><\/script>\s*<script src="src\/storage\/local-store\.js\?v=profile-message-polish-1"><\/script>\s*<script src="src\/storage\/archive-export\.js\?v=profile-message-polish-1"><\/script>\s*<script src="src\/api-client\.js\?v=profile-message-polish-1"><\/script>\s*<script src="src\/main\.js\?v=profile-message-polish-1"><\/script>\s*<script src="src\/fullstack-panel\.js\?v=profile-message-polish-1"><\/script>/, "seed, domain, storage, API, app, and fullstack scripts should load in order while keeping classic script support");
 assert.match(html, /data-ink-landscape/, "app shell should include a non-interactive ink landscape layer");
 assert.match(html, /ink-moon/, "ink landscape should include a visible moon/sun wash");
 assert.match(html, /ink-cloud-bank/, "ink landscape should include a visible cloud and water wash");
@@ -142,6 +142,8 @@ assert.match(html, /data-open-profile-space/, "profile page should expose entry 
 assert.match(html, /data-profile-space-edit/, "personal space should expose an edit profile action");
 assert.match(html, /data-profile-space-tab="comments"/, "personal space should expose a comments/interactions tab entry");
 assert.match(html, /data-profile-edit-panel/, "profile should expose an avatar-driven edit panel");
+assert.match(html, /profile-edit-avatar-card/, "profile edit should separate avatar changes into a readable card");
+assert.match(html, /profile-edit-section/, "profile edit should group profile fields and account actions");
 assert.match(html, /data-profile-avatar-input/, "profile edit panel should support avatar upload preview");
 assert.match(html, /data-profile-phone/, "profile edit panel should expose phone editing");
 assert.match(html, /data-profile-bio/, "profile edit panel should expose bio editing");
@@ -191,6 +193,9 @@ assert.match(css, /\.profile-space-screen/, "personal space screen should be sty
 assert.match(css, /\.profile-space-hero/, "personal space hero should be styled");
 assert.match(css, /\.profile-space-tabs/, "personal space tabs should be styled");
 assert.match(css, /\.profile-edit-panel/, "profile edit panel should be styled");
+assert.match(css, /\.profile-edit-avatar-card/, "profile avatar edit card should be styled");
+assert.match(css, /\.profile-edit-section/, "profile edit groups should be styled");
+assert.match(css, /\.profile-edit-fields\s*\{[\s\S]*grid-template-columns:\s*1fr/, "profile edit fields should use a readable single column");
 assert.match(css, /\.avatar-edit-badge/, "avatar edit affordance should be styled");
 assert.match(css, /\.file-picker/, "cloud file picker should be styled");
 assert.match(css, /\.cloud-danger-action/, "photo delete action should be styled");
@@ -255,6 +260,8 @@ assert.match(js, /function openRecordBrowse/, "record summary should open browse
 assert.match(js, /function switchCommunityTab/, "community topic tabs should switch panels");
 assert.match(js, /function openConversation/, "messages should open friend conversations");
 assert.match(js, /function sendConversationReply/, "messages should send local replies");
+assert.match(js, /loadConversationState/, "messages should restore local conversation replies through the storage adapter");
+assert.match(js, /persistConversationState/, "messages should persist local conversation replies through the storage adapter");
 assert.match(js, /function renderMemoryDetail/, "memory detail should render selected archive data");
 assert.match(js, /function renderDestination/, "detail view should render selected destination data");
 assert.match(js, /function toggleWantToGo/, "want-to-go action should be implemented");

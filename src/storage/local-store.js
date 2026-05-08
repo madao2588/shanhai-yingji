@@ -1,5 +1,6 @@
 (function () {
   const archiveStorageKey = "shanhai-archive";
+  const conversationStorageKey = "shanhai-conversation-state";
   const createDraftStorageKey = "shanhai-create-draft";
   const destinationStorageKey = "shanhai-destination-state";
   const memoryStorageKey = "shanhai-memory-entries";
@@ -87,6 +88,20 @@
     }
   }
 
+  function loadConversationState(storage) {
+    const conversations = readJson(storage, conversationStorageKey);
+    return conversations && typeof conversations === "object" && !Array.isArray(conversations) ? conversations : null;
+  }
+
+  function persistConversationState(conversations, storage) {
+    try {
+      getStorage(storage).setItem(conversationStorageKey, JSON.stringify(conversations));
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error: error?.message || "storage unavailable" };
+    }
+  }
+
   window.shanhaiLocalStore = {
     loadArchive,
     persistArchive,
@@ -97,5 +112,7 @@
     saveDestinationState,
     loadSavedMemories,
     persistSavedMemories,
+    loadConversationState,
+    persistConversationState,
   };
 })();

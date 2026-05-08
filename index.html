@@ -11,7 +11,7 @@
     <link rel="icon" href="assets/app-icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="assets/app-icon.svg" />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="styles.css?v=button-polish-1" />
+    <link rel="stylesheet" href="styles.css?v=profile-message-polish-1" />
   </head>
   <body>
     <main class="stage" aria-label="山海映记移动端原型">
@@ -981,27 +981,45 @@
                   <button type="button" data-profile-edit-close aria-label="收起资料编辑"></button>
                 </div>
                 <div class="profile-edit-body">
-                  <label class="avatar-picker">
-                    <span class="avatar-picker-preview">
-                      <img src="assets/avatar-lin-che.svg" alt="头像预览" data-profile-avatar-preview />
-                    </span>
-                    <input type="file" accept="image/*" data-profile-avatar-input />
-                    <em>更换头像</em>
-                  </label>
-                  <div class="profile-edit-fields">
-                    <input type="text" placeholder="昵称" autocomplete="name" data-cloud-name />
-                    <input type="tel" placeholder="手机号" autocomplete="tel" data-profile-phone />
-                    <input type="email" placeholder="邮箱" autocomplete="email" data-cloud-email />
-                    <input type="password" placeholder="密码" autocomplete="current-password" data-cloud-password />
-                    <textarea placeholder="个人简介" data-profile-bio>把走过的山海，整理成可发布、可备份、可回看的记忆。</textarea>
-                  </div>
-                </div>
-                <div class="profile-auth-actions">
-                  <button type="button" data-cloud-register>注册</button>
-                  <button type="button" data-cloud-login>登录</button>
-                  <button type="button" data-cloud-update-profile>更新资料</button>
-                  <button type="button" data-cloud-logout>退出</button>
-                  <button type="button" class="account-danger-action" data-cloud-delete-account>注销账号</button>
+                  <section class="profile-edit-avatar-card" aria-label="头像设置">
+                    <label class="avatar-picker">
+                      <span class="avatar-picker-preview">
+                        <img src="assets/avatar-lin-che.svg" alt="头像预览" data-profile-avatar-preview />
+                      </span>
+                      <input type="file" accept="image/*" data-profile-avatar-input />
+                      <em>更换头像</em>
+                    </label>
+                    <div>
+                      <strong>个人头像</strong>
+                      <p>用于个人空间、公开映记和互动消息，建议使用清晰的旅行肖像或标识。</p>
+                    </div>
+                  </section>
+                  <section class="profile-edit-section" aria-label="基础资料">
+                    <div class="profile-edit-section-head">
+                      <strong>基础资料</strong>
+                      <span>公开主页会展示昵称和简介</span>
+                    </div>
+                    <div class="profile-edit-fields">
+                      <input type="text" placeholder="昵称" autocomplete="name" data-cloud-name />
+                      <input type="tel" placeholder="手机号" autocomplete="tel" data-profile-phone />
+                      <input type="email" placeholder="邮箱" autocomplete="email" data-cloud-email />
+                      <input type="password" placeholder="密码" autocomplete="current-password" data-cloud-password />
+                      <textarea placeholder="个人简介" data-profile-bio>把走过的山海，整理成可发布、可备份、可回看的记忆。</textarea>
+                    </div>
+                  </section>
+                  <section class="profile-edit-section" aria-label="账号操作">
+                    <div class="profile-edit-section-head">
+                      <strong>账号操作</strong>
+                      <span>登录后可同步发布、互动和个人资料</span>
+                    </div>
+                    <div class="profile-auth-actions">
+                      <button type="button" data-cloud-register>注册</button>
+                      <button type="button" data-cloud-login>登录</button>
+                      <button type="button" data-cloud-update-profile>更新资料</button>
+                      <button type="button" data-cloud-logout>退出</button>
+                      <button type="button" class="account-danger-action" data-cloud-delete-account>注销账号</button>
+                    </div>
+                  </section>
                 </div>
               </section>
 
@@ -1071,14 +1089,14 @@
       </section>
     </main>
 
-    <script src="src/data/seed-destinations.js?v=profile-edit-3"></script>
-    <script src="src/data/seed-memories.js?v=profile-edit-3"></script>
-    <script src="src/domain/memory.js?v=profile-edit-3"></script>
-    <script src="src/storage/local-store.js?v=profile-edit-3"></script>
-    <script src="src/storage/archive-export.js?v=profile-edit-3"></script>
-    <script src="src/api-client.js?v=profile-edit-3"></script>
-    <script src="src/main.js?v=profile-edit-3"></script>
-    <script src="src/fullstack-panel.js?v=profile-edit-3"></script>
-    <script src="src/pwa-register.js?v=profile-edit-3"></script>
+    <script src="src/data/seed-destinations.js?v=profile-message-polish-1"></script>
+    <script src="src/data/seed-memories.js?v=profile-message-polish-1"></script>
+    <script src="src/domain/memory.js?v=profile-message-polish-1"></script>
+    <script src="src/storage/local-store.js?v=profile-message-polish-1"></script>
+    <script src="src/storage/archive-export.js?v=profile-message-polish-1"></script>
+    <script src="src/api-client.js?v=profile-message-polish-1"></script>
+    <script src="src/main.js?v=profile-message-polish-1"></script>
+    <script src="src/fullstack-panel.js?v=profile-message-polish-1"></script>
+    <script src="src/pwa-register.js?v=profile-message-polish-1"></script>
   </body>
 </html>
