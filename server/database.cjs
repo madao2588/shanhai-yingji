@@ -19,6 +19,7 @@ function createEmptyData() {
     follows: [],
     reports: [],
     notifications: [],
+    conversations: [],
     moderationActions: [],
     views: [],
   };
@@ -572,6 +573,51 @@ class JsonDatabase {
     return data.notifications
       .filter((item) => item.userId === userId)
       .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+  }
+
+  async listConversations(userId) {
+    const data = await this.ensureLoaded();
+    return data.conversations
+      .filter((item) => item.userId === userId)
+      .sort((a, b) => String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt)));
+  }
+
+  async addConversationMessage(userId, conversationId, input = {}) {
+    const data = await this.ensureLoaded();
+    const timestamp = now();
+    let conversation = data.conversations.find((item) => item.userId === userId && item.conversationId === conversationId);
+    if (!conversation) {
+      conversation = {
+        id: crypto.randomUUID(),
+        userId,
+        conversationId,
+        title: input.title || conversationId,
+        status: "已发送",
+        preview: "",
+        lastTime: "",
+        unreadCount: 0,
+        messages: [],
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      };
+      data.conversations.push(conversation);
+    }
+
+    const message = {
+      id: crypto.randomUUID(),
+      direction: "from-me",
+      body: String(input.body || "").trim(),
+      createdAt: timestamp,
+    };
+    conversation.title = input.title || conversation.title || conversationId;
+    conversation.status = "已发送";
+    conversation.preview = `我：${message.body}`;
+    conversation.lastTime = "刚刚";
+    conversation.unreadCount = 0;
+    conversation.updatedAt = timestamp;
+    conversation.messages = [...(conversation.messages || []), message];
+    await this.save();
+    return conversation;
   }
 
   async markNotificationRead(userId, notificationId) {

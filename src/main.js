@@ -500,6 +500,36 @@ function isConversationMessage(message) {
   return Array.isArray(message) && typeof message[0] === "string" && typeof message[1] === "string";
 }
 
+function normalizeConversationMessage(message) {
+  if (isConversationMessage(message)) {
+    return message;
+  }
+  if (message && typeof message === "object" && typeof message.body === "string") {
+    return [message.direction === "from-friend" ? "from-friend" : "from-me", message.body];
+  }
+  return null;
+}
+
+function mergeConversationMessages(...messageLists) {
+  const seen = new Set();
+  const merged = [];
+
+  messageLists.flat().forEach((message) => {
+    const normalized = normalizeConversationMessage(message);
+    if (!normalized) {
+      return;
+    }
+    const key = `${normalized[0]}\u0000${normalized[1]}`;
+    if (seen.has(key)) {
+      return;
+    }
+    seen.add(key);
+    merged.push(normalized);
+  });
+
+  return merged;
+}
+
 function normalizeConversationState(conversations) {
   if (!conversations || typeof conversations !== "object" || Array.isArray(conversations)) {
     return {};
@@ -508,7 +538,7 @@ function normalizeConversationState(conversations) {
   return Object.fromEntries(
     Object.entries(conversations).map(([id, conversation]) => {
       const fallback = baseConversationState[id] || {};
-      const messages = Array.isArray(conversation?.messages) ? conversation.messages.filter(isConversationMessage) : fallback.messages || [];
+      const messages = Array.isArray(conversation?.messages) ? mergeConversationMessages(conversation.messages) : fallback.messages || [];
 
       return [
         id,
@@ -546,6 +576,79 @@ function persistConversationState() {
 const conversationState = hydrateConversationState();
 
 let activeConversationId = "lin-che";
+
+function applyRemoteConversation(conversation) {
+  const id = conversation?.conversationId || conversation?.id;
+  if (!id || !conversationState[id]) {
+    return;
+  }
+
+  const fallback = baseConversationState[id] || {};
+  const current = conversationState[id];
+  const remoteMessages = Array.isArray(conversation.messages) ? conversation.messages.map(normalizeConversationMessage).filter(Boolean) : [];
+  conversationState[id] = {
+    ...current,
+    title: conversation.title || current.title || fallback.title,
+    status: conversation.status || current.status || fallback.status,
+    preview: conversation.preview || current.preview || fallback.preview,
+    lastTime: conversation.lastTime || current.lastTime || fallback.lastTime,
+    unreadCount: Number.isFinite(conversation.unreadCount) ? Math.max(0, conversation.unreadCount) : current.unreadCount || 0,
+    messages: mergeConversationMessages(fallback.messages || [], current.messages || [], remoteMessages),
+  };
+}
+
+function rerenderActiveConversation() {
+  renderConversationList();
+  if (!conversationThread?.hidden) {
+    const activeConversation = conversationState[activeConversationId] || conversationState["lin-che"];
+    conversationTitle.textContent = activeConversation.title;
+    conversationStatus.textContent = activeConversation.status;
+    renderConversationMessages(activeConversation.messages);
+  }
+}
+
+async function syncConversationsFromCloud() {
+  const api = window.shanhaiApi;
+  if (!api?.getToken?.()) {
+    return;
+  }
+
+  try {
+    const payload = await api.listConversations();
+    (payload.conversations || []).forEach(applyRemoteConversation);
+    persistConversationState();
+    rerenderActiveConversation();
+  } catch (error) {
+    if (messageThreadState && !conversationThread?.hidden) {
+      messageThreadState.textContent = "云端消息暂时不可用，本机记录已保留";
+    }
+  }
+}
+
+async function syncSentConversation(conversationId, text) {
+  const api = window.shanhaiApi;
+  if (!api?.getToken?.()) {
+    return;
+  }
+
+  try {
+    const conversation = conversationState[conversationId] || conversationState["lin-che"];
+    const payload = await api.sendConversationMessage(conversationId, {
+      body: text,
+      title: conversation.title,
+    });
+    applyRemoteConversation(payload.conversation);
+    persistConversationState();
+    rerenderActiveConversation();
+    if (messageThreadState) {
+      messageThreadState.textContent = "云端已同步";
+    }
+  } catch (error) {
+    if (messageThreadState) {
+      messageThreadState.textContent = "本机已保存，云端同步失败";
+    }
+  }
+}
 
 function renderConversationList() {
   const unreadTotal = Object.values(conversationState).reduce((total, item) => total + item.unreadCount, 0);
@@ -665,6 +768,7 @@ function sendConversationReply() {
   activeConversation.preview = `我：${text}`;
   activeConversation.lastTime = "刚刚";
   activeConversation.status = "已发送";
+  persistConversationState();
   conversationInput.value = "";
   conversationInput.setAttribute("aria-invalid", "false");
   if (messageEmptyReply) {
@@ -677,6 +781,7 @@ function sendConversationReply() {
   if (messageThreadState) {
     messageThreadState.textContent = "已发送";
   }
+  syncSentConversation(activeConversationId, text);
 }
 
 function getVisibilityLabel(value) {
@@ -2338,6 +2443,9 @@ conversationInput?.addEventListener("keydown", (event) => {
     sendConversationReply();
   }
 });
+window.addEventListener("shanhai:auth-changed", () => {
+  syncConversationsFromCloud();
+});
 profileActionButtons.forEach((button) => {
   button.addEventListener("click", handleProfileAction);
 });
@@ -2365,6 +2473,7 @@ window.addEventListener("load", () => {
   updateCreateProgress();
   filterReviews();
   renderConversationList();
+  syncConversationsFromCloud();
   renderDestination(activeDestinationId);
   handleHashRoute();
   startSplash();

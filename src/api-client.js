@@ -95,6 +95,8 @@
     creatorStats: () => request("/api/creator/stats"),
     notifications: () => request("/api/notifications"),
     markNotificationRead: (id) => request(`/api/notifications/${encodeURIComponent(id)}/read`, { method: "PATCH" }),
+    listConversations: () => request("/api/conversations"),
+    sendConversationMessage: (id, input) => request(`/api/conversations/${encodeURIComponent(id)}/messages`, { method: "POST", body: input }),
     exportArchive: () => request("/api/export"),
     importArchive: (archive) => request("/api/import", { method: "POST", body: archive }),
   };

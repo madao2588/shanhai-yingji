@@ -106,6 +106,7 @@
     if (elements.profileSyncState) {
       elements.profileSyncState.textContent = user ? "云端可用" : "未同步";
     }
+    window.dispatchEvent(new CustomEvent("shanhai:auth-changed", { detail: { user } }));
   }
 
   function renderPhotoList(photos = []) {

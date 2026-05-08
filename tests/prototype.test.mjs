@@ -15,8 +15,8 @@ const screenBackgroundAssets = [
   "assets/bg-profile-ink.png",
 ];
 
-assert.match(html, /<script src="src\/main\.js\?v=profile-message-polish-1"><\/script>/, "prototype should load the app through the src entry while keeping direct file-open support");
-assert.match(html, /<script src="src\/data\/seed-destinations\.js\?v=profile-message-polish-1"><\/script>\s*<script src="src\/data\/seed-memories\.js\?v=profile-message-polish-1"><\/script>\s*<script src="src\/domain\/memory\.js\?v=profile-message-polish-1"><\/script>\s*<script src="src\/storage\/local-store\.js\?v=profile-message-polish-1"><\/script>\s*<script src="src\/storage\/archive-export\.js\?v=profile-message-polish-1"><\/script>\s*<script src="src\/api-client\.js\?v=profile-message-polish-1"><\/script>\s*<script src="src\/main\.js\?v=profile-message-polish-1"><\/script>\s*<script src="src\/fullstack-panel\.js\?v=profile-message-polish-1"><\/script>/, "seed, domain, storage, API, app, and fullstack scripts should load in order while keeping classic script support");
+assert.match(html, /<script src="src\/main\.js\?v=cloud-conversation-1"><\/script>/, "prototype should load the app through the src entry while keeping direct file-open support");
+assert.match(html, /<script src="src\/data\/seed-destinations\.js\?v=cloud-conversation-1"><\/script>\s*<script src="src\/data\/seed-memories\.js\?v=cloud-conversation-1"><\/script>\s*<script src="src\/domain\/memory\.js\?v=cloud-conversation-1"><\/script>\s*<script src="src\/storage\/local-store\.js\?v=cloud-conversation-1"><\/script>\s*<script src="src\/storage\/archive-export\.js\?v=cloud-conversation-1"><\/script>\s*<script src="src\/api-client\.js\?v=cloud-conversation-1"><\/script>\s*<script src="src\/main\.js\?v=cloud-conversation-1"><\/script>\s*<script src="src\/fullstack-panel\.js\?v=cloud-conversation-1"><\/script>/, "seed, domain, storage, API, app, and fullstack scripts should load in order while keeping classic script support");
 assert.match(html, /data-ink-landscape/, "app shell should include a non-interactive ink landscape layer");
 assert.match(html, /ink-moon/, "ink landscape should include a visible moon/sun wash");
 assert.match(html, /ink-cloud-bank/, "ink landscape should include a visible cloud and water wash");
@@ -262,6 +262,8 @@ assert.match(js, /function openConversation/, "messages should open friend conve
 assert.match(js, /function sendConversationReply/, "messages should send local replies");
 assert.match(js, /loadConversationState/, "messages should restore local conversation replies through the storage adapter");
 assert.match(js, /persistConversationState/, "messages should persist local conversation replies through the storage adapter");
+assert.match(js, /syncConversationsFromCloud/, "messages should sync cloud-backed conversation replies after authentication");
+assert.match(js, /sendConversationMessage/, "messages should send authenticated replies to the backend conversation API");
 assert.match(js, /function renderMemoryDetail/, "memory detail should render selected archive data");
 assert.match(js, /function renderDestination/, "detail view should render selected destination data");
 assert.match(js, /function toggleWantToGo/, "want-to-go action should be implemented");
@@ -293,6 +295,8 @@ assert.match(apiClient, /followProfile/, "API client should expose follows");
 assert.match(apiClient, /createReport/, "API client should expose reports");
 assert.match(apiClient, /creatorStats/, "API client should expose creator stats");
 assert.match(apiClient, /notifications/, "API client should expose notifications");
+assert.match(apiClient, /listConversations/, "API client should expose cloud conversation loading");
+assert.match(apiClient, /sendConversationMessage/, "API client should expose cloud conversation sending");
 assert.match(apiClient, /updateMe/, "API client should expose profile updates");
 assert.match(apiClient, /deleteMe/, "API client should expose account deletion");
 assert.match(apiClient, /deletePhoto/, "API client should expose photo deletion");
@@ -300,4 +304,5 @@ assert.match(fullstackPanel, /renderCommunityFeed/, "fullstack panel should rend
 assert.match(fullstackPanel, /renderPhotoList/, "fullstack panel should render uploaded photo management");
 assert.match(fullstackPanel, /renderCreatorStats/, "fullstack panel should render creator stats");
 assert.match(fullstackPanel, /renderNotifications/, "fullstack panel should render notifications");
+assert.match(fullstackPanel, /shanhai:auth-changed/, "fullstack panel should notify the app when cloud auth state changes");
 assert.match(fullstackPanel, /handleCommunityAction/, "fullstack panel should handle community actions");

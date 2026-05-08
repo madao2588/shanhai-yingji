@@ -12,6 +12,7 @@ const postgresCollections = [
   "follows",
   "reports",
   "notifications",
+  "conversations",
   "moderationActions",
   "views",
 ];

@@ -126,6 +126,25 @@ function validateCommentInput(input = {}) {
   };
 }
 
+function validateConversationId(value) {
+  const conversationId = cleanText(value, 80).toLowerCase();
+  if (!/^[a-z0-9][a-z0-9-]{1,78}[a-z0-9]$/.test(conversationId)) {
+    fail("conversation id is invalid");
+  }
+  return conversationId;
+}
+
+function validateConversationMessageInput(input = {}) {
+  const body = cleanText(input.body, 1200);
+  if (!body) {
+    fail("message body is required");
+  }
+  return {
+    body,
+    title: cleanText(input.title, 80),
+  };
+}
+
 function validateReportInput(input = {}) {
   const targetType = cleanText(input.targetType, 30);
   if (!["memory", "comment", "profile"].includes(targetType)) {
@@ -182,6 +201,8 @@ function validateUploadInput(input = {}, maxUploadBytes = 5 * 1024 * 1024) {
 module.exports = {
   validateAuthInput,
   validateCommentInput,
+  validateConversationId,
+  validateConversationMessageInput,
   validateLoginInput,
   validateMemoryInput,
   validateModerationInput,

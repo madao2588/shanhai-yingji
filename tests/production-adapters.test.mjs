@@ -40,7 +40,7 @@ assert.equal(productionConfig.rateLimit.store, "upstash", "production should use
 
 assert.deepEqual(
   postgresCollections,
-  ["users", "sessions", "memories", "photos", "likes", "bookmarks", "comments", "follows", "reports", "notifications", "moderationActions", "views"],
+  ["users", "sessions", "memories", "photos", "likes", "bookmarks", "comments", "follows", "reports", "notifications", "conversations", "moderationActions", "views"],
   "PostgreSQL adapter should provision a table for every persisted collection",
 );
 

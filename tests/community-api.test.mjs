@@ -53,6 +53,30 @@ try {
   const author = await register(port, { name: "Lina Author", email: "author@example.com" });
   const reader = await register(port, { name: "Ming Reader", email: "reader@example.com" });
 
+  const unauthenticatedConversations = await request(port, "GET", "/api/conversations");
+  assert.equal(unauthenticatedConversations.response.status, 401, "conversation sync should require authentication");
+  const emptyConversations = await request(port, "GET", "/api/conversations", undefined, reader.token);
+  assert.equal(emptyConversations.response.status, 200, "readers should load synced conversations");
+  assert.deepEqual(emptyConversations.payload.conversations, [], "new accounts should start without cloud conversation replies");
+  const sentConversation = await request(
+    port,
+    "POST",
+    "/api/conversations/mori/messages",
+    { body: "See you at the morning tide.", title: "Mori" },
+    reader.token,
+  );
+  assert.equal(sentConversation.response.status, 201, "readers should sync a friend-thread reply");
+  assert.equal(sentConversation.payload.conversation.conversationId, "mori");
+  assert.equal(sentConversation.payload.conversation.preview, "我：See you at the morning tide.");
+  assert.equal(sentConversation.payload.conversation.messages.at(-1).body, "See you at the morning tide.");
+  const reloadedConversations = await request(port, "GET", "/api/conversations", undefined, reader.token);
+  assert.equal(reloadedConversations.response.status, 200, "synced conversations should reload from the server");
+  assert.equal(reloadedConversations.payload.conversations[0].messages.at(-1).body, "See you at the morning tide.");
+  const authorConversationIsolation = await request(port, "GET", "/api/conversations", undefined, author.token);
+  assert.deepEqual(authorConversationIsolation.payload.conversations, [], "conversation replies should stay scoped to the current account");
+  const invalidConversationReply = await request(port, "POST", "/api/conversations/mori/messages", { body: "" }, reader.token);
+  assert.equal(invalidConversationReply.response.status, 400, "blank conversation replies should be rejected");
+
   const publicMemory = await request(
     port,
     "POST",

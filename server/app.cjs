@@ -10,6 +10,8 @@ const { createToken, hashPassword, publicUser, verifyPassword } = require("./aut
 const {
   validateAuthInput,
   validateCommentInput,
+  validateConversationId,
+  validateConversationMessageInput,
   validateLoginInput,
   validateMemoryInput,
   validateModerationInput,
@@ -476,6 +478,23 @@ function createApp(options = {}) {
 
       if (request.method === "GET" && pathname === "/api/notifications") {
         sendJson(response, 200, { notifications: await db.listNotifications(user.id) });
+        return;
+      }
+
+      if (request.method === "GET" && pathname === "/api/conversations") {
+        sendJson(response, 200, { conversations: await db.listConversations(user.id) });
+        return;
+      }
+
+      const conversationMessageMatch = pathname.match(/^\/api\/conversations\/([^/]+)\/messages$/);
+      if (request.method === "POST" && conversationMessageMatch) {
+        const conversationId = validateConversationId(conversationMessageMatch[1]);
+        const conversation = await db.addConversationMessage(
+          user.id,
+          conversationId,
+          validateConversationMessageInput(await readBody(request, config.maxJsonBytes)),
+        );
+        sendJson(response, 201, { conversation });
         return;
       }
 
