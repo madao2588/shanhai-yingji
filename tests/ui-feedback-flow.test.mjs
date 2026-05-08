@@ -55,6 +55,8 @@ try {
   );
   assert.equal(await page.locator(".ink-moon").count(), 1, "ink landscape should include a visible moon/sun wash");
   assert.equal(await page.locator(".ink-cloud-bank").count(), 1, "ink landscape should include a visible cloud and water wash");
+  assert.equal(await page.locator(".ink-landscape-art").count(), 1, "ink landscape should include explicit shanshui artwork");
+  assert.equal(await page.locator(".ink-pine-stroke").count(), 1, "ink landscape should include an unmistakable ink brush stroke");
   assert.equal(
     await page.locator(".screen.is-active").evaluate((node) => getComputedStyle(node).backgroundColor),
     "rgba(0, 0, 0, 0)",

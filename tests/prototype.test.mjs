@@ -12,6 +12,8 @@ assert.match(html, /<script src="src\/data\/seed-destinations\.js\?v=profile-edi
 assert.match(html, /data-ink-landscape/, "app shell should include a non-interactive ink landscape layer");
 assert.match(html, /ink-moon/, "ink landscape should include a visible moon/sun wash");
 assert.match(html, /ink-cloud-bank/, "ink landscape should include a visible cloud and water wash");
+assert.match(html, /ink-landscape-art/, "ink landscape should include explicit SVG shanshui artwork");
+assert.match(html, /ink-pine-stroke/, "ink landscape should include an unmistakable ink brush stroke");
 assert.equal(existsSync(seedDestinationsPath), true, "destination seed data should live in src/data");
 assert.equal(existsSync(seedMemoriesPath), true, "memory seed data should live in src/data");
 
@@ -192,6 +194,9 @@ assert.match(css, /\.ink-river/, "app shell should style a river-like wash");
 assert.match(css, /\.ink-seal/, "app shell should style a seal accent");
 assert.match(css, /\.ink-moon/, "app shell should style the visible moon/sun wash");
 assert.match(css, /\.ink-cloud-bank/, "app shell should style the visible cloud and water wash");
+assert.match(css, /\.ink-landscape-art/, "app shell should style explicit shanshui SVG artwork");
+assert.match(css, /\.ink-ridge-near/, "app shell should style near mountain ridges");
+assert.match(css, /\.ink-pine-stroke/, "app shell should style ink brush strokes");
 assert.match(css, /\.screen\s*\{[\s\S]*background:\s*transparent/, "active screens should not hide the app-level ink landscape");
 assert.match(css, /\.screens\s*\{[\s\S]*z-index:\s*1/, "screens should stay above the decorative ink landscape");
 assert.match(css, /\.ink-wash\s*\{[\s\S]*pointer-events:\s*none/, "ink landscape should not intercept app interaction");
