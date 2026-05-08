@@ -37,6 +37,15 @@ page.on("requestfailed", (request) => {
 try {
   await page.goto(`http://127.0.0.1:${port}/index.html#record`, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => document.querySelector("#splash")?.classList.contains("is-hidden"));
+  assert.equal(
+    await page.evaluate(() => document.elementFromPoint(60, 160)?.closest("#splash") === null),
+    true,
+    "hidden splash should not cover the active screen"
+  );
+  assert.equal(await page.locator("[data-record-overview]").count(), 1, "record home should show a normal app overview");
+  assert.match(await page.locator("[data-record-latest-title]").textContent(), /京都|映记|memory/i, "record overview should show latest memory");
+  assert.match(await page.locator("[data-record-visibility]").textContent(), /私密|公开|待创建|private|public/i, "record overview should show visibility mix or an empty local state");
+  assert.match(await page.locator("[data-record-next-action]").textContent(), /继续|创建|整理|create/i, "record overview should show a next action");
 
   await page.click("[data-open-map-browse]");
   await page.waitForSelector('[data-browse-panel]:not([hidden])');

@@ -48,6 +48,10 @@ const memoryRow = document.querySelector("[data-memory-row]");
 const diaryTimeline = document.querySelector("[data-diary-timeline]");
 const summaryMemory = document.querySelector("[data-summary-memory]");
 const summaryCity = document.querySelector("[data-summary-city]");
+const recordLatestTitle = document.querySelector("[data-record-latest-title]");
+const recordLatestMeta = document.querySelector("[data-record-latest-meta]");
+const recordVisibility = document.querySelector("[data-record-visibility]");
+const recordNextAction = document.querySelector("[data-record-next-action]");
 const openArchiveButton = document.querySelector("[data-open-archive]");
 const archiveBack = document.querySelector("[data-archive-back]");
 const archiveSearch = document.querySelector("[data-archive-search]");
@@ -1004,11 +1008,30 @@ function renderContinueEntry() {
 function renderPersonalArchive() {
   const entries = getArchiveEntries();
   const savedCities = new Set(savedMemories.map((memory) => memory.location).filter(Boolean));
+  const latest = entries[0];
+  const publicCount = entries.filter((memory) => (memory.status || memory.visibility) === "public").length;
+  const privateCount = entries.filter((memory) => !["public", "unlisted"].includes(memory.status || memory.visibility)).length;
+  const unlistedCount = entries.filter((memory) => (memory.status || memory.visibility) === "unlisted").length;
 
   memoryRow.replaceChildren(...entries.slice(0, 4).map(renderMemoryCard));
   diaryTimeline.replaceChildren(...entries.slice(0, 3).map(renderDiaryEntry), renderContinueEntry());
   summaryMemory.textContent = `${baseArchiveStats.memories + savedMemories.length} 篇映记`;
   summaryCity.textContent = `${baseArchiveStats.cities + savedCities.size} 座城市`;
+
+  if (latest && recordLatestTitle && recordLatestMeta) {
+    recordLatestTitle.textContent = latest.title;
+    recordLatestMeta.textContent = `${getVisibilityLabel(latest.status || latest.visibility)} · ${latest.photoCount || latest.photos?.length || 0} 张照片`;
+  }
+  if (recordVisibility) {
+    const visibilityParts = [`私密 ${privateCount}`, `公开 ${publicCount}`];
+    if (unlistedCount) {
+      visibilityParts.splice(1, 0, `仅链接 ${unlistedCount}`);
+    }
+    recordVisibility.textContent = entries.length ? visibilityParts.join(" · ") : "本机档案待创建";
+  }
+  if (recordNextAction) {
+    recordNextAction.textContent = entries.length ? "继续整理" : "创建第一篇";
+  }
   renderProfileDashboardStats();
 }
 
@@ -2168,6 +2191,7 @@ navButtons.forEach((button) => {
   button.addEventListener("click", () => activateScreen(button.dataset.target));
 });
 
+recordNextAction?.addEventListener("click", () => activateScreen("create"));
 profileShortcut.addEventListener("click", () => activateScreen("profile"));
 openArchiveButton.addEventListener("click", () => openArchiveLibrary());
 archiveBack.addEventListener("click", () => activateScreen("record"));
