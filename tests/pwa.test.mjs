@@ -16,7 +16,7 @@ const pwaRegister = readFileSync(pwaRegisterPath, "utf8");
 
 assert.match(html, /<link rel="manifest" href="manifest\.webmanifest" \/>/, "index should link the manifest");
 assert.match(html, /<meta name="theme-color" content="#0a1214" \/>/, "index should expose a mobile theme color");
-assert.match(html, /<script src="src\/pwa-register\.js\?v=cloud-conversation-1"><\/script>/, "index should load the external PWA registration script");
+assert.match(html, /<script src="src\/pwa-register\.js\?v=direct-message-1"><\/script>/, "index should load the external PWA registration script");
 assert.match(pwaRegister, /navigator\.serviceWorker\.register\("service-worker\.js"\)/, "PWA script should register the service worker");
 assert.match(pwaRegister, /window\.location\.protocol\.startsWith\("http"\)/, "service worker registration should preserve direct file-open support");
 
@@ -25,9 +25,9 @@ assert.equal(manifest.display, "standalone", "manifest should enable standalone 
 assert.equal(manifest.start_url, "./index.html", "manifest should start at the static app entry");
 assert.equal(manifest.icons[0].src, "assets/app-icon.svg", "manifest should use the existing app icon");
 
-assert.match(serviceWorker, /const cacheName = "shanhai-yingji-v8"/, "service worker should version its cache");
+assert.match(serviceWorker, /const cacheName = "shanhai-yingji-v9"/, "service worker should version its cache");
 assert.match(serviceWorker, /"\.\/assets\/avatar-lin-che\.svg"/, "service worker should cache the profile avatar");
-assert.match(serviceWorker, /"\.\/src\/main\.js\?v=cloud-conversation-1"/, "service worker should cache the app entry");
-assert.match(serviceWorker, /"\.\/src\/storage\/archive-export\.js\?v=cloud-conversation-1"/, "service worker should cache archive transfer helpers");
-assert.match(serviceWorker, /"\.\/src\/pwa-register\.js\?v=cloud-conversation-1"/, "service worker should cache PWA registration");
+assert.match(serviceWorker, /"\.\/src\/main\.js\?v=direct-message-1"/, "service worker should cache the app entry");
+assert.match(serviceWorker, /"\.\/src\/storage\/archive-export\.js\?v=direct-message-1"/, "service worker should cache archive transfer helpers");
+assert.match(serviceWorker, /"\.\/src\/pwa-register\.js\?v=direct-message-1"/, "service worker should cache PWA registration");
 assert.match(serviceWorker, /caches\.match\("\.\/index\.html"\)/, "service worker should fall back to the static entry for navigation");

@@ -38,6 +38,25 @@ function hashToken(token) {
   return crypto.createHash("sha256").update(String(token || "")).digest("hex");
 }
 
+function createConversationRecord(userId, conversationId, input = {}) {
+  const timestamp = now();
+  return {
+    id: crypto.randomUUID(),
+    userId,
+    conversationId,
+    peerUserId: input.peerUserId || null,
+    peerUsername: input.peerUsername || conversationId,
+    title: input.title || conversationId,
+    status: input.status || "已发送",
+    preview: input.preview || "",
+    lastTime: input.lastTime || "",
+    unreadCount: Number.isFinite(input.unreadCount) ? Math.max(0, input.unreadCount) : 0,
+    messages: [],
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  };
+}
+
 class JsonDatabase {
   constructor({ dataDir }) {
     this.dataDir = dataDir || path.resolve(process.cwd(), ".data");
@@ -618,6 +637,72 @@ class JsonDatabase {
     conversation.messages = [...(conversation.messages || []), message];
     await this.save();
     return conversation;
+  }
+
+  async addDirectMessage(sender, recipient, input = {}) {
+    const data = await this.ensureLoaded();
+    const timestamp = now();
+    const body = String(input.body || "").trim();
+    const senderConversationId = recipient.username;
+    const recipientConversationId = sender.username;
+    let senderConversation = data.conversations.find((item) => item.userId === sender.id && item.conversationId === senderConversationId);
+    let recipientConversation = data.conversations.find((item) => item.userId === recipient.id && item.conversationId === recipientConversationId);
+
+    if (!senderConversation) {
+      senderConversation = createConversationRecord(sender.id, senderConversationId, {
+        peerUserId: recipient.id,
+        peerUsername: recipient.username,
+        title: recipient.name || recipient.username,
+        status: "云端私信",
+      });
+      data.conversations.push(senderConversation);
+    }
+
+    if (!recipientConversation) {
+      recipientConversation = createConversationRecord(recipient.id, recipientConversationId, {
+        peerUserId: sender.id,
+        peerUsername: sender.username,
+        title: sender.name || sender.username,
+        status: "云端私信",
+      });
+      data.conversations.push(recipientConversation);
+    }
+
+    const senderMessage = {
+      id: crypto.randomUUID(),
+      direction: "from-me",
+      body,
+      createdAt: timestamp,
+    };
+    const recipientMessage = {
+      id: crypto.randomUUID(),
+      direction: "from-friend",
+      body,
+      createdAt: timestamp,
+    };
+
+    senderConversation.peerUserId = recipient.id;
+    senderConversation.peerUsername = recipient.username;
+    senderConversation.title = recipient.name || recipient.username;
+    senderConversation.status = "已发送";
+    senderConversation.preview = `我：${body}`;
+    senderConversation.lastTime = "刚刚";
+    senderConversation.unreadCount = 0;
+    senderConversation.updatedAt = timestamp;
+    senderConversation.messages = [...(senderConversation.messages || []), senderMessage];
+
+    recipientConversation.peerUserId = sender.id;
+    recipientConversation.peerUsername = sender.username;
+    recipientConversation.title = sender.name || sender.username;
+    recipientConversation.status = "新消息";
+    recipientConversation.preview = `${sender.name || sender.username}：${body}`;
+    recipientConversation.lastTime = "刚刚";
+    recipientConversation.unreadCount = Math.max(0, Number(recipientConversation.unreadCount) || 0) + 1;
+    recipientConversation.updatedAt = timestamp;
+    recipientConversation.messages = [...(recipientConversation.messages || []), recipientMessage];
+
+    await this.save();
+    return senderConversation;
   }
 
   async markNotificationRead(userId, notificationId) {

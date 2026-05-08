@@ -15,8 +15,8 @@ const screenBackgroundAssets = [
   "assets/bg-profile-ink.png",
 ];
 
-assert.match(html, /<script src="src\/main\.js\?v=cloud-conversation-1"><\/script>/, "prototype should load the app through the src entry while keeping direct file-open support");
-assert.match(html, /<script src="src\/data\/seed-destinations\.js\?v=cloud-conversation-1"><\/script>\s*<script src="src\/data\/seed-memories\.js\?v=cloud-conversation-1"><\/script>\s*<script src="src\/domain\/memory\.js\?v=cloud-conversation-1"><\/script>\s*<script src="src\/storage\/local-store\.js\?v=cloud-conversation-1"><\/script>\s*<script src="src\/storage\/archive-export\.js\?v=cloud-conversation-1"><\/script>\s*<script src="src\/api-client\.js\?v=cloud-conversation-1"><\/script>\s*<script src="src\/main\.js\?v=cloud-conversation-1"><\/script>\s*<script src="src\/fullstack-panel\.js\?v=cloud-conversation-1"><\/script>/, "seed, domain, storage, API, app, and fullstack scripts should load in order while keeping classic script support");
+assert.match(html, /<script src="src\/main\.js\?v=direct-message-1"><\/script>/, "prototype should load the app through the src entry while keeping direct file-open support");
+assert.match(html, /<script src="src\/data\/seed-destinations\.js\?v=direct-message-1"><\/script>\s*<script src="src\/data\/seed-memories\.js\?v=direct-message-1"><\/script>\s*<script src="src\/domain\/memory\.js\?v=direct-message-1"><\/script>\s*<script src="src\/storage\/local-store\.js\?v=direct-message-1"><\/script>\s*<script src="src\/storage\/archive-export\.js\?v=direct-message-1"><\/script>\s*<script src="src\/api-client\.js\?v=direct-message-1"><\/script>\s*<script src="src\/main\.js\?v=direct-message-1"><\/script>\s*<script src="src\/fullstack-panel\.js\?v=direct-message-1"><\/script>/, "seed, domain, storage, API, app, and fullstack scripts should load in order while keeping classic script support");
 assert.match(html, /data-ink-landscape/, "app shell should include a non-interactive ink landscape layer");
 assert.match(html, /ink-moon/, "ink landscape should include a visible moon/sun wash");
 assert.match(html, /ink-cloud-bank/, "ink landscape should include a visible cloud and water wash");
@@ -124,6 +124,8 @@ assert.match(html, /data-community-report/, "community cards should expose repor
 assert.match(html, /data-creator-stats/, "cloud account panel should expose creator stats");
 assert.match(html, /data-notification-list/, "messages should expose server notification list");
 assert.match(html, /data-conversation-list/, "messages should expose friend conversations");
+assert.match(html, /data-direct-message-username/, "messages should expose a direct-message username input");
+assert.match(html, /data-direct-message-start/, "messages should expose a direct-message start action");
 assert.match(html, /data-conversation-item/, "messages should expose selectable conversation items");
 assert.match(html, /data-conversation-thread/, "messages should expose a friend conversation thread");
 assert.match(html, /data-conversation-message-input/, "messages should expose a reply input");
@@ -188,6 +190,7 @@ assert.match(css, /\.community-channel-card/, "community tab active channel summ
 assert.match(css, /\.creator-stats/, "creator stats should be styled");
 assert.match(css, /\.notification-list/, "notification list should be styled");
 assert.match(css, /\.conversation-layout/, "friend conversation layout should be styled");
+assert.match(css, /\.direct-message-card/, "direct-message starter should be styled");
 assert.match(css, /\.profile-dashboard/, "profile dashboard should be styled");
 assert.match(css, /\.profile-space-screen/, "personal space screen should be styled");
 assert.match(css, /\.profile-space-hero/, "personal space hero should be styled");
@@ -259,6 +262,8 @@ assert.match(js, /function openMemoryDetail/, "memory cards should open a person
 assert.match(js, /function openRecordBrowse/, "record summary should open browse panels");
 assert.match(js, /function switchCommunityTab/, "community topic tabs should switch panels");
 assert.match(js, /function openConversation/, "messages should open friend conversations");
+assert.match(js, /function startDirectConversation/, "messages should start cloud direct conversations");
+assert.match(js, /function renderCloudConversationItems/, "messages should render dynamic cloud conversations");
 assert.match(js, /function sendConversationReply/, "messages should send local replies");
 assert.match(js, /loadConversationState/, "messages should restore local conversation replies through the storage adapter");
 assert.match(js, /persistConversationState/, "messages should persist local conversation replies through the storage adapter");

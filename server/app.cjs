@@ -489,11 +489,15 @@ function createApp(options = {}) {
       const conversationMessageMatch = pathname.match(/^\/api\/conversations\/([^/]+)\/messages$/);
       if (request.method === "POST" && conversationMessageMatch) {
         const conversationId = validateConversationId(conversationMessageMatch[1]);
-        const conversation = await db.addConversationMessage(
-          user.id,
-          conversationId,
-          validateConversationMessageInput(await readBody(request, config.maxJsonBytes)),
-        );
+        const input = validateConversationMessageInput(await readBody(request, config.maxJsonBytes));
+        const recipient = await db.findUserByUsername(conversationId);
+        if (recipient?.id === user.id) {
+          sendJson(response, 400, { error: "cannot message yourself" });
+          return;
+        }
+        const conversation = recipient
+          ? await db.addDirectMessage(user, recipient, input)
+          : await db.addConversationMessage(user.id, conversationId, input);
         sendJson(response, 201, { conversation });
         return;
       }

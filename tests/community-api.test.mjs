@@ -52,6 +52,7 @@ try {
   const admin = await register(port, { name: "Admin", email: "admin@example.com" });
   const author = await register(port, { name: "Lina Author", email: "author@example.com" });
   const reader = await register(port, { name: "Ming Reader", email: "reader@example.com" });
+  const dmTarget = await register(port, { name: "Direct Target", email: "direct-target@example.com" });
 
   const unauthenticatedConversations = await request(port, "GET", "/api/conversations");
   assert.equal(unauthenticatedConversations.response.status, 401, "conversation sync should require authentication");
@@ -76,6 +77,24 @@ try {
   assert.deepEqual(authorConversationIsolation.payload.conversations, [], "conversation replies should stay scoped to the current account");
   const invalidConversationReply = await request(port, "POST", "/api/conversations/mori/messages", { body: "" }, reader.token);
   assert.equal(invalidConversationReply.response.status, 400, "blank conversation replies should be rejected");
+  const directMessage = await request(
+    port,
+    "POST",
+    `/api/conversations/${dmTarget.user.username}/messages`,
+    { body: "Hello from the cloud inbox." },
+    reader.token,
+  );
+  assert.equal(directMessage.response.status, 201, "users should send direct messages to another account");
+  assert.equal(directMessage.payload.conversation.conversationId, dmTarget.user.username, "sender should see the recipient username as the conversation id");
+  assert.equal(directMessage.payload.conversation.messages.at(-1).direction, "from-me", "sender should store the outgoing side");
+  const recipientConversations = await request(port, "GET", "/api/conversations", undefined, dmTarget.token);
+  const recipientDirectThread = recipientConversations.payload.conversations.find((item) => item.conversationId === reader.user.username);
+  assert.ok(recipientDirectThread, "recipient should receive a matching direct-message thread");
+  assert.equal(recipientDirectThread.unreadCount, 1, "recipient direct thread should be unread");
+  assert.equal(recipientDirectThread.messages.at(-1).direction, "from-friend", "recipient should store the incoming side");
+  assert.equal(recipientDirectThread.messages.at(-1).body, "Hello from the cloud inbox.");
+  const selfMessage = await request(port, "POST", `/api/conversations/${reader.user.username}/messages`, { body: "Mirror note" }, reader.token);
+  assert.equal(selfMessage.response.status, 400, "users should not direct-message themselves");
 
   const publicMemory = await request(
     port,

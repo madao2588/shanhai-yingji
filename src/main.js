@@ -130,6 +130,7 @@ const memoryRoute = document.querySelector("[data-memory-route]");
 const memoryOrigin = document.querySelector("[data-memory-origin]");
 const memoryStatusChip = document.querySelector("[data-memory-status-chip]");
 const memoryTags = document.querySelector("[data-memory-tags]");
+const conversationList = document.querySelector("[data-conversation-list]");
 const conversationItems = document.querySelectorAll("[data-conversation-item]");
 const messageInboxSummary = document.querySelector("[data-message-inbox-summary]");
 const messageUnreadCount = document.querySelector("[data-message-unread-count]");
@@ -141,6 +142,9 @@ const conversationInput = document.querySelector("[data-conversation-message-inp
 const conversationSend = document.querySelector("[data-conversation-send]");
 const messageThreadState = document.querySelector("[data-message-thread-state]");
 const messageEmptyReply = document.querySelector("[data-message-empty-reply]");
+const directMessageUsername = document.querySelector("[data-direct-message-username]");
+const directMessageStart = document.querySelector("[data-direct-message-start]");
+const directMessageFeedback = document.querySelector("[data-direct-message-feedback]");
 const profileActionButtons = document.querySelectorAll("[data-profile-primary-action], [data-profile-quick-action]");
 const profileAvatarEdit = document.querySelector("[data-profile-avatar-edit]");
 const profileEditPanel = document.querySelector("[data-profile-edit-panel]");
@@ -558,7 +562,7 @@ function normalizeConversationState(conversations) {
 
 function hydrateConversationState() {
   const savedConversations = normalizeConversationState(localStore.loadConversationState?.());
-  return Object.fromEntries(
+  const seededConversations = Object.fromEntries(
     Object.entries(baseConversationState).map(([id, conversation]) => [
       id,
       {
@@ -567,6 +571,10 @@ function hydrateConversationState() {
       },
     ]),
   );
+  return {
+    ...seededConversations,
+    ...Object.fromEntries(Object.entries(savedConversations).filter(([id]) => !seededConversations[id])),
+  };
 }
 
 function persistConversationState() {
@@ -579,12 +587,19 @@ let activeConversationId = "lin-che";
 
 function applyRemoteConversation(conversation) {
   const id = conversation?.conversationId || conversation?.id;
-  if (!id || !conversationState[id]) {
+  if (!id) {
     return;
   }
 
   const fallback = baseConversationState[id] || {};
-  const current = conversationState[id];
+  const current = conversationState[id] || {
+    title: conversation.title || id,
+    status: conversation.status || "云端私信",
+    preview: conversation.preview || "还没有消息",
+    lastTime: conversation.lastTime || "刚刚",
+    unreadCount: 0,
+    messages: [],
+  };
   const remoteMessages = Array.isArray(conversation.messages) ? conversation.messages.map(normalizeConversationMessage).filter(Boolean) : [];
   conversationState[id] = {
     ...current,
@@ -650,17 +665,73 @@ async function syncSentConversation(conversationId, text) {
   }
 }
 
+function normalizeDirectUsername(value) {
+  return String(value || "")
+    .trim()
+    .replace(/^@+/, "")
+    .toLowerCase();
+}
+
+function conversationInitial(data, id) {
+  const source = data?.title || id || "?";
+  return source.trim().charAt(0).toUpperCase() || "?";
+}
+
+function getConversationItems() {
+  return Array.from(conversationList?.querySelectorAll("[data-conversation-item]") || conversationItems);
+}
+
+function renderCloudConversationItems() {
+  if (!conversationList) {
+    return;
+  }
+
+  Object.entries(conversationState).forEach(([id, data]) => {
+    if (conversationList.querySelector(`[data-conversation-item="${CSS.escape(id)}"]`)) {
+      return;
+    }
+
+    const item = document.createElement("button");
+    const avatar = document.createElement("span");
+    const text = document.createElement("span");
+    const title = document.createElement("strong");
+    const preview = document.createElement("em");
+    const meta = document.createElement("small");
+    const time = document.createElement("span");
+    const unread = document.createElement("b");
+
+    item.className = "conversation-item";
+    item.type = "button";
+    item.dataset.conversationItem = id;
+    avatar.className = "conversation-avatar cloud";
+    avatar.textContent = conversationInitial(data, id);
+    preview.dataset.conversationPreview = "";
+    time.dataset.conversationTime = "";
+    unread.dataset.conversationUnread = "";
+    title.textContent = data.title || `@${id}`;
+    preview.textContent = data.preview || "还没有消息";
+    time.textContent = data.lastTime || "现在";
+    unread.textContent = data.unreadCount ? `${data.unreadCount} 新` : "已读";
+    text.append(title, preview);
+    meta.append(time, unread);
+    item.append(avatar, text, meta);
+    conversationList.append(item);
+  });
+}
+
 function renderConversationList() {
+  renderCloudConversationItems();
+  const items = getConversationItems();
   const unreadTotal = Object.values(conversationState).reduce((total, item) => total + item.unreadCount, 0);
 
   if (messageInboxSummary) {
-    messageInboxSummary.textContent = `${conversationItems.length} 个对话 · ${unreadTotal} 条未读`;
+    messageInboxSummary.textContent = `${items.length} 个对话 · ${unreadTotal} 条未读`;
   }
   if (messageUnreadCount) {
     messageUnreadCount.textContent = unreadTotal ? `${unreadTotal} 未读` : "全部已读";
   }
 
-  conversationItems.forEach((item) => {
+  items.forEach((item) => {
     const id = item.dataset.conversationItem;
     const data = conversationState[id];
     const preview = item.querySelector("[data-conversation-preview]");
@@ -724,6 +795,46 @@ function openConversation(conversationId) {
   }
   conversationThread.hidden = false;
   persistConversationState();
+}
+
+function startDirectConversation() {
+  const username = normalizeDirectUsername(directMessageUsername?.value);
+  if (!username || !/^[a-z0-9][a-z0-9-]{1,78}[a-z0-9]$/.test(username)) {
+    if (directMessageFeedback) {
+      directMessageFeedback.textContent = "请输入正确的用户名";
+    }
+    directMessageUsername?.focus();
+    return;
+  }
+
+  if (!window.shanhaiApi?.getToken?.()) {
+    if (directMessageFeedback) {
+      directMessageFeedback.textContent = "请先登录账号，再发起云端私信";
+    }
+    directMessageUsername?.focus();
+    return;
+  }
+
+  if (!conversationState[username]) {
+    conversationState[username] = {
+      title: `@${username}`,
+      status: "云端私信",
+      preview: "还没有消息",
+      lastTime: "现在",
+      unreadCount: 0,
+      messages: [],
+    };
+  }
+
+  if (directMessageUsername) {
+    directMessageUsername.value = "";
+  }
+  if (directMessageFeedback) {
+    directMessageFeedback.textContent = "已打开云端私信";
+  }
+  persistConversationState();
+  openConversation(username);
+  conversationInput?.focus();
 }
 
 function renderProfileDashboardStats() {
@@ -2433,8 +2544,18 @@ planClose.addEventListener("click", () => {
 });
 planSave.addEventListener("click", savePlanDraft);
 memoryAction.addEventListener("click", openMemoryLink);
-conversationItems.forEach((item) => {
-  item.addEventListener("click", () => openConversation(item.dataset.conversationItem));
+conversationList?.addEventListener("click", (event) => {
+  const item = event.target.closest("[data-conversation-item]");
+  if (item && conversationList.contains(item)) {
+    openConversation(item.dataset.conversationItem);
+  }
+});
+directMessageStart?.addEventListener("click", startDirectConversation);
+directMessageUsername?.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    startDirectConversation();
+  }
 });
 conversationSend?.addEventListener("click", sendConversationReply);
 conversationInput?.addEventListener("keydown", (event) => {

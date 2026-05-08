@@ -1,8 +1,8 @@
-﻿const cacheName = "shanhai-yingji-v8";
+﻿const cacheName = "shanhai-yingji-v9";
 const coreAssets = [
   "./",
   "./index.html",
-  "./styles.css?v=cloud-conversation-1",
+  "./styles.css?v=direct-message-1",
   "./manifest.webmanifest",
   "./assets/app-icon.svg",
   "./assets/avatar-lin-che.svg",
@@ -14,15 +14,15 @@ const coreAssets = [
   "./assets/photo-desert-city.svg",
   "./assets/photo-alpine.svg",
   "./assets/photo-ocean.svg",
-  "./src/data/seed-destinations.js?v=cloud-conversation-1",
-  "./src/data/seed-memories.js?v=cloud-conversation-1",
-  "./src/domain/memory.js?v=cloud-conversation-1",
-  "./src/storage/local-store.js?v=cloud-conversation-1",
-  "./src/storage/archive-export.js?v=cloud-conversation-1",
-  "./src/api-client.js?v=cloud-conversation-1",
-  "./src/main.js?v=cloud-conversation-1",
-  "./src/fullstack-panel.js?v=cloud-conversation-1",
-  "./src/pwa-register.js?v=cloud-conversation-1",
+  "./src/data/seed-destinations.js?v=direct-message-1",
+  "./src/data/seed-memories.js?v=direct-message-1",
+  "./src/domain/memory.js?v=direct-message-1",
+  "./src/storage/local-store.js?v=direct-message-1",
+  "./src/storage/archive-export.js?v=direct-message-1",
+  "./src/api-client.js?v=direct-message-1",
+  "./src/main.js?v=direct-message-1",
+  "./src/fullstack-panel.js?v=direct-message-1",
+  "./src/pwa-register.js?v=direct-message-1",
 ];
 
 self.addEventListener("install", (event) => {

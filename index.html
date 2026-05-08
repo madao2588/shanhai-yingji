@@ -11,7 +11,7 @@
     <link rel="icon" href="assets/app-icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="assets/app-icon.svg" />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="styles.css?v=cloud-conversation-1" />
+    <link rel="stylesheet" href="styles.css?v=direct-message-1" />
   </head>
   <body>
     <main class="stage" aria-label="山海映记移动端原型">
@@ -772,6 +772,17 @@
                 <span data-message-unread-count>2 未读</span>
               </section>
               <section class="conversation-layout" aria-label="好友对话与提醒">
+                <section class="direct-message-card" aria-label="发起云端私信">
+                  <div>
+                    <p>云端私信</p>
+                    <strong>输入对方用户名开始对话</strong>
+                  </div>
+                  <div class="direct-message-form">
+                    <input type="text" inputmode="text" autocomplete="username" placeholder="@username" aria-label="对方用户名" data-direct-message-username />
+                    <button type="button" data-direct-message-start>发起</button>
+                  </div>
+                  <p data-direct-message-feedback aria-live="polite"></p>
+                </section>
                 <div class="conversation-list" data-conversation-list aria-label="好友对话">
                   <button class="conversation-item is-active" type="button" data-conversation-item="lin-che">
                     <span class="conversation-avatar">林</span>
@@ -1089,14 +1100,14 @@
       </section>
     </main>
 
-    <script src="src/data/seed-destinations.js?v=cloud-conversation-1"></script>
-    <script src="src/data/seed-memories.js?v=cloud-conversation-1"></script>
-    <script src="src/domain/memory.js?v=cloud-conversation-1"></script>
-    <script src="src/storage/local-store.js?v=cloud-conversation-1"></script>
-    <script src="src/storage/archive-export.js?v=cloud-conversation-1"></script>
-    <script src="src/api-client.js?v=cloud-conversation-1"></script>
-    <script src="src/main.js?v=cloud-conversation-1"></script>
-    <script src="src/fullstack-panel.js?v=cloud-conversation-1"></script>
-    <script src="src/pwa-register.js?v=cloud-conversation-1"></script>
+    <script src="src/data/seed-destinations.js?v=direct-message-1"></script>
+    <script src="src/data/seed-memories.js?v=direct-message-1"></script>
+    <script src="src/domain/memory.js?v=direct-message-1"></script>
+    <script src="src/storage/local-store.js?v=direct-message-1"></script>
+    <script src="src/storage/archive-export.js?v=direct-message-1"></script>
+    <script src="src/api-client.js?v=direct-message-1"></script>
+    <script src="src/main.js?v=direct-message-1"></script>
+    <script src="src/fullstack-panel.js?v=direct-message-1"></script>
+    <script src="src/pwa-register.js?v=direct-message-1"></script>
   </body>
 </html>
