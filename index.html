@@ -277,6 +277,10 @@
               </article>
 
               <section class="memory-prose" aria-label="映记正文">
+                <div class="memory-meta-chips" aria-label="映记状态与标签">
+                  <span data-memory-status-chip>私密</span>
+                  <div data-memory-tags></div>
+                </div>
                 <p data-memory-body>石板路还在反光，风里有樱花落下来的声音。</p>
               </section>
 
@@ -288,6 +292,20 @@
                   <h3 data-memory-route>清水寺 -> 二年坂 -> 八坂神社</h3>
                 </div>
                 <span data-memory-origin>来自最近映记</span>
+              </section>
+              <section class="memory-comments-card" aria-label="映记评论">
+                <div class="memory-comments-head">
+                  <div>
+                    <p>公开互动</p>
+                    <h3>评论</h3>
+                  </div>
+                  <span data-memory-comment-status>打开公开映记后加载评论</span>
+                </div>
+                <div class="memory-comments-list" data-memory-comments></div>
+                <div class="memory-comment-compose">
+                  <input type="text" placeholder="写一条评论" aria-label="写一条评论" data-memory-comment-input />
+                  <button type="button" data-memory-comment-submit>发送</button>
+                </div>
               </section>
             </section>
 
@@ -617,6 +635,28 @@
                   <span>时间与地点</span>
                   <input type="text" value="2026.04.12 · 日本京都" aria-label="时间与地点" data-create-location />
                 </label>
+                <div class="create-grid-fields">
+                  <label>
+                    <span>出发日期</span>
+                    <input type="date" value="2026-04-12" aria-label="出发日期" data-create-date />
+                  </label>
+                  <label>
+                    <span>可见性</span>
+                    <select aria-label="映记可见性" data-create-visibility>
+                      <option value="private">私密</option>
+                      <option value="unlisted">仅链接</option>
+                      <option value="public">公开</option>
+                    </select>
+                  </label>
+                </div>
+                <label>
+                  <span>路线</span>
+                  <input type="text" value="清水寺 -> 二年坂 -> 八坂神社" aria-label="旅行路线" data-create-route />
+                </label>
+                <label>
+                  <span>标签</span>
+                  <input type="text" value="京都,寺社,雨后" aria-label="标签，用逗号分隔" data-create-tags />
+                </label>
                 <label>
                   <span>这段回望</span>
                   <textarea aria-label="这段回望" data-create-body>石板路还在反光，风里有樱花落下来的声音。</textarea>
@@ -789,7 +829,11 @@
                     </label>
                     <button type="button" data-cloud-upload-photo>上传照片</button>
                   </div>
-                  <button class="cloud-save-action" type="button" data-cloud-save-memory>保存到云端档案</button>
+                  <div class="cloud-editor-actions">
+                    <button class="cloud-secondary-action" type="button" data-cloud-new-memory>新建映记</button>
+                    <button class="cloud-secondary-action cloud-delete-memory-action" type="button" data-cloud-delete-memory>删除映记</button>
+                    <button class="cloud-save-action" type="button" data-cloud-save-memory>保存到云端档案</button>
+                  </div>
                 </div>
                 <p class="cloud-status" data-cloud-status>启动后端后可注册、保存、上传和发布。</p>
                 <div class="cloud-module cloud-library-grid">
@@ -894,11 +938,12 @@
                   <button type="button" data-profile-space-tab="liked" aria-pressed="false">赞过</button>
                   <button type="button" data-profile-space-tab="comments" aria-pressed="false">评论</button>
                 </div>
-                <div class="profile-space-counters">
+                <div class="profile-space-counters" data-profile-space-counters>
                   <span>公开 0</span>
                   <span>私密 0</span>
                   <span>合集 0</span>
                 </div>
+                <div class="profile-space-list" data-profile-space-list aria-label="我的空间映记"></div>
                 <div class="profile-space-empty" data-profile-space-empty>
                   <span></span>
                   <strong>还没有公开内容</strong>

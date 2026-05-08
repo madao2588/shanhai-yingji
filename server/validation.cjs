@@ -157,7 +157,11 @@ function validateUploadInput(input = {}, maxUploadBytes = 5 * 1024 * 1024) {
     fail("valid dataUrl is required");
   }
 
-  const mimeType = input.mimeType || match[1];
+  const dataUrlMimeType = match[1];
+  const mimeType = input.mimeType || dataUrlMimeType;
+  if (mimeType !== dataUrlMimeType) {
+    fail("upload mimeType must match dataUrl media type");
+  }
   if (!allowedImageTypes.has(mimeType)) {
     fail("only png, jpeg, webp, and gif images are allowed");
   }

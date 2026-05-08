@@ -3,3 +3,6 @@ npm-debug.log*
 .DS_Store
 .data/
 stdout
+.omx/logs/
+.omx/state/
+.omx/metrics.json

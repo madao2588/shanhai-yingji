@@ -43,6 +43,15 @@
 
 - [ ] Verify `npm test` passes after community API, browser, and launch-readiness tests.
 - [ ] Register an admin email from `SHANHAI_ADMIN_EMAILS` and confirm non-admin users receive 403 for `/api/admin/reports`.
+
+## Production beta readiness
+
+- [ ] Render web service is deployed from `render.yaml`.
+- [ ] `/api/health` returns `database=postgres` and `mediaStore=r2`.
+- [ ] Cloudflare R2 upload, public media URL rendering, and object deletion are verified.
+- [ ] Upstash Redis rate limiting is enabled with `SHANHAI_RATE_LIMIT_STORE=upstash`.
+- [ ] `NODE_ENV=production` fails fast when required production variables are missing.
+- [ ] Admin first registration, public post creation, photo upload, report, moderation removal, backup export, and rollback drill are complete.
 - [ ] Create public, unlisted, and private memories; confirm only public appears in discovery, unlisted opens by direct link, and private remains hidden.
 - [ ] Confirm likes, bookmarks, comments, follows, reports, creator stats, notifications, and admin removal all persist after service restart.
 - [ ] Confirm moderation removal hides content from `/api/discover/memories`.

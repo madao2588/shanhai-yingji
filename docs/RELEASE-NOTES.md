@@ -17,3 +17,9 @@
 - JSON 文件数据库是当前实现，不是最终生产数据库。
 - 本地 uploads 是当前实现，不是最终生产对象存储。
 - 生产域名、法律主体、支持邮箱、监控告警渠道仍是生产待替换项。
+# Production beta infrastructure update
+
+- Added production fail-fast configuration for PostgreSQL, Cloudflare R2, Upstash Redis, public origin, and admin emails.
+- Added a PostgreSQL-backed persistence adapter that keeps the existing API behavior while storing each persisted collection in its own table.
+- Added local/R2 media storage adapters and shared memory/Upstash rate limiter adapters.
+- Added Render blueprint, production environment documentation, backup/monitoring/runbook updates, and production adapter regression tests.

@@ -137,3 +137,7 @@ docker run -p 4173:4173 --env-file .env shanhai-yingji
 - `docs/MONITORING.md`：监控告警。
 - `docs/TROUBLESHOOTING.md`：故障排查。
 - `docs/RELEASE-NOTES.md`：发布记录。
+
+## Production beta stack
+
+The first public beta target is Render Web Service, Render PostgreSQL, Cloudflare R2, Upstash Redis REST rate limiting, and Cloudflare DNS/TLS. In `NODE_ENV=production`, the server now fails fast unless PostgreSQL, R2, Redis, public origin, and admin email configuration are present. Use `render.yaml` and `docs/DEPLOYMENT.md` for the release path.

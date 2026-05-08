@@ -26,6 +26,8 @@
     body: $("[data-cloud-body]"),
     privacy: $("[data-cloud-privacy]"),
     tags: $("[data-cloud-tags]"),
+    newMemory: $("[data-cloud-new-memory]"),
+    deleteMemory: $("[data-cloud-delete-memory]"),
     saveMemory: $("[data-cloud-save-memory]"),
     photoInput: $("[data-cloud-photo-input]"),
     photoFileName: $("[data-cloud-photo-file-name]"),
@@ -46,6 +48,10 @@
     creatorFollowers: $("[data-creator-followers]"),
     profileSpaceComments: $("[data-profile-space-comments]"),
     notificationList: $("[data-notification-list]"),
+    memoryCommentStatus: $("[data-memory-comment-status]"),
+    memoryComments: $("[data-memory-comments]"),
+    memoryCommentInput: $("[data-memory-comment-input]"),
+    memoryCommentSubmit: $("[data-memory-comment-submit]"),
   };
 
   if (!elements.panel) {
@@ -55,6 +61,7 @@
   let currentUser = null;
   let activeMemoryId = "";
   let activePhotoId = "";
+  let activePublicMemoryId = "";
 
   function setStatus(message) {
     elements.status.textContent = message;
@@ -110,6 +117,31 @@
     activePhotoId = photos[0].id;
   }
 
+  function fillMemoryEditor(memory) {
+    if (!memory) {
+      return;
+    }
+    elements.title.value = memory.title || "";
+    elements.location.value = memory.locationLabel || "";
+    elements.body.value = memory.body || "";
+    elements.privacy.value = memory.status || "private";
+    elements.tags.value = Array.isArray(memory.tags) ? memory.tags.join(",") : "";
+    elements.saveMemory.textContent = "更新云端档案";
+  }
+
+  function resetMemoryEditorMode() {
+    activeMemoryId = "";
+    activePhotoId = "";
+    elements.title.value = "";
+    elements.location.value = "";
+    elements.body.value = "";
+    elements.privacy.value = "private";
+    elements.tags.value = "";
+    renderPhotoList([]);
+    elements.saveMemory.textContent = "保存到云端档案";
+    elements.memoryList?.querySelectorAll("[data-cloud-memory-id]").forEach((entry) => entry.classList.remove("is-active"));
+  }
+
   function renderMemoryList(memories = []) {
     elements.memoryList.replaceChildren(
       ...memories.map((memory) => {
@@ -119,9 +151,12 @@
         title.textContent = memory.title;
         meta.textContent = `${memory.status === "public" ? "公开" : memory.status === "unlisted" ? "仅链接" : "私密"} · ${memory.locationLabel || "未标记地点"} · ${memory.photos?.length || 0} 张照片`;
         item.dataset.cloudMemoryId = memory.id;
+        item.classList.toggle("is-active", memory.id === activeMemoryId);
         item.addEventListener("click", () => {
           activeMemoryId = memory.id;
+          fillMemoryEditor(memory);
           renderPhotoList(memory.photos || []);
+          elements.memoryList.querySelectorAll("[data-cloud-memory-id]").forEach((entry) => entry.classList.toggle("is-active", entry === item));
         });
         item.append(title, meta);
         return item;
@@ -130,10 +165,12 @@
     const activeMemory = memories.find((memory) => memory.id === activeMemoryId) || memories[0];
     if (activeMemory) {
       activeMemoryId = activeMemory.id;
+      fillMemoryEditor(activeMemory);
       renderPhotoList(activeMemory.photos || []);
       return;
     }
     activeMemoryId = "";
+    elements.saveMemory.textContent = "保存到云端档案";
     renderPhotoList([]);
   }
 
@@ -160,6 +197,28 @@
       }),
     );
   }
+
+  function toSpaceMemory(memory) {
+    const photoUrl = memory.photos?.[0]?.url || "assets/photo-ocean.svg";
+    const route = Array.isArray(memory.route) ? memory.route.join(" -> ") : "";
+    return {
+      id: memory.id,
+      title: memory.title,
+      location: memory.locationLabel || memory.city || memory.country || "云端映记",
+      route,
+      cover: photoUrl,
+      alt: memory.title || "云端映记照片",
+      status: memory.status || "private",
+      visibility: memory.status || "private",
+      tags: memory.tags || [],
+      source: "cloud",
+    };
+  }
+
+  function dispatchCloudSpace(memories = []) {
+    window.dispatchEvent(new CustomEvent("shanhai:cloud-space-updated", { detail: { memories: memories.map(toSpaceMemory) } }));
+  }
+
   function renderCreatorStats(stats = {}) {
     if (!elements.creatorStats) {
       return;
@@ -192,6 +251,10 @@
     return new Date(value).toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
   }
 
+  function notificationMemoryId(notification = {}) {
+    return notification.memoryId || notification.targetId || notification.payload?.memoryId || "";
+  }
+
   function renderNotifications(notifications = []) {
     if (!elements.notificationList) {
       return;
@@ -204,16 +267,70 @@
         const body = document.createElement("div");
         const title = document.createElement("h3");
         const time = document.createElement("p");
+        const memoryId = notificationMemoryId(notification);
         dot.className = notification.readAt ? "" : "message-dot";
         item.dataset.notificationItem = notification.id;
         item.dataset.notificationType = notification.type;
+        if (memoryId) {
+          item.dataset.notificationMemoryId = memoryId;
+          item.tabIndex = 0;
+          item.setAttribute("role", "button");
+          item.setAttribute("aria-label", `${notificationTitle(notification.type)}，打开对应映记`);
+        }
         title.textContent = notification.type === "empty" ? "暂无新的互动通知" : notificationTitle(notification.type);
         time.textContent = notification.type === "empty" ? "社区互动会出现在这里" : formatDate(notification.createdAt);
+        if (memoryId && notification.type !== "empty") {
+          time.textContent = `${time.textContent} · 点击查看映记`;
+        }
         body.append(title, time);
         item.append(dot, body);
         return item;
       }),
     );
+  }
+
+  async function openNotificationMemory(memoryId, notificationId = "", item = null) {
+    if (!memoryId) {
+      return;
+    }
+    try {
+      const payload = await api.getPublicMemory(memoryId);
+      if (notificationId) {
+        try {
+          await api.markNotificationRead(notificationId);
+          if (item?.firstElementChild) {
+            item.firstElementChild.className = "";
+          }
+        } catch {
+          // Opening the memory is more important than blocking on read state.
+        }
+      }
+      if (payload?.memory) {
+        window.shanhaiOpenExternalMemory?.(payload.memory);
+      }
+    } catch (error) {
+      setStatus(error.message || "通知对应的映记已不可访问。");
+    }
+  }
+
+  function handleNotificationList(event) {
+    const item = event.target.closest("[data-notification-memory-id]");
+    if (!item || !elements.notificationList?.contains(item)) {
+      return;
+    }
+    openNotificationMemory(item.dataset.notificationMemoryId, item.dataset.notificationItem, item);
+  }
+
+  function handleNotificationKeydown(event) {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+    const item = event.target.closest("[data-notification-memory-id]");
+    if (!item || !elements.notificationList?.contains(item)) {
+      return;
+    }
+    event.preventDefault();
+    openNotificationMemory(item.dataset.notificationMemoryId, item.dataset.notificationItem, item);
   }
 
   function renderCommunityFeed(memories = []) {
@@ -248,6 +365,8 @@
         const commentSubmit = document.createElement("button");
 
         item.dataset.communityItem = memory.id;
+        item.setAttribute("role", "button");
+        item.tabIndex = 0;
         image.src = memory.photos?.[0]?.url || "assets/photo-ocean.svg";
         image.alt = memory.title;
         title.textContent = memory.title;
@@ -282,6 +401,19 @@
         commentSubmit.textContent = "评论";
         commentRow.append(commentInput, commentSubmit);
         item.append(image, title, meta, actions, commentRow);
+        item.addEventListener("click", (event) => {
+          if (event.target.closest("button, input")) {
+            return;
+          }
+          window.shanhaiOpenExternalMemory?.(memory);
+        });
+        item.addEventListener("keydown", (event) => {
+          if (event.key !== "Enter" && event.key !== " ") {
+            return;
+          }
+          event.preventDefault();
+          window.shanhaiOpenExternalMemory?.(memory);
+        });
         return item;
       }),
     );
@@ -327,9 +459,11 @@
       ]);
       renderMemoryList(owned.memories);
       renderPublicList(published.memories);
+      dispatchCloudSpace(owned.memories);
       await Promise.all([refreshCommunityFeed(), refreshCreatorStats(), refreshNotifications()]);
     } catch (error) {
       renderPublicList([]);
+      dispatchCloudSpace([]);
       setStatus(error.message || "云端服务暂时不可用。");
     }
   }
@@ -397,6 +531,7 @@
       activePhotoId = "";
       renderProfile(null);
       renderMemoryList([]);
+      dispatchCloudSpace([]);
       renderCreatorStats();
       renderNotifications([]);
       setStatus("账号已注销，本机登录已清除。");
@@ -407,18 +542,74 @@
 
   async function saveMemory() {
     try {
-      const payload = await api.createMemory({
+      const input = {
         title: elements.title.value,
         body: elements.body.value,
         locationLabel: elements.location.value,
         status: elements.privacy.value,
         tags: parseTags(elements.tags.value),
-      });
+      };
+      const wasUpdating = Boolean(activeMemoryId);
+      const payload = wasUpdating ? await api.updateMemory(activeMemoryId, input) : await api.createMemory(input);
       activeMemoryId = payload.memory.id;
-      setStatus("云端日志已保存。");
+      setStatus(wasUpdating ? "云端日志已更新。" : "云端日志已保存。");
       await refreshMemories();
     } catch (error) {
       setStatus(error.message || "云端日志保存失败");
+    }
+  }
+
+  function renderDetailComments(comments = []) {
+    if (!elements.memoryComments || !elements.memoryCommentStatus) {
+      return;
+    }
+    elements.memoryCommentStatus.textContent = `${comments.length} 条评论`;
+    if (!comments.length) {
+      const empty = document.createElement("p");
+      empty.textContent = "还没有评论，成为第一个补充路线经验的人。";
+      elements.memoryComments.replaceChildren(empty);
+      return;
+    }
+    elements.memoryComments.replaceChildren(
+      ...comments.map((comment) => {
+        const item = document.createElement("article");
+        const author = document.createElement("strong");
+        const body = document.createElement("p");
+        author.textContent = comment.author?.name || "山海旅人";
+        body.textContent = comment.body || "";
+        item.append(author, body);
+        return item;
+      }),
+    );
+  }
+
+  async function refreshDetailComments(memoryId = activePublicMemoryId) {
+    if (!memoryId || !elements.memoryComments) {
+      return;
+    }
+    activePublicMemoryId = memoryId;
+    elements.memoryCommentStatus.textContent = "正在加载评论";
+    try {
+      const payload = await api.listComments(memoryId);
+      renderDetailComments(payload.comments || []);
+    } catch (error) {
+      elements.memoryCommentStatus.textContent = error.message || "评论加载失败";
+      renderDetailComments([]);
+    }
+  }
+
+  async function deleteSelectedMemory() {
+    if (!activeMemoryId) {
+      setStatus("请先选择要删除的云端映记。");
+      return;
+    }
+    try {
+      await api.deleteMemory(activeMemoryId);
+      resetMemoryEditorMode();
+      setStatus("云端映记已删除。");
+      await refreshMemories();
+    } catch (error) {
+      setStatus(error.message || "云端映记删除失败");
     }
   }
 
@@ -511,6 +702,24 @@
     }
   }
 
+  async function submitDetailComment() {
+    const body = elements.memoryCommentInput?.value.trim();
+    if (!activePublicMemoryId || !body) {
+      return;
+    }
+    if (!api.getToken()) {
+      setStatus("请先登录，再评论公开映记。");
+      return;
+    }
+    try {
+      await api.createComment(activePublicMemoryId, { body });
+      elements.memoryCommentInput.value = "";
+      await Promise.all([refreshDetailComments(activePublicMemoryId), refreshCommunityFeed(), refreshCreatorStats(), refreshNotifications()]);
+    } catch (error) {
+      elements.memoryCommentStatus.textContent = error.message || "评论发送失败";
+    }
+  }
+
   elements.register.addEventListener("click", () => authenticate("register"));
   elements.login.addEventListener("click", () => authenticate("login"));
   elements.updateProfile?.addEventListener("click", updateProfile);
@@ -524,6 +733,11 @@
     await refreshMemories();
   });
   elements.saveMemory.addEventListener("click", saveMemory);
+  elements.newMemory?.addEventListener("click", () => {
+    resetMemoryEditorMode();
+    setStatus("已切换为新建云端映记。");
+  });
+  elements.deleteMemory?.addEventListener("click", deleteSelectedMemory);
   elements.uploadPhoto.addEventListener("click", uploadPhoto);
   elements.photoInput?.addEventListener("change", () => {
     elements.photoFileName.textContent = elements.photoInput.files?.[0]?.name || "未选择文件";
@@ -538,6 +752,17 @@
   });
   elements.communitySort?.addEventListener("change", refreshCommunityFeed);
   elements.communityFeed?.addEventListener("click", handleCommunityAction);
+  elements.notificationList?.addEventListener("click", handleNotificationList);
+  elements.notificationList?.addEventListener("keydown", handleNotificationKeydown);
+  window.addEventListener("shanhai:cloud-memory-updated", refreshMemories);
+  window.addEventListener("shanhai:public-memory-opened", (event) => refreshDetailComments(event.detail?.memoryId));
+  elements.memoryCommentSubmit?.addEventListener("click", submitDetailComment);
+  elements.memoryCommentInput?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      submitDetailComment();
+    }
+  });
 
   window.addEventListener("load", restoreSession);
 })();

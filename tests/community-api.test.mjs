@@ -190,6 +190,12 @@ try {
     ["bookmark", "comment", "follow", "like"],
     "author should receive interaction notifications",
   );
+  const commentNotification = notifications.payload.notifications.find((item) => item.type === "comment");
+  const readNotification = await request(port, "PATCH", `/api/notifications/${commentNotification.id}/read`, undefined, author.token);
+  assert.equal(readNotification.response.status, 200, "authors should mark their notifications read");
+  assert.ok(readNotification.payload.notification.readAt, "marking a notification read should persist readAt");
+  const readerReadAttempt = await request(port, "PATCH", `/api/notifications/${commentNotification.id}/read`, undefined, reader.token);
+  assert.equal(readerReadAttempt.response.status, 404, "readers should not mark another user's notifications read");
 
   const report = await request(
     port,

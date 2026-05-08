@@ -82,6 +82,7 @@
     deletePhoto: (memoryId, photoId) =>
       request(`/api/memories/${encodeURIComponent(memoryId)}/photos/${encodeURIComponent(photoId)}`, { method: "DELETE" }),
     listPublicMemories: () => request("/api/public/memories"),
+    getPublicMemory: (id) => request(`/api/public/memories/${encodeURIComponent(id)}`),
     discoverMemories: (params) => request(`/api/discover/memories${queryString(params)}`),
     listTags: () => request("/api/tags"),
     listDestinations: () => request("/api/destinations"),
@@ -93,6 +94,7 @@
     createReport: (input) => request("/api/reports", { method: "POST", body: input }),
     creatorStats: () => request("/api/creator/stats"),
     notifications: () => request("/api/notifications"),
+    markNotificationRead: (id) => request(`/api/notifications/${encodeURIComponent(id)}/read`, { method: "PATCH" }),
     exportArchive: () => request("/api/export"),
     importArchive: (archive) => request("/api/import", { method: "POST", body: archive }),
   };

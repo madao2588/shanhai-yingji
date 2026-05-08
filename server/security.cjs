@@ -11,7 +11,11 @@ function securityHeaders(extra = {}) {
   };
 }
 
-function createRateLimiter({ windowMs = 60000, max = 240 } = {}) {
+function rateLimitKey(request) {
+  return `rate:${request.socket.remoteAddress || "unknown"}`;
+}
+
+function createMemoryRateLimiter({ windowMs = 60000, max = 240 } = {}) {
   const hits = new Map();
 
   return function checkRateLimit(request) {
@@ -35,7 +39,48 @@ function createRateLimiter({ windowMs = 60000, max = 240 } = {}) {
   };
 }
 
+function createUpstashRateLimiter({ windowMs = 60000, max = 240, redisRestUrl, redisRestToken, fetchImpl = fetch } = {}) {
+  return async function checkRateLimit(request) {
+    const now = Date.now();
+    const resetAt = now + windowMs;
+    const response = await fetchImpl(`${String(redisRestUrl || "").replace(/\/+$/, "")}/pipeline`, {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${redisRestToken}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify([
+        ["INCR", rateLimitKey(request)],
+        ["PEXPIRE", rateLimitKey(request), String(windowMs), "NX"],
+      ]),
+    });
+
+    if (!response.ok) {
+      const error = new Error("rate limiter unavailable");
+      error.status = 503;
+      throw error;
+    }
+
+    const payload = await response.json();
+    const count = Number(payload?.[0]?.result || 0);
+    return {
+      limited: count > max,
+      remaining: Math.max(max - count, 0),
+      resetAt,
+    };
+  };
+}
+
+function createRateLimiter(config = {}) {
+  if (config.store === "upstash") {
+    return createUpstashRateLimiter(config);
+  }
+  return createMemoryRateLimiter(config);
+}
+
 module.exports = {
   createRateLimiter,
+  createMemoryRateLimiter,
+  createUpstashRateLimiter,
   securityHeaders,
 };

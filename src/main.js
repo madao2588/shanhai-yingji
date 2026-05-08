@@ -17,6 +17,10 @@ const profileShortcut = document.querySelector("[data-open-profile]");
 const createForm = document.querySelector(".create-form");
 const createTitle = document.querySelector("[data-create-title]");
 const createLocation = document.querySelector("[data-create-location]");
+const createDate = document.querySelector("[data-create-date]");
+const createRoute = document.querySelector("[data-create-route]");
+const createTags = document.querySelector("[data-create-tags]");
+const createVisibility = document.querySelector("[data-create-visibility]");
 const createBody = document.querySelector("[data-create-body]");
 const stepItems = document.querySelectorAll(".step-rail span");
 const generateButton = document.querySelector("[data-generate-recap]");
@@ -117,6 +121,8 @@ const memoryBody = document.querySelector("[data-memory-body]");
 const memoryGallery = document.querySelector("[data-memory-gallery]");
 const memoryRoute = document.querySelector("[data-memory-route]");
 const memoryOrigin = document.querySelector("[data-memory-origin]");
+const memoryStatusChip = document.querySelector("[data-memory-status-chip]");
+const memoryTags = document.querySelector("[data-memory-tags]");
 const conversationItems = document.querySelectorAll("[data-conversation-item]");
 const conversationThread = document.querySelector("[data-conversation-thread]");
 const conversationTitle = document.querySelector("[data-conversation-title]");
@@ -136,6 +142,8 @@ const profileSpaceBack = document.querySelector("[data-profile-space-back]");
 const profileSpaceEditButtons = document.querySelectorAll("[data-profile-space-edit], [data-profile-space-avatar-edit]");
 const profileSpaceTabs = document.querySelectorAll("[data-profile-space-tab]");
 const profileSpaceEmpty = document.querySelector("[data-profile-space-empty]");
+const profileSpaceCounters = document.querySelector("[data-profile-space-counters]");
+const profileSpaceList = document.querySelector("[data-profile-space-list]");
 
 const particlePalette = [
   "rgba(214, 181, 109, 0.9)",
@@ -168,6 +176,7 @@ const baseArchiveStats = {
 const seedMemories = window.seedMemories || [];
 let destinationState = localStore.loadDestinationState();
 let savedMemories = localStore.loadSavedMemories();
+let cloudSpaceMemories = [];
 
 function persistSavedMemories() {
   return localStore.persistSavedMemories(savedMemories);
@@ -502,6 +511,71 @@ function sendConversationReply() {
   conversationInput.value = "";
 }
 
+function getVisibilityLabel(value) {
+  return (
+    {
+      public: "公开",
+      unlisted: "仅链接",
+      private: "私密",
+    }[value] || "私密"
+  );
+}
+
+function renderProfileSpaceList(tabName = "notes") {
+  if (!profileSpaceList || !profileSpaceCounters || !profileSpaceEmpty) {
+    return;
+  }
+
+  const localEntries = savedMemories.filter((memory) => isSavedMemory(memory));
+  const entries = [...cloudSpaceMemories, ...localEntries];
+  const publicCount = entries.filter((memory) => (memory.status || memory.visibility) === "public").length;
+  const privateCount = entries.filter((memory) => !["public", "unlisted"].includes(memory.status || memory.visibility)).length;
+  const unlistedCount = entries.filter((memory) => (memory.status || memory.visibility) === "unlisted").length;
+
+  profileSpaceCounters.replaceChildren(
+    ...[`公开 ${publicCount}`, `私密 ${privateCount}`, `仅链接 ${unlistedCount}`].map((label) => {
+      const item = document.createElement("span");
+      item.textContent = label;
+      return item;
+    }),
+  );
+
+  if (tabName !== "notes") {
+    profileSpaceList.replaceChildren();
+    profileSpaceEmpty.hidden = false;
+    return;
+  }
+
+  if (!entries.length) {
+    profileSpaceList.replaceChildren();
+    profileSpaceEmpty.hidden = false;
+    return;
+  }
+
+  profileSpaceEmpty.hidden = true;
+  profileSpaceList.replaceChildren(
+    ...entries.map((memory) => {
+      const item = document.createElement("article");
+      const image = document.createElement("img");
+      const copy = document.createElement("div");
+      const title = document.createElement("strong");
+      const meta = document.createElement("span");
+      const status = document.createElement("em");
+
+      item.dataset.profileSpaceMemory = memory.id;
+      image.src = memory.cover;
+      image.alt = memory.alt || `${memory.title} 照片`;
+      title.textContent = memory.title;
+      meta.textContent = [memory.location, memory.route].filter(Boolean).join(" · ");
+      status.textContent = getVisibilityLabel(memory.status || memory.visibility);
+      copy.append(title, meta, status);
+      item.append(image, copy);
+      item.addEventListener("click", () => openMemoryDetail(memory.id));
+      return item;
+    }),
+  );
+}
+
 function activateProfileSpaceTab(tabName = "notes") {
   profileSpaceTabs.forEach((button) => {
     const isSelected = button.dataset.profileSpaceTab === tabName;
@@ -524,6 +598,7 @@ function activateProfileSpaceTab(tabName = "notes") {
 
   profileSpaceEmpty.querySelector("strong").textContent = copy[0];
   profileSpaceEmpty.querySelector("p").textContent = copy[1];
+  renderProfileSpaceList(tabName);
 }
 
 function openProfileSpace(tabName = "notes") {
@@ -631,6 +706,10 @@ function saveCreateDraft() {
   const result = localStore.saveCreateDraft({
     title: createTitle.value,
     location: createLocation.value,
+    date: createDate?.value || "",
+    route: createRoute?.value || "",
+    tags: createTags?.value || "",
+    visibility: createVisibility?.value || "private",
     body: createBody.value,
     selectedPhotoIds,
     localPhotos: getLocalPhotoDrafts(),
@@ -676,6 +755,18 @@ function restoreCreateDraft() {
   }
   if (typeof draft.location === "string") {
     createLocation.value = draft.location;
+  }
+  if (typeof draft.date === "string" && createDate) {
+    createDate.value = draft.date;
+  }
+  if (typeof draft.route === "string" && createRoute) {
+    createRoute.value = draft.route;
+  }
+  if (typeof draft.tags === "string" && createTags) {
+    createTags.value = draft.tags;
+  }
+  if (typeof draft.visibility === "string" && createVisibility) {
+    createVisibility.value = draft.visibility;
   }
   if (typeof draft.body === "string") {
     createBody.value = draft.body;
@@ -1127,6 +1218,52 @@ function renderMemoryDetail(memoryId = activeMemoryId) {
   memoryBody.textContent = memory.body;
   memoryRoute.textContent = memory.route || memory.location;
   memoryOrigin.textContent = memory.origin || "来自我的山海档案";
+  if (memoryStatusChip) {
+    memoryStatusChip.textContent = getVisibilityLabel(memory.status || memory.visibility);
+  }
+  if (memoryTags) {
+    memoryTags.replaceChildren(
+      ...(memory.tags?.length ? memory.tags : ["未标记"]).map((tag) => {
+        const item = document.createElement("span");
+        item.textContent = tag;
+        return item;
+      }),
+    );
+  }
+  memoryGallery.replaceChildren(
+    ...photos.slice(0, 6).map((src, index) => {
+      const image = document.createElement("img");
+      image.src = src;
+      image.alt = `${memory.title} 照片 ${index + 1}`;
+      return image;
+    }),
+  );
+}
+
+function renderExternalMemoryDetail(memory) {
+  const photos = memory.photos?.length ? memory.photos : [memory.cover];
+
+  activeMemoryId = memory.id;
+  memoryHero.src = memory.cover;
+  memoryHero.alt = memory.alt || `${memory.title} 封面照片`;
+  memoryTitle.textContent = memory.title;
+  memoryLocation.textContent = memory.location;
+  memoryMeta.textContent = `${memory.photoCount} 张照片 · ${memory.words} 字`;
+  memoryBody.textContent = memory.body;
+  memoryRoute.textContent = memory.route || memory.location;
+  memoryOrigin.textContent = memory.origin || "来自社区公开映记";
+  if (memoryStatusChip) {
+    memoryStatusChip.textContent = getVisibilityLabel(memory.status || memory.visibility);
+  }
+  if (memoryTags) {
+    memoryTags.replaceChildren(
+      ...(memory.tags?.length ? memory.tags : ["未标记"]).map((tag) => {
+        const item = document.createElement("span");
+        item.textContent = tag;
+        return item;
+      }),
+    );
+  }
   memoryGallery.replaceChildren(
     ...photos.slice(0, 6).map((src, index) => {
       const image = document.createElement("img");
@@ -1141,6 +1278,34 @@ function openMemoryDetail(memoryId = activeMemoryId, updateHash = true) {
   renderMemoryDetail(memoryId);
   activateScreen("memory-detail", `memory:${activeMemoryId}`, updateHash);
 }
+
+window.shanhaiOpenExternalMemory = function openExternalMemory(memory = {}) {
+  const photos = Array.isArray(memory.photos) ? memory.photos.map((photo) => photo.url).filter(Boolean) : [];
+  const route = Array.isArray(memory.route) ? memory.route.join(" -> ") : String(memory.route || "");
+  renderExternalMemoryDetail({
+    id: memory.id || "community-memory",
+    title: memory.title || "未命名公开映记",
+    location: memory.locationLabel || memory.city || memory.country || "公开映记",
+    body: memory.body || "",
+    photoCount: photos.length || 1,
+    words: String(memory.body || "").length,
+    cover: photos[0] || "assets/photo-ocean.svg",
+    alt: memory.title || "公开映记照片",
+    route,
+    origin: memory.author?.name ? `来自 ${memory.author.name} 的公开映记` : "来自社区公开映记",
+    tags: memory.tags || [],
+    status: memory.status || memory.visibility || "public",
+    visibility: memory.visibility || memory.status || "public",
+    photos,
+  });
+  activateScreen("memory-detail", `public-memory:${memory.id || "community-memory"}`, false);
+  window.dispatchEvent(new CustomEvent("shanhai:public-memory-opened", { detail: { memoryId: memory.id || "" } }));
+};
+
+window.addEventListener("shanhai:cloud-space-updated", (event) => {
+  cloudSpaceMemories = Array.isArray(event.detail?.memories) ? event.detail.memories : [];
+  renderProfileSpaceList("notes");
+});
 
 function renderSelectedPhotos() {
   const selected = getSelectedPhotoData();
@@ -1388,7 +1553,7 @@ function addSuggestedPhoto() {
 
 function updateCreateProgress() {
   const values = Array.from(createForm.elements)
-    .filter((field) => field.matches("input, textarea"))
+    .filter((field) => field.matches("input, textarea, select"))
     .map((field) => field.value.trim());
   const completed = values.filter(Boolean).length + (selectedPhotoIds.length ? 1 : 0);
   const activeIndex = Math.min(completed, stepItems.length - 1);
@@ -1548,28 +1713,75 @@ function buildCreatedMemory() {
   const body = createBody.value.trim() || "写下这一段回望后生成分享长图。";
   const location = createLocation.value.trim() || "未标记地点";
   const { country, city } = inferLocationParts(location);
+  const dateValue = createDate?.value || "";
+  const route = createRoute?.value.trim() || selected.map((photo) => photo.place).join(" -> ") || location;
+  const status = createVisibility?.value || "private";
+  const inputTags = parseTagInput(createTags?.value || "");
+  const fallbackTags = [country, city].filter((tag) => tag && tag !== "未标记地点");
 
   return memoryDomain.createMemory({
     title: createTitle.value.trim() || "未命名映记",
     location,
     country,
     city,
-    year: "2026",
+    year: dateValue ? dateValue.slice(0, 4) : "2026",
     source: "saved",
-    dateLabel: "今天",
+    status,
+    visibility: status,
+    date: dateValue,
+    dateLabel: dateValue ? dateValue.slice(5).replace("-", ".") : "今天",
     body,
     photoCount: Math.max(selected.length, 1),
     words: body.length,
     cover: cover.src,
     alt: cover.alt,
-    route: selected.map((photo) => photo.place).join(" -> ") || location,
+    route,
     origin: "来自刚保存的映记",
-    tags: [country, city].filter((tag) => tag && tag !== "未标记地点"),
+    tags: inputTags.length ? inputTags : fallbackTags,
     photos: (selected.length ? selected : [cover]).map((photo) => photo.src),
   });
 }
 
-function saveCreatedMemory() {
+async function syncCreatedMemoryToCloud(memory) {
+  const api = window.shanhaiApi;
+  const canUseApi = api?.getToken?.() && window.location.protocol.startsWith("http");
+
+  if (!canUseApi) {
+    return { ok: false, skipped: true };
+  }
+
+  try {
+    const payload = await api.createMemory({
+      title: memory.title,
+      body: memory.body,
+      locationLabel: memory.location,
+      occurredAt: memory.date || "",
+      route: String(memory.route || "")
+        .split(/\s*->\s*|、|，|,/)
+        .map((item) => item.trim())
+        .filter(Boolean),
+      status: memory.status || "private",
+      tags: memory.tags || [],
+    });
+    const uploadablePhotos = getSelectedPhotoData().filter((photo) => /^data:image\/(png|jpeg|webp|gif);base64,/.test(photo.src));
+    let uploadedCount = 0;
+    for (const photo of uploadablePhotos.slice(0, 6)) {
+      const mimeType = photo.src.match(/^data:([^;]+);base64,/)?.[1] || "image/png";
+      await api.uploadPhoto(payload.memory.id, {
+        fileName: `${photo.place || "create-photo"}.${mimeType.split("/")[1] || "png"}`,
+        mimeType,
+        dataUrl: photo.src,
+        alt: photo.alt || memory.title,
+      });
+      uploadedCount += 1;
+    }
+    return { ok: true, uploadedCount };
+  } catch (error) {
+    return { ok: false, error: error?.message || "云端同步失败" };
+  }
+}
+
+async function saveCreatedMemory() {
   const memory = buildCreatedMemory();
 
   savedMemories = [memory, ...savedMemories].slice(0, 12);
@@ -1581,9 +1793,18 @@ function saveCreatedMemory() {
     }
     renderPersonalArchive();
     renderArchiveLibrary();
+    renderProfileSpaceList("notes");
     clearCreateDraft();
     saveMemoryButton.textContent = "已保存到我的档案";
-    saveStatus.textContent = "已写入首页最近映记，并同步年度档案统计。";
+    saveStatus.textContent = `已保存为${getVisibilityLabel(memory.status)}映记，并同步首页、档案和个人空间。`;
+    const cloudResult = await syncCreatedMemoryToCloud(memory);
+    if (cloudResult.ok) {
+      const photoCopy = cloudResult.uploadedCount ? `，含 ${cloudResult.uploadedCount} 张照片` : "";
+      saveStatus.textContent = `已保存为${getVisibilityLabel(memory.status)}映记，并同步到云端与社区发现${photoCopy}。`;
+      window.dispatchEvent(new CustomEvent("shanhai:cloud-memory-updated"));
+    } else if (cloudResult.error) {
+      saveStatus.textContent = `本地已保存，云端同步失败：${cloudResult.error}`;
+    }
   } catch {
     savedMemories = savedMemories.filter((item) => item.id !== memory.id);
     saveStatus.textContent = "本机存储空间不足，暂时无法保存这篇映记。";
@@ -1831,6 +2052,10 @@ createForm.addEventListener("input", () => {
   updateCreateProgress();
   saveCreateDraft();
 });
+createForm.addEventListener("change", () => {
+  updateCreateProgress();
+  saveCreateDraft();
+});
 photoOptions.forEach((option) => {
   option.addEventListener("click", selectPhotoAsset);
 });
@@ -1919,6 +2144,7 @@ window.addEventListener("hashchange", handleHashRoute);
 window.addEventListener("load", () => {
   sizeCanvas();
   renderPersonalArchive();
+  renderProfileSpaceList("notes");
   restoreCreateDraft();
   updateCreateProgress();
   filterReviews();

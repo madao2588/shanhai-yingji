@@ -19,6 +19,21 @@ function listen(app) {
   });
 }
 
+async function request(port, method, path, body, token) {
+  const response = await fetch(`http://127.0.0.1:${port}${path}`, {
+    method,
+    headers: {
+      "content-type": "application/json",
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
+    },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  const text = await response.text();
+  const payload = text ? JSON.parse(text) : null;
+  assert.ok(response.ok, `${method} ${path} should succeed: ${response.status}`);
+  return payload;
+}
+
 const port = await listen(server);
 const browser = await chromium.launch();
 const page = await browser.newPage();
@@ -58,6 +73,21 @@ try {
   await page.click("[data-cloud-save-memory]");
   await page.waitForFunction(() => document.querySelector("[data-cloud-status]")?.textContent.includes("云端日志已保存"));
 
+  const authorToken = await page.evaluate(() => window.sessionStorage.getItem("shanhai-api-token"));
+  const authorProfile = await request(port, "GET", "/api/me", undefined, authorToken);
+  const authorMemories = await request(port, "GET", "/api/memories", undefined, authorToken);
+  const publishedMemory = authorMemories.memories.find((memory) => memory.title === "Lisbon tile route");
+  assert.ok(publishedMemory?.id, "published memory should be available for cross-user notification setup");
+  const reader = await request(port, "POST", "/api/auth/register", {
+    name: "Message Reader",
+    email: "message-reader@example.com",
+    password: "reader-pass-123",
+  });
+  await request(port, "POST", `/api/memories/${publishedMemory.id}/like`, undefined, reader.token);
+  await request(port, "POST", `/api/memories/${publishedMemory.id}/bookmark`, undefined, reader.token);
+  await request(port, "POST", `/api/memories/${publishedMemory.id}/comments`, { body: "Notification should open this public memory." }, reader.token);
+  await request(port, "POST", `/api/profile/${authorProfile.user.username}/follow`, undefined, reader.token);
+
   await page.click('[data-target="community"]');
   await page.waitForSelector("[data-community-feed] [data-community-item]");
   await page.fill("[data-community-search-input]", "Lisbon");
@@ -75,7 +105,11 @@ try {
   await page.click('[data-target="profile"]');
   await page.waitForFunction(() => document.querySelector("[data-creator-stats]")?.textContent.includes("1"));
   await page.click('[data-target="messages"]');
-  await page.waitForSelector("[data-notification-list] [data-notification-item]");
+  await page.waitForSelector(`[data-notification-memory-id="${publishedMemory.id}"]`);
+  await page.click(`[data-notification-memory-id="${publishedMemory.id}"]`);
+  await page.waitForSelector('[data-screen="memory-detail"].is-active');
+  assert.equal(await page.locator("[data-memory-title]").textContent(), "Lisbon tile route", "notification should open the related public memory");
+  await page.waitForFunction(() => document.querySelector("[data-memory-comments]")?.textContent.includes("Notification should open this public memory."));
 
   assert.deepEqual(consoleErrors, [], "community browser flow should not log console errors");
   assert.deepEqual(failedRequests, [], "community browser flow should not have failed resource requests");

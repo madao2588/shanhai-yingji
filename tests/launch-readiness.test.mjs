@@ -53,6 +53,8 @@ assert.match(runbook, /上传/, "runbook should cover upload incidents");
 const backup = readFileSync("docs/BACKUP-RESTORE.md", "utf8");
 assert.match(backup, /RPO/, "backup docs should cover RPO");
 assert.match(backup, /恢复验证/, "backup docs should cover restore validation");
+assert.match(backup, /PostgreSQL/, "backup docs should cover production database backups");
+assert.match(backup, /R2/, "backup docs should cover production media backups");
 
 const sourceFiles = [
   "index.html",

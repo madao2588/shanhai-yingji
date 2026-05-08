@@ -67,7 +67,7 @@ try {
   await page.fill("[data-create-location]", "日本京都");
   await page.fill("[data-create-body]", "收藏筛选和删除测试");
   await page.click("[data-save-memory]");
-  await page.waitForFunction(() => document.querySelector("[data-save-status]")?.textContent.includes("已写入"));
+  await page.waitForFunction(() => document.querySelector("[data-save-status]")?.textContent.includes("已保存"));
   assert.equal(await page.evaluate(() => localStorage.getItem("shanhai-create-draft")), null, "saving should clear the create draft");
 
   await page.click('[data-target="record"]');

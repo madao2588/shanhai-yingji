@@ -29,3 +29,25 @@
 - 升级前备份数据目录。
 - 升级后运行 `npm test` 和健康检查。
 - 回滚时恢复上一版本代码和数据备份。
+# Production beta operations
+
+## Daily checks
+
+- Confirm `GET /api/health` returns `status=ok`, `database=postgres`, and `mediaStore=r2`.
+- Review Render deploy/runtime logs for 5xx responses and startup configuration failures.
+- Review Upstash request limits and Cloudflare R2 storage growth.
+- Confirm latest PostgreSQL automated backup is present.
+
+## Upload incidents
+
+1. Check whether R2 credentials, bucket name, endpoint, and public base URL are present in Render.
+2. Confirm the failing upload is below `SHANHAI_MAX_UPLOAD_BYTES` and has matching `mimeType` and data URL media type.
+3. If R2 is unavailable, pause new releases and keep the service running for read-only flows.
+4. After recovery, upload a small PNG, verify the public URL, delete it, and confirm the object is removed.
+
+## Rollback
+
+1. Roll back the Render web service to the previous deploy.
+2. Keep the PostgreSQL database in place unless a destructive migration was explicitly run.
+3. Re-run `/api/health`, admin login, public post read, and backup export.
+4. If media writes failed during the incident, reconcile orphaned R2 objects against the `photos` collection.

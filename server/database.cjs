@@ -353,6 +353,7 @@ class JsonDatabase {
       memoryId,
       userId,
       fileName: photo.fileName,
+      storageKey: photo.storageKey || photo.fileName,
       mimeType: photo.mimeType,
       url: photo.url,
       alt: String(photo.alt || "").trim(),
@@ -573,6 +574,17 @@ class JsonDatabase {
       .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
   }
 
+  async markNotificationRead(userId, notificationId) {
+    const data = await this.ensureLoaded();
+    const notification = data.notifications.find((item) => item.id === notificationId && item.userId === userId);
+    if (!notification) {
+      return null;
+    }
+    notification.readAt = notification.readAt || now();
+    await this.save();
+    return notification;
+  }
+
   async creatorStats(userId) {
     const data = await this.ensureLoaded();
     const publicMemories = data.memories.filter((memory) => memory.userId === userId && memory.status === "public" && !memory.deletedAt && !memory.removedAt);
@@ -698,6 +710,7 @@ class JsonDatabase {
         for (const photo of item.photos) {
           await this.addPhoto(created.id, userId, {
             fileName: photo.fileName || "imported-photo",
+            storageKey: photo.storageKey || photo.fileName || "imported-photo",
             mimeType: photo.mimeType || "image/jpeg",
             url: photo.url || "",
             alt: photo.alt || "",
@@ -712,6 +725,7 @@ class JsonDatabase {
 }
 
 module.exports = {
+  createEmptyData,
   JsonDatabase,
   now,
 };

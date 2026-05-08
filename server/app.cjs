@@ -3,6 +3,8 @@ const http = require("node:http");
 const path = require("node:path");
 const { loadConfig } = require("./config.cjs");
 const { JsonDatabase } = require("./database.cjs");
+const { createMediaStore } = require("./media-store.cjs");
+const { PostgresDatabase } = require("./postgres-database.cjs");
 const { createRateLimiter, securityHeaders } = require("./security.cjs");
 const { createToken, hashPassword, publicUser, verifyPassword } = require("./auth.cjs");
 const {
@@ -42,16 +44,10 @@ const staticFiles = new Set([
   "src/storage/local-store.js",
 ]);
 
-const uploadExtensions = new Map([
-  ["image/png", ".png"],
-  ["image/jpeg", ".jpg"],
-  ["image/webp", ".webp"],
-  ["image/gif", ".gif"],
-]);
-
 function sendJson(response, status, payload, headers = {}) {
   response.writeHead(status, {
     ...securityHeaders(),
+    ...(response.shanhaiCorsHeaders || {}),
     "content-type": "application/json; charset=utf-8",
     "cache-control": "no-store",
     ...headers,
@@ -60,7 +56,10 @@ function sendJson(response, status, payload, headers = {}) {
 }
 
 function sendNoContent(response) {
-  response.writeHead(204, securityHeaders());
+  response.writeHead(204, {
+    ...securityHeaders(),
+    ...(response.shanhaiCorsHeaders || {}),
+  });
   response.end();
 }
 
@@ -107,30 +106,6 @@ async function getCurrentUser(request, db) {
   }
 
   return db.findUserById(session.userId);
-}
-
-function createSafeUploadName(mimeType) {
-  const ext = uploadExtensions.get(mimeType) || ".bin";
-  return `${Date.now()}-${Math.random().toString(16).slice(2)}${ext}`;
-}
-
-async function saveDataUrlUpload(db, payload) {
-  const match = String(payload.dataUrl || "").match(/^data:([^;]+);base64,(.+)$/);
-  if (!match) {
-    return null;
-  }
-
-  const mimeType = payload.mimeType || match[1];
-  const buffer = Buffer.from(match[2], "base64");
-  const fileName = createSafeUploadName(mimeType);
-  await fs.mkdir(db.uploadDir, { recursive: true });
-  await fs.writeFile(path.join(db.uploadDir, fileName), buffer);
-  return {
-    fileName,
-    mimeType,
-    url: `/uploads/${fileName}`,
-    alt: payload.alt,
-  };
 }
 
 function withAuthor(memory, user) {
@@ -194,6 +169,40 @@ function isAdmin(user) {
 
 function isApiPath(pathname) {
   return pathname === "/api" || pathname.startsWith("/api/");
+}
+
+function applyOriginPolicy(request, response, config) {
+  const origin = request.headers.origin || "";
+  if (!config.allowedOrigin || !origin) {
+    return true;
+  }
+
+  if (origin !== config.allowedOrigin) {
+    sendJson(response, 403, { error: "origin not allowed" });
+    return false;
+  }
+
+  response.shanhaiCorsHeaders = {
+    "access-control-allow-origin": config.allowedOrigin,
+    "access-control-allow-headers": "content-type, authorization",
+    "access-control-allow-methods": "GET,POST,PATCH,DELETE,OPTIONS",
+    vary: "Origin",
+  };
+  return true;
+}
+
+function createDatabase(config, options = {}) {
+  if (options.db) {
+    return options.db;
+  }
+  if (config.databaseAdapter === "postgres") {
+    return new PostgresDatabase({
+      connectionString: config.databaseUrl,
+      pool: options.pgPool,
+      ssl: config.databaseSsl,
+    });
+  }
+  return new JsonDatabase({ dataDir: config.dataDir });
 }
 
 function isAllowedStaticPath(relative) {
@@ -267,7 +276,8 @@ function createApp(options = {}) {
   const config = loadConfig(options);
   const publicDir = config.publicDir;
   const dataDir = config.dataDir;
-  const db = new JsonDatabase({ dataDir });
+  const db = createDatabase(config, options);
+  const mediaStore = createMediaStore(config, options);
   const checkRateLimit = createRateLimiter(config.rateLimit);
 
   const server = http.createServer(async (request, response) => {
@@ -275,14 +285,18 @@ function createApp(options = {}) {
     const pathname = url.pathname;
 
     try {
-      const rateLimit = checkRateLimit(request);
-      if (rateLimit.limited) {
-        sendJson(response, 429, { error: "too many requests" }, { "retry-after": String(Math.ceil((rateLimit.resetAt - Date.now()) / 1000)) });
+      if (!isApiPath(pathname)) {
+        await serveStatic(response, pathname, { dataDir, publicDir });
         return;
       }
 
-      if (!isApiPath(pathname)) {
-        await serveStatic(response, pathname, { dataDir, publicDir });
+      if (!applyOriginPolicy(request, response, config)) {
+        return;
+      }
+
+      const rateLimit = await checkRateLimit(request);
+      if (rateLimit.limited) {
+        sendJson(response, 429, { error: "too many requests" }, { "retry-after": String(Math.ceil((rateLimit.resetAt - Date.now()) / 1000)) });
         return;
       }
 
@@ -296,8 +310,9 @@ function createApp(options = {}) {
         sendJson(response, 200, {
           status: "ok",
           service: "shanhai-yingji",
-          dataDir,
-          uploads: "ok",
+          database: config.databaseAdapter,
+          mediaStore: config.mediaStore,
+          uploads: await mediaStore.health(),
           timestamp: new Date().toISOString(),
         });
         return;
@@ -459,6 +474,17 @@ function createApp(options = {}) {
         return;
       }
 
+      const notificationReadMatch = pathname.match(/^\/api\/notifications\/([^/]+)\/read$/);
+      if (request.method === "PATCH" && notificationReadMatch) {
+        const notification = await db.markNotificationRead(user.id, notificationReadMatch[1]);
+        if (!notification) {
+          sendJson(response, 404, { error: "notification not found" });
+          return;
+        }
+        sendJson(response, 200, { notification });
+        return;
+      }
+
       if (request.method === "GET" && pathname === "/api/creator/stats") {
         sendJson(response, 200, { stats: await db.creatorStats(user.id) });
         return;
@@ -594,7 +620,7 @@ function createApp(options = {}) {
 
       const photoMatch = pathname.match(/^\/api\/memories\/([^/]+)\/photos$/);
       if (request.method === "POST" && photoMatch) {
-        const upload = await saveDataUrlUpload(db, validateUploadInput(await readBody(request, config.maxJsonBytes), config.maxUploadBytes));
+        const upload = await mediaStore.save(validateUploadInput(await readBody(request, config.maxJsonBytes), config.maxUploadBytes));
         if (!upload) {
           sendJson(response, 400, { error: "valid dataUrl is required" });
           return;
@@ -610,6 +636,9 @@ function createApp(options = {}) {
 
       const photoDeleteMatch = pathname.match(/^\/api\/memories\/([^/]+)\/photos\/([^/]+)$/);
       if (request.method === "DELETE" && photoDeleteMatch) {
+        const memoryBeforeDelete = await db.findMemory(photoDeleteMatch[1]);
+        const photoBeforeDelete =
+          memoryBeforeDelete?.userId === user.id ? (memoryBeforeDelete.photos || []).find((photo) => photo.id === photoDeleteMatch[2]) : null;
         const deleted = await db.deletePhoto(photoDeleteMatch[1], photoDeleteMatch[2], user.id);
         if (deleted === null) {
           sendJson(response, 404, { error: "memory not found" });
@@ -618,6 +647,9 @@ function createApp(options = {}) {
         if (!deleted) {
           sendJson(response, 404, { error: "photo not found" });
           return;
+        }
+        if (photoBeforeDelete) {
+          await mediaStore.delete(photoBeforeDelete);
         }
         sendNoContent(response);
         return;
@@ -639,10 +671,11 @@ function createApp(options = {}) {
     }
   });
 
-  server.shanhai = { db, dataDir, publicDir, config };
+  server.shanhai = { db, dataDir, mediaStore, publicDir, config };
   return server;
 }
 
 module.exports = {
+  createDatabase,
   createApp,
 };

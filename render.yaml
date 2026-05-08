@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: shanhai-yingji
+    runtime: docker
+    plan: starter
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4173
+      - key: SHANHAI_DATABASE_ADAPTER
+        value: postgres
+      - key: DATABASE_URL
+        fromDatabase:
+          name: shanhai-yingji-db
+          property: connectionString
+      - key: DATABASE_SSL
+        value: true
+      - key: SHANHAI_MEDIA_STORE
+        value: r2
+      - key: SHANHAI_RATE_LIMIT_STORE
+        value: upstash
+      - key: SHANHAI_MAX_JSON_BYTES
+        value: 8388608
+      - key: SHANHAI_MAX_UPLOAD_BYTES
+        value: 5242880
+
+databases:
+  - name: shanhai-yingji-db
+    plan: starter

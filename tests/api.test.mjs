@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { existsSync } from "node:fs";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
@@ -18,12 +19,13 @@ function listen(app) {
   });
 }
 
-async function request(port, method, path, body, token) {
+async function request(port, method, path, body, token, extraHeaders = {}) {
   const response = await fetch(`http://127.0.0.1:${port}${path}`, {
     method,
     headers: {
       "content-type": "application/json",
       ...(token ? { authorization: `Bearer ${token}` } : {}),
+      ...extraHeaders,
     },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
@@ -162,6 +164,8 @@ try {
   );
   assert.equal(uploaded.response.status, 201, "owners should upload memory photos");
   assert.match(uploaded.payload.photo.url, /^\/uploads\/.+\.png$/, "uploaded photos should receive a safe served media URL");
+  const uploadedPhotoPath = join(dataDir, uploaded.payload.photo.url.replace(/^\//, ""));
+  assert.equal(existsSync(uploadedPhotoPath), true, "uploaded photo file should exist on disk before deletion");
 
   const invalidUpload = await request(
     port,
@@ -176,6 +180,19 @@ try {
   );
   assert.equal(invalidUpload.response.status, 400, "non-image uploads should be rejected");
 
+  const spoofedUpload = await request(
+    port,
+    "POST",
+    `/api/memories/${memoryId}/photos`,
+    {
+      fileName: "spoofed.png",
+      mimeType: "image/png",
+      dataUrl: "data:text/plain;base64,Zm9v",
+    },
+    token,
+  );
+  assert.equal(spoofedUpload.response.status, 400, "upload mimeType should match the data URL media type");
+
   const exported = await request(port, "GET", "/api/export", undefined, token);
   assert.equal(exported.response.status, 200, "users should export their archive");
   assert.equal(exported.payload.archive.memories.length, 1, "export should include owned memories");
@@ -186,9 +203,18 @@ try {
     email: "backup@example.com",
     password: "correct horse battery",
   });
+
+  const nonOwnerDelete = await request(port, "DELETE", `/api/memories/${memoryId}/photos/${uploaded.payload.photo.id}`, undefined, secondRegister.payload.token);
+  assert.equal(nonOwnerDelete.response.status, 404, "non-owners should not delete another user's photos");
+  assert.equal(existsSync(uploadedPhotoPath), true, "non-owner photo delete attempts should not remove files");
+
   const importResult = await request(port, "POST", "/api/import", exported.payload.archive, secondRegister.payload.token);
   assert.equal(importResult.response.status, 200, "users should import archive backups");
   assert.equal(importResult.payload.imported, 1, "import should restore one memory into the second account");
+
+  const deletedPhoto = await request(port, "DELETE", `/api/memories/${memoryId}/photos/${uploaded.payload.photo.id}`, undefined, token);
+  assert.equal(deletedPhoto.response.status, 204, "owners should delete uploaded photos");
+  assert.equal(existsSync(uploadedPhotoPath), false, "deleted photo files should be removed from disk");
 
   const deleted = await request(port, "DELETE", `/api/memories/${memoryId}`, undefined, token);
   assert.equal(deleted.response.status, 204, "owners should delete their memories");
@@ -198,6 +224,72 @@ try {
 } finally {
   await new Promise((resolveClose) => server.close(resolveClose));
   await rm(dataDir, { recursive: true, force: true });
+}
+
+const originDataDir = await mkdtemp(join(tmpdir(), "shanhai-origin-"));
+const originServer = createApp({
+  dataDir: originDataDir,
+  publicDir: projectRoot,
+  allowedOrigin: "https://app.example.com",
+});
+const originPort = await listen(originServer);
+
+try {
+  const allowed = await request(originPort, "GET", "/api/health", undefined, undefined, { origin: "https://app.example.com" });
+  assert.equal(allowed.response.status, 200, "configured origin should be allowed");
+  assert.equal(allowed.response.headers.get("access-control-allow-origin"), "https://app.example.com", "allowed origin should receive CORS headers");
+
+  const rejected = await request(originPort, "GET", "/api/health", undefined, undefined, { origin: "https://evil.example.com" });
+  assert.equal(rejected.response.status, 403, "unexpected origins should be rejected");
+} finally {
+  await new Promise((resolveClose) => originServer.close(resolveClose));
+  await rm(originDataDir, { recursive: true, force: true });
+}
+
+const failingMediaDataDir = await mkdtemp(join(tmpdir(), "shanhai-failing-media-"));
+const failingMediaServer = createApp({
+  dataDir: failingMediaDataDir,
+  publicDir: projectRoot,
+  mediaStore: {
+    async health() {
+      return "failing-test";
+    },
+    async save() {
+      const error = new Error("media store unavailable");
+      error.status = 503;
+      throw error;
+    },
+    async delete() {},
+  },
+});
+const failingMediaPort = await listen(failingMediaServer);
+
+try {
+  const failingUser = await request(failingMediaPort, "POST", "/api/auth/register", {
+    name: "Media Failure",
+    email: "media-failure@example.com",
+    password: "correct horse battery",
+  });
+  const failingMemory = await request(
+    failingMediaPort,
+    "POST",
+    "/api/memories",
+    { title: "Upload rollback test", body: "Photo metadata should not be written when media storage fails." },
+    failingUser.payload.token,
+  );
+  const failedUpload = await request(
+    failingMediaPort,
+    "POST",
+    `/api/memories/${failingMemory.payload.memory.id}/photos`,
+    { mimeType: "image/png", dataUrl: "data:image/png;base64,ZmFrZQ==" },
+    failingUser.payload.token,
+  );
+  assert.equal(failedUpload.response.status, 503, "media store failures should be explicit");
+  const afterFailedUpload = await request(failingMediaPort, "GET", `/api/memories/${failingMemory.payload.memory.id}`, undefined, failingUser.payload.token);
+  assert.equal(afterFailedUpload.payload.memory.photos.length, 0, "failed media writes should not create photo metadata");
+} finally {
+  await new Promise((resolveClose) => failingMediaServer.close(resolveClose));
+  await rm(failingMediaDataDir, { recursive: true, force: true });
 }
 
 const limitedDataDir = await mkdtemp(join(tmpdir(), "shanhai-rate-limit-"));
