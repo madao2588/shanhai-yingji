@@ -33,7 +33,7 @@
 
 ## Daily checks
 
-- Confirm `GET /api/health` returns `status=ok`, `database=postgres`, and `mediaStore=r2`.
+- Confirm `GET /api/health` returns `status=ok`, `database=postgres`, `mediaStore=r2`, `checks.database.status=ok`, and `checks.media.status=ok`.
 - Review Render deploy/runtime logs for 5xx responses and startup configuration failures.
 - Review Upstash request limits and Cloudflare R2 storage growth.
 - Confirm latest PostgreSQL automated backup is present.

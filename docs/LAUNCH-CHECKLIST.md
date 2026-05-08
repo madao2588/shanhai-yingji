@@ -47,7 +47,7 @@
 ## Production beta readiness
 
 - [ ] Render web service is deployed from `render.yaml`.
-- [ ] `/api/health` returns `database=postgres` and `mediaStore=r2`.
+- [ ] `/api/health` returns `database=postgres`, `mediaStore=r2`, `checks.database.status=ok`, and `checks.media.status=ok`.
 - [ ] Cloudflare R2 upload, public media URL rendering, and object deletion are verified.
 - [ ] Upstash Redis rate limiting is enabled with `SHANHAI_RATE_LIMIT_STORE=upstash`.
 - [ ] `NODE_ENV=production` fails fast when required production variables are missing.

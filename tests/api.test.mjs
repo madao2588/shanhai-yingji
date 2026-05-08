@@ -41,6 +41,8 @@ try {
   const health = await request(port, "GET", "/api/health");
   assert.equal(health.response.status, 200, "health check should be public");
   assert.equal(health.payload.status, "ok", "health check should report ok");
+  assert.equal(health.payload.checks.database.status, "ok", "health check should probe the database");
+  assert.equal(health.payload.checks.media.status, "ok", "health check should probe the media store");
   assert.equal(health.response.headers.get("x-content-type-options"), "nosniff", "responses should include security headers");
   assert.equal(health.response.headers.get("referrer-policy"), "no-referrer", "responses should include a referrer policy");
 
@@ -51,9 +53,35 @@ try {
     const configuredHealth = await request(configuredPort, "GET", "/api/health");
     assert.equal(configuredHealth.response.status, 200, "health check should work when createApp receives a loaded config");
     assert.equal(configuredHealth.payload.uploads, "local", "loaded local config should create a local media store");
+    assert.equal(configuredHealth.payload.checks.media.store, "local", "loaded local config should report local media health");
   } finally {
     await new Promise((resolveClose) => configuredServer.close(resolveClose));
     await rm(configuredDataDir, { recursive: true, force: true });
+  }
+
+  const failingHealthServer = createApp({
+    dataDir: await mkdtemp(join(tmpdir(), "shanhai-failing-health-")),
+    publicDir: projectRoot,
+    mediaStore: {
+      async health() {
+        throw new Error("r2 secret endpoint leaked");
+      },
+      async save() {
+        return null;
+      },
+      async delete() {},
+    },
+  });
+  const failingHealthPort = await listen(failingHealthServer);
+  try {
+    const failingHealth = await request(failingHealthPort, "GET", "/api/health");
+    assert.equal(failingHealth.response.status, 503, "health check should fail explicitly when a dependency probe fails");
+    assert.equal(failingHealth.payload.status, "degraded", "failed dependency probes should report degraded status");
+    assert.equal(failingHealth.payload.checks.media.status, "error", "failed media probes should be named");
+    assert.doesNotMatch(JSON.stringify(failingHealth.payload), /secret endpoint/, "public health should not leak dependency error details");
+  } finally {
+    await new Promise((resolveClose) => failingHealthServer.close(resolveClose));
+    await rm(failingHealthServer.shanhai.dataDir, { recursive: true, force: true });
   }
 
   const packageProbe = await fetch(`http://127.0.0.1:${port}/package.json`);

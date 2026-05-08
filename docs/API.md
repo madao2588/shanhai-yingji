@@ -104,3 +104,9 @@
 The production community API includes: `GET /api/discover/memories`, `GET /api/tags`, `GET /api/destinations`, `POST /api/memories/:id/like`, `POST /api/memories/:id/bookmark`, `GET/POST /api/memories/:id/comments`, `POST /api/profile/:username/follow`, `GET /api/notifications`, `GET /api/creator/stats`, `POST /api/reports`, `GET /api/admin/reports`, and `PATCH /api/admin/reports/:id`.
 
 Public discovery accepts `q`, `tag`, `city`, `country`, `destinationId`, and `sort=latest|popular`. Public memories appear in discovery, unlisted memories are directly readable by link, private memories are not public, and admin `remove_memory` moderation removes content from discovery. Admin users are configured through `SHANHAI_ADMIN_EMAILS`.
+
+## Production Health Contract
+
+`GET /api/health` returns structured dependency probes in addition to the legacy `database`, `mediaStore`, and `uploads` fields. Production should return HTTP `200`, `status=ok`, `checks.database.status=ok`, and `checks.media.status=ok`.
+
+If a database or media probe fails, the endpoint returns HTTP `503` with `status=degraded`; the failed dependency is marked with `status=error`. The response intentionally avoids exposing internal dependency error details.

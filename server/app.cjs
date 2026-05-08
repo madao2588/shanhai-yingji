@@ -279,6 +279,21 @@ async function serveFile(response, filePath) {
   }
 }
 
+async function probeDependency(adapter, probe) {
+  try {
+    return {
+      adapter,
+      status: "ok",
+      value: await probe(),
+    };
+  } catch {
+    return {
+      adapter,
+      status: "error",
+    };
+  }
+}
+
 function createApp(options = {}) {
   const config = loadConfig(options);
   const publicDir = config.publicDir;
@@ -313,13 +328,26 @@ function createApp(options = {}) {
       }
 
       if (request.method === "GET" && pathname === "/api/health") {
-        await db.ensureLoaded();
-        sendJson(response, 200, {
-          status: "ok",
+        const databaseCheck = await probeDependency(config.databaseAdapter, () => (typeof db.health === "function" ? db.health() : db.ensureLoaded().then(() => config.databaseAdapter)));
+        const mediaCheck = await probeDependency(config.mediaStore, () => mediaStore.health());
+        const checks = {
+          database: {
+            adapter: databaseCheck.adapter,
+            status: databaseCheck.status,
+          },
+          media: {
+            store: mediaCheck.adapter,
+            status: mediaCheck.status,
+          },
+        };
+        const isHealthy = databaseCheck.status === "ok" && mediaCheck.status === "ok";
+        sendJson(response, isHealthy ? 200 : 503, {
+          status: isHealthy ? "ok" : "degraded",
           service: "shanhai-yingji",
           database: config.databaseAdapter,
           mediaStore: config.mediaStore,
-          uploads: await mediaStore.health(),
+          uploads: mediaCheck.value || config.mediaStore,
+          checks,
           timestamp: new Date().toISOString(),
         });
         return;

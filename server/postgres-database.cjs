@@ -80,6 +80,12 @@ class PostgresDatabase extends JsonDatabase {
     return this.data;
   }
 
+  async health() {
+    await this.ensureSchema();
+    await this.pool.query("select 1");
+    return "postgres";
+  }
+
   async save() {
     await this.ensureSchema();
     this.writeQueue = this.writeQueue.then(async () => {

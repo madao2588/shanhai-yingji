@@ -4,7 +4,7 @@ import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const { loadConfig } = require("../server/config.cjs");
 const { R2MediaStore } = require("../server/media-store.cjs");
-const { postgresCollections } = require("../server/postgres-database.cjs");
+const { PostgresDatabase, postgresCollections } = require("../server/postgres-database.cjs");
 const { createRateLimiter } = require("../server/security.cjs");
 
 assert.throws(
@@ -66,6 +66,20 @@ assert.match(upload.url, /^https:\/\/media\.example\.com\/uploads\/.+\.png$/, "R
 assert.equal(upload.storageKey.startsWith("uploads/"), true, "R2 uploads should persist an object storage key");
 await mediaStore.delete(upload);
 assert.deepEqual(sentCommands, ["PutObjectCommand", "DeleteObjectCommand"], "R2 store should write and delete objects through S3-compatible commands");
+assert.equal(await mediaStore.health(), "r2", "R2 media store should expose a production health probe label");
+
+const pgQueries = [];
+const postgres = new PostgresDatabase({
+  pool: {
+    async query(sql) {
+      pgQueries.push(sql);
+      return { rows: [] };
+    },
+    async end() {},
+  },
+});
+assert.equal(await postgres.health(), "postgres", "PostgreSQL adapter should expose a health probe");
+assert.equal(pgQueries.some((sql) => /select 1/.test(sql)), true, "PostgreSQL health should run a lightweight query");
 
 const redisCalls = [];
 const limiter = createRateLimiter({

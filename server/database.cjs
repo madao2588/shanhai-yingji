@@ -91,6 +91,11 @@ class JsonDatabase {
     return this.writeQueue;
   }
 
+  async health() {
+    await this.ensureLoaded();
+    return "json";
+  }
+
   async createUser({ name, email, passwordHash, role = "member" }) {
     const data = await this.ensureLoaded();
     const cleanEmail = String(email || "").trim().toLowerCase();
