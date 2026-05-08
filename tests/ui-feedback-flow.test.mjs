@@ -61,11 +61,24 @@ try {
   assert.equal(await page.locator(".search-button").count(), 0, "community header should not keep a redundant empty search icon");
 
   await page.click('[data-target="messages"]');
+  assert.equal(await page.locator("[data-message-inbox-summary]").count(), 1, "messages should show a normal inbox summary");
+  assert.equal(await page.locator("[data-message-unread-count]").count(), 1, "messages should show unread counts");
+  assert.equal(await page.locator("[data-conversation-preview]").count() >= 3, true, "conversation rows should expose mutable previews");
+  assert.equal(await page.locator("[data-conversation-unread]").count() >= 3, true, "conversation rows should expose read state");
   await page.click('[data-conversation-item="lin-che"]');
   await page.waitForSelector('[data-conversation-thread]:not([hidden])');
+  await page.fill("[data-conversation-message-input]", "   ");
+  await page.click("[data-conversation-send]");
+  assert.equal(await page.locator('[data-conversation-messages] .from-me').count(), 1, "empty replies should not create new bubbles");
+  assert.equal(await page.locator("[data-conversation-message-input]").getAttribute("aria-invalid"), "true", "empty replies should mark the input invalid");
+  assert.match(await page.locator("[data-message-empty-reply]").textContent(), /输入|回复|message/i, "empty replies should show useful feedback");
   await page.fill("[data-conversation-message-input]", "下次把路线发我");
   await page.click("[data-conversation-send]");
   await page.waitForFunction(() => document.querySelector("[data-conversation-thread]")?.textContent.includes("下次把路线发我"));
+
+  assert.equal(await page.locator("[data-conversation-message-input]").getAttribute("aria-invalid"), "false", "valid replies should clear invalid state");
+  assert.match(await page.locator('[data-conversation-item="lin-che"] [data-conversation-preview]').textContent(), /我：|route-note|涓嬫/, "sent replies should update the conversation preview");
+  assert.match(await page.locator("[data-message-thread-state]").textContent(), /已发送|sent/i, "sent replies should update thread delivery state");
 
   await page.click('[data-target="profile"]');
   await page.waitForSelector("[data-profile-dashboard]");

@@ -11,7 +11,7 @@
     <link rel="icon" href="assets/app-icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="assets/app-icon.svg" />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="styles.css?v=profile-edit-3" />
+    <link rel="stylesheet" href="styles.css?v=message-polish-1" />
   </head>
   <body>
     <main class="stage" aria-label="山海映记移动端原型">
@@ -718,28 +718,35 @@
                   <h2>消息</h2>
                 </div>
               </header>
+              <section class="message-overview" aria-label="消息总览">
+                <div>
+                  <p>收件箱</p>
+                  <strong data-message-inbox-summary>3 个对话 · 2 条未读</strong>
+                </div>
+                <span data-message-unread-count>2 未读</span>
+              </section>
               <section class="conversation-layout" aria-label="好友对话与提醒">
                 <div class="conversation-list" data-conversation-list aria-label="好友对话">
                   <button class="conversation-item is-active" type="button" data-conversation-item="lin-che">
                     <span class="conversation-avatar">林</span>
-                    <span><strong>林澈</strong><em>刚分享了京都路线</em></span>
-                    <small>现在</small>
+                    <span><strong>林澈</strong><em data-conversation-preview>刚分享了京都路线</em></span>
+                    <small><span data-conversation-time>现在</span><b data-conversation-unread>1 新</b></small>
                   </button>
                   <button class="conversation-item" type="button" data-conversation-item="mori">
                     <span class="conversation-avatar alt">森</span>
-                    <span><strong>森野</strong><em>问你冰岛照片参数</em></span>
-                    <small>12:08</small>
+                    <span><strong>森野</strong><em data-conversation-preview>问你冰岛照片参数</em></span>
+                    <small><span data-conversation-time>12:08</span><b data-conversation-unread>1 新</b></small>
                   </button>
                   <button class="conversation-item" type="button" data-conversation-item="aya">
                     <span class="conversation-avatar warm">青</span>
-                    <span><strong>青禾</strong><em>收藏了你的西湖晨雾</em></span>
-                    <small>昨天</small>
+                    <span><strong>青禾</strong><em data-conversation-preview>收藏了你的西湖晨雾</em></span>
+                    <small><span data-conversation-time>昨天</span><b data-conversation-unread>已读</b></small>
                   </button>
                 </div>
                 <section class="conversation-thread" data-conversation-thread aria-label="好友对话线程">
                   <div class="thread-head">
                     <div>
-                      <p>好友对话</p>
+                      <p data-message-thread-state>本地对话</p>
                       <h3 data-conversation-title>林澈</h3>
                     </div>
                     <span data-conversation-status>正在整理京都路线</span>
@@ -749,9 +756,10 @@
                     <article class="from-me"><span>可以，记得加上人流时间和拍照点。</span></article>
                   </div>
                   <div class="thread-reply">
-                    <input type="text" placeholder="回复好友" aria-label="回复好友" data-conversation-message-input />
+                    <input type="text" placeholder="回复好友" aria-label="回复好友" aria-invalid="false" data-conversation-message-input />
                     <button type="button" data-conversation-send>发送</button>
                   </div>
+                  <p class="thread-feedback" data-message-empty-reply aria-live="polite"></p>
                 </section>
                 <div class="message-list notification-list" data-notification-list>
                   <article><span class="message-dot"></span><div><h3>你的「冰岛环岛第 3 天」收到 28 个喜欢</h3><p>刚刚</p></div></article>

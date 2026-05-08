@@ -101,6 +101,12 @@ assert.match(html, /data-conversation-list/, "messages should expose friend conv
 assert.match(html, /data-conversation-item/, "messages should expose selectable conversation items");
 assert.match(html, /data-conversation-thread/, "messages should expose a friend conversation thread");
 assert.match(html, /data-conversation-message-input/, "messages should expose a reply input");
+assert.match(html, /data-message-inbox-summary/, "messages should expose an inbox summary");
+assert.match(html, /data-message-unread-count/, "messages should expose unread conversation counts");
+assert.match(html, /data-conversation-preview/, "conversation rows should expose mutable previews");
+assert.match(html, /data-conversation-unread/, "conversation rows should expose read state");
+assert.match(html, /data-message-thread-state/, "message thread should expose delivery state");
+assert.match(html, /data-message-empty-reply/, "message thread should expose empty reply feedback");
 assert.match(html, /data-profile-dashboard/, "profile should expose a structured dashboard");
 assert.match(html, /data-profile-avatar-edit/, "profile avatar should open account and identity editing");
 assert.match(html, /data-profile-avatar-image/, "profile should render a real avatar image");

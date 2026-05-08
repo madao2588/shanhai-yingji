@@ -124,12 +124,16 @@ const memoryOrigin = document.querySelector("[data-memory-origin]");
 const memoryStatusChip = document.querySelector("[data-memory-status-chip]");
 const memoryTags = document.querySelector("[data-memory-tags]");
 const conversationItems = document.querySelectorAll("[data-conversation-item]");
+const messageInboxSummary = document.querySelector("[data-message-inbox-summary]");
+const messageUnreadCount = document.querySelector("[data-message-unread-count]");
 const conversationThread = document.querySelector("[data-conversation-thread]");
 const conversationTitle = document.querySelector("[data-conversation-title]");
 const conversationStatus = document.querySelector("[data-conversation-status]");
 const conversationMessages = document.querySelector("[data-conversation-messages]");
 const conversationInput = document.querySelector("[data-conversation-message-input]");
 const conversationSend = document.querySelector("[data-conversation-send]");
+const messageThreadState = document.querySelector("[data-message-thread-state]");
+const messageEmptyReply = document.querySelector("[data-message-empty-reply]");
 const profileActionButtons = document.querySelectorAll("[data-profile-primary-action], [data-profile-quick-action]");
 const profileAvatarEdit = document.querySelector("[data-profile-avatar-edit]");
 const profileEditPanel = document.querySelector("[data-profile-edit-panel]");
@@ -449,44 +453,83 @@ function switchCommunityTab(tabName) {
   }
 }
 
-function openConversation(conversationId) {
-  if (!conversationThread || !conversationMessages) {
-    return;
+const conversationState = {
+  "lin-che": {
+    title: "林澈",
+    status: "正在整理京都路线",
+    preview: "刚分享了京都路线",
+    lastTime: "现在",
+    unreadCount: 1,
+    messages: [
+      ["from-friend", "我把清水寺到八坂神社的步行线补全了，你看要不要放进公开映记？"],
+      ["from-me", "可以，记得加上人流时间和拍照点。"],
+    ],
+  },
+  mori: {
+    title: "森野",
+    status: "想复用你的冰岛照片参数",
+    preview: "问你冰岛照片参数",
+    lastTime: "12:08",
+    unreadCount: 1,
+    messages: [
+      ["from-friend", "黑沙滩那组颜色很好看，是清晨拍的吗？"],
+      ["from-me", "是清晨，风很大，快门要留一点余量。"],
+    ],
+  },
+  aya: {
+    title: "青禾",
+    status: "关注了你的公开主页",
+    preview: "收藏了你的西湖晨雾",
+    lastTime: "昨天",
+    unreadCount: 0,
+    messages: [
+      ["from-friend", "西湖晨雾那篇我收藏了，下次想照着走一遍。"],
+      ["from-me", "我把路线和备选咖啡店也补上。"],
+    ],
+  },
+};
+
+let activeConversationId = "lin-che";
+
+function renderConversationList() {
+  const unreadTotal = Object.values(conversationState).reduce((total, item) => total + item.unreadCount, 0);
+
+  if (messageInboxSummary) {
+    messageInboxSummary.textContent = `${conversationItems.length} 个对话 · ${unreadTotal} 条未读`;
+  }
+  if (messageUnreadCount) {
+    messageUnreadCount.textContent = unreadTotal ? `${unreadTotal} 未读` : "全部已读";
   }
 
-  const conversations = {
-    "lin-che": {
-      title: "林澈",
-      status: "正在整理京都路线",
-      messages: [
-        ["from-friend", "我把清水寺到八坂神社的步行线补全了，你看要不要放进公开映记？"],
-        ["from-me", "可以，记得加上人流时间和拍照点。"],
-      ],
-    },
-    mori: {
-      title: "森野",
-      status: "想复用你的冰岛照片参数",
-      messages: [
-        ["from-friend", "黑沙滩那组颜色很好看，是清晨拍的吗？"],
-        ["from-me", "是清晨，风很大，快门要留一点余量。"],
-      ],
-    },
-    aya: {
-      title: "青禾",
-      status: "关注了你的公开主页",
-      messages: [
-        ["from-friend", "西湖晨雾那篇我收藏了，下次想照着走一遍。"],
-        ["from-me", "我把路线和备选咖啡店也补上。"],
-      ],
-    },
-  };
-  const data = conversations[conversationId] || conversations["lin-che"];
+  conversationItems.forEach((item) => {
+    const id = item.dataset.conversationItem;
+    const data = conversationState[id];
+    const preview = item.querySelector("[data-conversation-preview]");
+    const time = item.querySelector("[data-conversation-time]");
+    const unread = item.querySelector("[data-conversation-unread]");
 
-  conversationItems.forEach((item) => item.classList.toggle("is-active", item.dataset.conversationItem === conversationId));
-  conversationTitle.textContent = data.title;
-  conversationStatus.textContent = data.status;
+    if (!data) {
+      return;
+    }
+
+    item.classList.toggle("is-active", id === activeConversationId);
+    item.classList.toggle("has-unread", data.unreadCount > 0);
+    item.setAttribute("aria-label", `${data.title}，${data.preview}`);
+    if (preview) {
+      preview.textContent = data.preview;
+    }
+    if (time) {
+      time.textContent = data.lastTime;
+    }
+    if (unread) {
+      unread.textContent = data.unreadCount ? `${data.unreadCount} 新` : "已读";
+    }
+  });
+}
+
+function renderConversationMessages(messages) {
   conversationMessages.replaceChildren(
-    ...data.messages.map(([className, text]) => {
+    ...messages.map(([className, text]) => {
       const message = document.createElement("article");
       const bubble = document.createElement("span");
 
@@ -496,6 +539,30 @@ function openConversation(conversationId) {
       return message;
     }),
   );
+}
+
+function openConversation(conversationId) {
+  if (!conversationThread || !conversationMessages) {
+    return;
+  }
+
+  const activeId = conversationState[conversationId] ? conversationId : "lin-che";
+  const activeConversation = conversationState[activeId];
+  activeConversationId = activeId;
+  activeConversation.unreadCount = 0;
+  conversationTitle.textContent = activeConversation.title;
+  conversationStatus.textContent = activeConversation.status;
+  renderConversationMessages(activeConversation.messages);
+  renderConversationList();
+  if (messageThreadState) {
+    messageThreadState.textContent = "正在查看";
+  }
+  if (messageEmptyReply) {
+    messageEmptyReply.textContent = "";
+  }
+  if (conversationInput) {
+    conversationInput.setAttribute("aria-invalid", "false");
+  }
   conversationThread.hidden = false;
 }
 
@@ -526,17 +593,33 @@ function sendConversationReply() {
   const text = conversationInput?.value.trim();
 
   if (!text || !conversationMessages) {
+    if (conversationInput) {
+      conversationInput.setAttribute("aria-invalid", "true");
+      conversationInput.focus();
+    }
+    if (messageEmptyReply) {
+      messageEmptyReply.textContent = "请输入回复内容。";
+    }
     return;
   }
 
-  const message = document.createElement("article");
-  const bubble = document.createElement("span");
-
-  message.className = "from-me";
-  bubble.textContent = text;
-  message.append(bubble);
-  conversationMessages.append(message);
+  const activeConversation = conversationState[activeConversationId] || conversationState["lin-che"];
+  activeConversation.messages.push(["from-me", text]);
+  activeConversation.preview = `我：${text}`;
+  activeConversation.lastTime = "刚刚";
+  activeConversation.status = "已发送";
   conversationInput.value = "";
+  conversationInput.setAttribute("aria-invalid", "false");
+  if (messageEmptyReply) {
+    messageEmptyReply.textContent = "";
+  }
+  if (messageThreadState) {
+    messageThreadState.textContent = "已发送";
+  }
+  openConversation(activeConversationId);
+  if (messageThreadState) {
+    messageThreadState.textContent = "已发送";
+  }
 }
 
 function getVisibilityLabel(value) {
@@ -2178,6 +2261,7 @@ window.addEventListener("load", () => {
   restoreCreateDraft();
   updateCreateProgress();
   filterReviews();
+  renderConversationList();
   renderDestination(activeDestinationId);
   handleHashRoute();
   startSplash();
